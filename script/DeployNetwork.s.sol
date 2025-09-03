@@ -6,8 +6,9 @@ import {console2 as console} from "forge-std/console2.sol";
 
 import {Network} from "../src/contracts/Network.sol";
 import {INetwork} from "../src/interfaces/INetwork.sol";
-import {NetworkConfig} from "./NetworkConfig.sol";
 import {MyNetwork} from "../examples/MyNetwork.sol";
+
+import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/SymbioticCoreConstants.sol";
 
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
@@ -15,25 +16,26 @@ import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transpa
 /**
  * Deploys Network implementation and a TransparentUpgradeableProxy managed by ProxyAdmin.
  *
- * Configuration is handled entirely by NetworkConfig contract.
- * Update the constants in NetworkConfig.sol before deployment.
+ * Configuration is handled entirely by inhired contract.
  */
-contract DeployNetwork is Script, NetworkConfig {
-    function run() external {
+contract DeployNetwork is Script {
+    struct NetworkDeployParams {
+        INetwork.NetworkInitParams initParams;
+        address proxyAdmin;
+    }
+
+    function run(
+        NetworkDeployParams memory params
+    ) public {
         vm.startBroadcast();
 
-        // 1) Deploy implementation (immutables are set via constructor)
-        Network implementation = new MyNetwork(NETWORK_REGISTRY, NETWORK_MIDDLEWARE_SERVICE);
+        address networkRegistry = address(SymbioticCoreConstants.core().networkRegistry);
+        address networkMiddlewareService = address(SymbioticCoreConstants.core().networkMiddlewareService);
 
-        // 2) Deploy ProxyAdmin owned by deployer
-        ProxyAdmin proxyAdmin = new ProxyAdmin(PROXY_ADMIN);
+        Network implementation = new MyNetwork(networkRegistry, networkMiddlewareService);
+        ProxyAdmin proxyAdmin = new ProxyAdmin(params.proxyAdmin);
+        bytes memory initData = abi.encodeCall(MyNetwork.initialize, (params.initParams));
 
-        // 3) Get initialization parameters
-        INetwork.NetworkInitParams memory initParams = _getInitParams();
-
-        bytes memory initData = abi.encodeCall(MyNetwork.initialize, (initParams));
-
-        // 4) Deploy TransparentUpgradeableProxy and call initializer
         TransparentUpgradeableProxy proxy =
             new TransparentUpgradeableProxy(address(implementation), address(proxyAdmin), initData);
 
@@ -42,29 +44,5 @@ contract DeployNetwork is Script, NetworkConfig {
         console.log("Network proxy:", address(proxy));
 
         vm.stopBroadcast();
-    }
-
-    /**
-     * @notice Get initialization parameters
-     * @return The initialization parameters
-     */
-    function _getInitParams() internal pure returns (INetwork.NetworkInitParams memory) {
-        address[] memory proposers = new address[](1);
-        proposers[0] = PROPOSER;
-
-        address[] memory executors = new address[](1);
-        executors[0] = EXECUTOR; // Open executor
-
-        return INetwork.NetworkInitParams({
-            globalMinDelay: GLOBAL_MIN_DELAY,
-            delayParams: new INetwork.DelayParams[](0),
-            proposers: proposers,
-            executors: executors,
-            name: NAME,
-            metadataURI: METADATA_URI,
-            defaultAdminRoleHolder: DEFAULT_ADMIN_ROLE_HOLDER,
-            nameUpdateRoleHolder: NAME_UPDATE_ROLE_HOLDER,
-            metadataURIUpdateRoleHolder: METADATA_URI_UPDATE_ROLE_HOLDER
-        });
     }
 }
