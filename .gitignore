@@ -32,3 +32,8 @@ coverage/
 
 # Local tool caches
 .eslintcache
+
+# Contracts build artifacts
+broadcast/
+out/
+cache/
