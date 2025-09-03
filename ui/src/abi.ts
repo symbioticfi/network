@@ -126,6 +126,37 @@ export const networkAbi = [
   },
 
   // Events
+  // AccessControl events
+  {
+    type: 'event',
+    name: 'RoleGranted',
+    inputs: [
+      { name: 'role', type: 'bytes32', indexed: true },
+      { name: 'account', type: 'address', indexed: true },
+      { name: 'sender', type: 'address', indexed: true },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleRevoked',
+    inputs: [
+      { name: 'role', type: 'bytes32', indexed: true },
+      { name: 'account', type: 'address', indexed: true },
+      { name: 'sender', type: 'address', indexed: true },
+    ],
+    anonymous: false,
+  },
+  {
+    type: 'event',
+    name: 'RoleAdminChanged',
+    inputs: [
+      { name: 'role', type: 'bytes32', indexed: true },
+      { name: 'previousAdminRole', type: 'bytes32', indexed: true },
+      { name: 'newAdminRole', type: 'bytes32', indexed: true },
+    ],
+    anonymous: false,
+  },
   {
     type: 'event',
     name: 'CallScheduled',
@@ -193,6 +224,16 @@ export const networkAbi = [
     ],
     anonymous: false,
   },
+  // AccessControl functions
+  { type: 'function', name: 'getRoleAdmin', stateMutability: 'view', inputs: [{ name: 'role', type: 'bytes32' }], outputs: [{ name: '', type: 'bytes32' }] },
+  { type: 'function', name: 'hasRole', stateMutability: 'view', inputs: [{ name: 'role', type: 'bytes32' }, { name: 'account', type: 'address' }], outputs: [{ name: '', type: 'bool' }] },
+  // Role constant getters (Timelock & custom)
+  { type: 'function', name: 'DEFAULT_ADMIN_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
+  { type: 'function', name: 'PROPOSER_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
+  { type: 'function', name: 'EXECUTOR_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
+  { type: 'function', name: 'CANCELLER_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
+  { type: 'function', name: 'NAME_UPDATE_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
+  { type: 'function', name: 'METADATA_URI_UPDATE_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
 ];
 
 export enum OperationState {
@@ -201,4 +242,3 @@ export enum OperationState {
   Ready = 2,
   Done = 3,
 }
-

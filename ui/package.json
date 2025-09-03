@@ -10,11 +10,14 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.56.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "viem": "^2.21.0"
+    "viem": "^2.21.0",
+    "wagmi": "^2.12.7"
   },
   "devDependencies": {
+    "@types/node": "^20.16.11",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
