@@ -6,15 +6,15 @@ import {INetwork} from "../src/interfaces/INetwork.sol";
 
 contract DeployMyNetwork is DeployNetwork {
     // Configuration constants - UPDATE THESE BEFORE DEPLOYMENT
-    string public constant NAME = "";
+    string public constant NAME = "My Network";
     string public constant METADATA_URI = "";
     uint256 public constant GLOBAL_MIN_DELAY = 0;
-    address public constant DEFAULT_ADMIN_ROLE_HOLDER = 0x0000000000000000000000000000000000000000;
-    address public constant NAME_UPDATE_ROLE_HOLDER = 0x0000000000000000000000000000000000000000;
-    address public constant METADATA_URI_UPDATE_ROLE_HOLDER = 0x0000000000000000000000000000000000000000;
-    address public constant PROPOSER = 0x0000000000000000000000000000000000000000;
-    address public constant EXECUTOR = 0x0000000000000000000000000000000000000000;
-    address public constant PROXY_ADMIN = 0x0000000000000000000000000000000000000000;
+    address public constant DEFAULT_ADMIN_ROLE_HOLDER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    address public constant NAME_UPDATE_ROLE_HOLDER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    address public constant METADATA_URI_UPDATE_ROLE_HOLDER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    address public constant PROPOSER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    address public constant EXECUTOR = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    address public constant PROXY_ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
     function run() public {
         address[] memory proposers = new address[](1);
