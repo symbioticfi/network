@@ -8,7 +8,7 @@ contract TimelockBase is Script {
     string internal constant LOG_FILE = "script/timelocked/callLog.txt";
 
     struct TimelockParams {
-        Network network;
+        address network;
         bool isExecutionMode;
         address target;
         bytes data;
@@ -21,18 +21,15 @@ contract TimelockBase is Script {
     ) internal {
         bytes32 salt = keccak256(abi.encode(params.seed));
         bytes32 predecessor;
-
-        bytes memory txn = params.isExecutionMode
-            ? abi.encodeCall(params.network.execute, (params.target, 0, params.data, predecessor, salt))
-            : abi.encodeCall(params.network.schedule, (params.target, 0, params.data, predecessor, salt, params.delay));
-
         vm.startBroadcast();
-        (bool success,) = address(params.network).call(txn);
-        vm.stopBroadcast();
 
-        if (!success) {
-            revert("Transaction failed");
+        if (params.isExecutionMode) {
+            Network(payable(params.network)).execute(params.target, 0, params.data, predecessor, salt);
+        } else {
+            Network(payable(params.network)).schedule(params.target, 0, params.data, predecessor, salt, params.delay);
         }
+
+        vm.stopBroadcast();
     }
 
     function logCall(

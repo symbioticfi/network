@@ -1,30 +1,29 @@
 pragma solidity ^0.8.25;
 
 import {TimelockBase} from "./TimelockBase.sol";
-import {Network} from "../../src/contracts/Network.sol";
 
-import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
+import {IVetoSlasher} from "@symbioticfi/core/src/interfaces/slasher/IVetoSlasher.sol";
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
 
 import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
 
-contract SetMaxNetworkLimit is TimelockBase {
+contract SetResolver is TimelockBase {
     function runSchedule(
         address network,
         address vault,
-        uint96 subnetworkId,
-        uint256 maxNetworkLimit,
+        uint96 identifier,
+        address resolver,
+        bytes memory hints,
         uint256 delay,
         string memory seed
     ) public {
-        address delegator = IVault(vault).delegator();
-        bytes memory data =
-            abi.encodeCall(IBaseDelegator(delegator).setMaxNetworkLimit, (subnetworkId, maxNetworkLimit));
+        address slasher = IVault(vault).slasher();
+        bytes memory data = abi.encodeCall(IVetoSlasher(slasher).setResolver, (identifier, resolver, hints));
 
         TimelockBase.TimelockParams memory params = TimelockBase.TimelockParams({
             network: network,
             isExecutionMode: false,
-            target: network,
+            target: slasher,
             data: data,
             delay: delay,
             seed: seed
@@ -33,15 +32,15 @@ contract SetMaxNetworkLimit is TimelockBase {
         callTimelock(params);
 
         string memory log = string.concat(
-            "\nScheduled setMaxNetworkLimit for",
+            "\nScheduled setResolver for",
             " network:",
             Strings.toHexString(network),
-            " delegator:",
-            Strings.toHexString(delegator),
-            " subnetworkId:",
-            Strings.toString(subnetworkId),
-            " maxNetworkLimit ",
-            Strings.toString(maxNetworkLimit),
+            " vault:",
+            Strings.toHexString(vault),
+            " identifier:",
+            Strings.toString(identifier),
+            " resolver:",
+            Strings.toHexString(resolver),
             " delay:",
             Strings.toString(delay),
             " seed:",
@@ -54,18 +53,18 @@ contract SetMaxNetworkLimit is TimelockBase {
     function runExecute(
         address network,
         address vault,
-        uint96 subnetworkId,
-        uint256 maxNetworkLimit,
+        uint96 identifier,
+        address resolver,
+        bytes memory hints,
         string memory seed
     ) public {
-        address delegator = IVault(vault).delegator();
-        bytes memory data =
-            abi.encodeCall(IBaseDelegator(delegator).setMaxNetworkLimit, (subnetworkId, maxNetworkLimit));
+        address slasher = IVault(vault).slasher();
+        bytes memory data = abi.encodeCall(IVetoSlasher(slasher).setResolver, (identifier, resolver, hints));
 
         TimelockBase.TimelockParams memory params = TimelockBase.TimelockParams({
             network: network,
             isExecutionMode: true,
-            target: network,
+            target: slasher,
             data: data,
             delay: 0,
             seed: seed
@@ -74,15 +73,15 @@ contract SetMaxNetworkLimit is TimelockBase {
         callTimelock(params);
 
         string memory log = string.concat(
-            "\nExecuted setMaxNetworkLimit for",
+            "\nExecuted setResolver for",
             " network:",
             Strings.toHexString(network),
-            " delegator:",
-            Strings.toHexString(delegator),
-            " subnetworkId:",
-            Strings.toString(subnetworkId),
-            " maxNetworkLimit ",
-            Strings.toString(maxNetworkLimit),
+            " vault:",
+            Strings.toHexString(vault),
+            " identifier:",
+            Strings.toString(identifier),
+            " resolver:",
+            Strings.toHexString(resolver),
             " seed:",
             seed
         );

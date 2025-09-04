@@ -15,6 +15,7 @@ contract DeployMyNetwork is DeployNetwork {
     address public constant PROPOSER = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     address public constant EXECUTOR = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
     address public constant PROXY_ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    bytes32 public constant SALT = keccak256("My Network");
 
     function run() public {
         address[] memory proposers = new address[](1);
@@ -35,7 +36,8 @@ contract DeployMyNetwork is DeployNetwork {
             metadataURIUpdateRoleHolder: METADATA_URI_UPDATE_ROLE_HOLDER
         });
 
-        NetworkDeployParams memory params = NetworkDeployParams({initParams: initParams, proxyAdmin: PROXY_ADMIN});
-        super.run(params);
+        NetworkDeployParams memory params =
+            NetworkDeployParams({initParams: initParams, proxyAdmin: PROXY_ADMIN, salt: SALT});
+        run(params);
     }
 }
