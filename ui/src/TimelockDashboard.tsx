@@ -106,7 +106,12 @@ export default function TimelockDashboard() {
   const detectTokenRef = useRef(0)
 
   // Access Control state
-  type RoleEntry = { role: Hex; name?: string; admin?: Hex | null; members: `0x${string}`[] }
+  type RoleEntry = {
+    role: Hex
+    name?: string
+    admin?: Hex | null
+    members: `0x${string}`[]
+  }
   const [rolesLoading, setRolesLoading] = useState(false)
   const [roles, setRoles] = useState<RoleEntry[]>([])
 
@@ -713,8 +718,26 @@ export default function TimelockDashboard() {
 
         <div className='border-b mb-4'>
           <div className='flex gap-2'>
-            <button onClick={() => setActiveTab('main')} className={`px-3 py-2 text-sm ${activeTab==='main'?'border-b-2 border-indigo-600 text-indigo-600':'text-gray-600'}`}>Overview</button>
-            <button onClick={() => setActiveTab('acl')} className={`px-3 py-2 text-sm ${activeTab==='acl'?'border-b-2 border-indigo-600 text-indigo-600':'text-gray-600'}`}>Access Control</button>
+            <button
+              onClick={() => setActiveTab('main')}
+              className={`px-3 py-2 text-sm ${
+                activeTab === 'main'
+                  ? 'border-b-2 border-indigo-600 text-indigo-600'
+                  : 'text-gray-600'
+              }`}
+            >
+              Overview
+            </button>
+            <button
+              onClick={() => setActiveTab('acl')}
+              className={`px-3 py-2 text-sm ${
+                activeTab === 'acl'
+                  ? 'border-b-2 border-indigo-600 text-indigo-600'
+                  : 'text-gray-600'
+              }`}
+            >
+              Access Control
+            </button>
           </div>
         </div>
         <section className='bg-white rounded border p-4 space-y-3'>
@@ -825,691 +848,439 @@ export default function TimelockDashboard() {
           </div>
         </section>
         {activeTab === 'main' && (
-        <section className='bg-white rounded border p-4 space-y-3'>
-          <div className='flex items-center justify-between'>
-            <h2 className='font-semibold'>Delays Setup</h2>
-            <div className='flex gap-2'>
-              <button
-                onClick={loadDelays}
-                disabled={
-                  loadingDelays || !contractAddress || !effectivePublicClient
-                }
-                className='px-3 py-1.5 rounded bg-indigo-600 text-white text-sm disabled:opacity-60'
-              >
-                {loadingDelays ? 'Loading…' : 'Load Delays'}
-              </button>
-              {loadingDelays && (
+          <section className='bg-white rounded border p-4 space-y-3'>
+            <div className='flex items-center justify-between'>
+              <h2 className='font-semibold'>Delays Setup</h2>
+              <div className='flex gap-2'>
                 <button
-                  onClick={() => {
-                    delaysTokenRef.current++
-                    setLoadingDelays(false)
-                  }}
-                  className='px-3 py-1.5 rounded bg-gray-100 border text-sm'
+                  onClick={loadDelays}
+                  disabled={
+                    loadingDelays || !contractAddress || !effectivePublicClient
+                  }
+                  className='px-3 py-1.5 rounded bg-indigo-600 text-white text-sm disabled:opacity-60'
                 >
-                  Cancel
+                  {loadingDelays ? 'Loading…' : 'Load Delays'}
                 </button>
-              )}
-            </div>
-          </div>
-
-          <div className='overflow-x-auto'>
-            <table className='min-w-full text-sm'>
-              <thead>
-                <tr className='text-left text-gray-500'>
-                  <th className='py-2 pr-4'>Target</th>
-                  <th className='py-2 pr-4'>Selector</th>
-                  <th className='py-2 pr-4'>Enabled</th>
-                  <th className='py-2 pr-4'>Min Delay (s)</th>
-                </tr>
-              </thead>
-              <tbody>
-                {delayEntries.length === 0 ? (
-                  <tr>
-                    <td className='py-3 text-gray-400' colSpan={4}>
-                      No entries loaded
-                    </td>
-                  </tr>
-                ) : (
-                  delayEntries.map((d) => (
-                    <tr key={d.key} className='border-t'>
-                      <td className='py-2 pr-4 font-mono text-xs'>
-                        {d.target}
-                      </td>
-                      <td className='py-2 pr-4 font-mono text-xs'>
-                        {d.selector}
-                      </td>
-                      <td className='py-2 pr-4'>{d.enabled ? 'Yes' : 'No'}</td>
-                      <td className='py-2 pr-4'>{d.delay.toString()}</td>
-                    </tr>
-                  ))
+                {loadingDelays && (
+                  <button
+                    onClick={() => {
+                      delaysTokenRef.current++
+                      setLoadingDelays(false)
+                    }}
+                    className='px-3 py-1.5 rounded bg-gray-100 border text-sm'
+                  >
+                    Cancel
+                  </button>
                 )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+              </div>
+            </div>
+
+            <div className='overflow-x-auto'>
+              <table className='min-w-full text-sm'>
+                <thead>
+                  <tr className='text-left text-gray-500'>
+                    <th className='py-2 pr-4'>Target</th>
+                    <th className='py-2 pr-4'>Selector</th>
+                    <th className='py-2 pr-4'>Enabled</th>
+                    <th className='py-2 pr-4'>Min Delay (s)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {delayEntries.length === 0 ? (
+                    <tr>
+                      <td className='py-3 text-gray-400' colSpan={4}>
+                        No entries loaded
+                      </td>
+                    </tr>
+                  ) : (
+                    delayEntries.map((d) => (
+                      <tr key={d.key} className='border-t'>
+                        <td className='py-2 pr-4 font-mono text-xs'>
+                          {d.target}
+                        </td>
+                        <td className='py-2 pr-4 font-mono text-xs'>
+                          {d.selector}
+                        </td>
+                        <td className='py-2 pr-4'>
+                          {d.enabled ? 'Yes' : 'No'}
+                        </td>
+                        <td className='py-2 pr-4'>{d.delay.toString()}</td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
         )}
 
         {activeTab === 'main' && (
-        <section className='bg-white rounded border p-4 space-y-3'>
-          <div className='flex items-center justify-between'>
-            <h2 className='font-semibold'>Scheduled Operations</h2>
-            <div className='flex gap-2'>
-              <button
-                onClick={loadOperations}
-                disabled={
-                  loadingOps || !contractAddress || !effectivePublicClient
-                }
-                className='px-3 py-1.5 rounded bg-indigo-600 text-white text-sm disabled:opacity-60'
-              >
-                {loadingOps ? 'Loading…' : 'Load Scheduled'}
-              </button>
-              {loadingOps && (
+          <section className='bg-white rounded border p-4 space-y-3'>
+            <div className='flex items-center justify-between'>
+              <h2 className='font-semibold'>Scheduled Operations</h2>
+              <div className='flex gap-2'>
                 <button
-                  onClick={() => {
-                    opsTokenRef.current++
-                    setLoadingOps(false)
-                  }}
-                  className='px-3 py-1.5 rounded bg-gray-100 border text-sm'
+                  onClick={loadOperations}
+                  disabled={
+                    loadingOps || !contractAddress || !effectivePublicClient
+                  }
+                  className='px-3 py-1.5 rounded bg-indigo-600 text-white text-sm disabled:opacity-60'
                 >
-                  Cancel
+                  {loadingOps ? 'Loading…' : 'Load Scheduled'}
                 </button>
-              )}
+                {loadingOps && (
+                  <button
+                    onClick={() => {
+                      opsTokenRef.current++
+                      setLoadingOps(false)
+                    }}
+                    className='px-3 py-1.5 rounded bg-gray-100 border text-sm'
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-          <div className='overflow-x-auto'>
-            <table className='min-w-full text-sm'>
-              <thead>
-                <tr className='text-left text-gray-500'>
-                  <th className='py-2 pr-4'>ID</th>
-                  <th className='py-2 pr-4'>Txs</th>
-                  <th className='py-2 pr-4'>ETA</th>
-                  <th className='py-2 pr-4'>State</th>
-                  <th className='py-2 pr-4'>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {ops.length === 0 ? (
-                  <tr>
-                    <td className='py-3 text-gray-400' colSpan={5}>
-                      No scheduled operations loaded
-                    </td>
+            <div className='overflow-x-auto'>
+              <table className='min-w-full text-sm'>
+                <thead>
+                  <tr className='text-left text-gray-500'>
+                    <th className='py-2 pr-4'>ID</th>
+                    <th className='py-2 pr-4'>Txs</th>
+                    <th className='py-2 pr-4'>ETA</th>
+                    <th className='py-2 pr-4'>State</th>
                   </tr>
-                ) : (
-                  ops.map((op) => (
-                    <tr key={op.id} className='border-t align-top'>
-                      <td className='py-2 pr-4 font-mono text-xs'>{op.id}</td>
-                      <td className='py-2 pr-4'>
-                        <div className='space-y-2'>
-                          {op.txs.map((t) => (
-                            <div
-                              key={`${op.id}-${t.index.toString()}`}
-                              className='p-2 bg-gray-50 rounded border'
-                            >
-                              <div className='text-xs text-gray-600'>
-                                Index {t.index.toString()}
-                              </div>
-                              <div className='text-xs'>
-                                Target:{' '}
-                                <span className='font-mono'>{t.target}</span>
-                              </div>
-                              <div className='text-xs'>
-                                Value: {formatEther(t.value)} ETH
-                              </div>
-                              <div className='text-xs'>
-                                Selector:{' '}
-                                <span className='font-mono'>
-                                  {selectorFromData(t.data)}
-                                </span>
-                              </div>
-                              <details>
-                                <summary className='text-xs text-gray-600 cursor-pointer'>
-                                  Data
-                                </summary>
-                                <div className='font-mono text-xs break-all'>
-                                  {t.data}
+                </thead>
+                <tbody>
+                  {ops.length === 0 ? (
+                    <tr>
+                      <td className='py-3 text-gray-400' colSpan={4}>
+                        No scheduled operations loaded
+                      </td>
+                    </tr>
+                  ) : (
+                    ops.map((op) => (
+                      <tr key={op.id} className='border-t align-top'>
+                        <td className='py-2 pr-4 font-mono text-xs'>{op.id}</td>
+                        <td className='py-2 pr-4'>
+                          <div className='space-y-2'>
+                            {op.txs.map((t) => (
+                              <div
+                                key={`${op.id}-${t.index.toString()}`}
+                                className='p-2 bg-gray-50 rounded border'
+                              >
+                                <div className='text-xs text-gray-600'>
+                                  Index {t.index.toString()}
                                 </div>
-                              </details>
-                            </div>
-                          ))}
-                        </div>
-                      </td>
-                      <td className='py-2 pr-4 text-xs'>
-                        {op.timestamp === 0n
-                          ? '—'
-                          : new Date(
-                              Number(op.timestamp) * 1000
-                            ).toLocaleString()}
-                      </td>
-                      <td className='py-2 pr-4'>
-                        {op.state === OperationState.Ready ? (
-                          <span className='px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs'>
-                            Ready
-                          </span>
-                        ) : op.state === OperationState.Waiting ? (
-                          <span className='px-2 py-0.5 rounded bg-yellow-100 text-yellow-700 text-xs'>
-                            Waiting
-                          </span>
-                        ) : op.state === OperationState.Done ? (
-                          <span className='px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs'>
-                            Done
-                          </span>
-                        ) : (
-                          <span className='px-2 py-0.5 rounded bg-gray-100 text-gray-600 text-xs'>
-                            Unset
-                          </span>
-                        )}
-                      </td>
-                      <td className='py-2 pr-4'>
-                        <button
-                          onClick={() => onExecute(op)}
-                          disabled={
-                            executing === op.id ||
-                            !canInteract ||
-                            op.state !== OperationState.Ready
-                          }
-                          className='px-3 py-1.5 rounded bg-indigo-600 text-white text-sm disabled:opacity-60'
-                        >
-                          {executing === op.id
-                            ? 'Executing…'
-                            : op.txs.length === 1
-                            ? 'Execute'
-                            : 'Execute Batch'}
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-        )}
-
-        {activeTab === 'main' && (
-        <section className='bg-white rounded border p-4 grid grid-cols-1 md:grid-cols-2 gap-6'>
-          <div className='space-y-3'>
-            <h2 className='font-semibold'>Schedule — Single</h2>
-            <div>
-              <label className='block text-xs text-gray-600 mb-1'>Target</label>
-              <input
-                className='w-full border rounded px-2 py-1'
-                placeholder='0x...'
-                value={singleTarget}
-                onChange={(e) => setSingleTarget(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className='block text-xs text-gray-600 mb-1'>
-                Value (ETH)
-              </label>
-              <input
-                className='w-full border rounded px-2 py-1'
-                placeholder='0'
-                value={singleValueEth}
-                onChange={(e) => setSingleValueEth(e.target.value)}
-              />
-            </div>
-            <div>
-              <div className='flex items-center justify-between'>
-                <label className='block text-xs text-gray-600 mb-1'>
-                  Calldata (hex)
-                </label>
-                <span className='text-xs text-gray-500'>
-                  Selector:{' '}
-                  <span className='font-mono'>
-                    {selectorFromData(singleData)}
-                  </span>
-                </span>
-              </div>
-              <input
-                className='w-full border rounded px-2 py-1 font-mono text-xs'
-                placeholder='0x'
-                value={singleData}
-                onChange={(e) => setSingleData(e.target.value)}
-              />
-
-              <details className='mt-2'>
-                <summary className='cursor-pointer text-sm text-indigo-600'>
-                  Calldata Builder
-                </summary>
-                <div className='mt-2 space-y-2 border rounded p-2 bg-gray-50'>
-                  <div className='flex items-center gap-2 text-xs'>
-                    <label className='font-medium'>Mode:</label>
-                    <select
-                      className='border rounded px-2 py-1'
-                      value={builderMode}
-                      onChange={(e) => setBuilderMode(e.target.value as any)}
-                    >
-                      <option value='raw'>Raw Hex</option>
-                      <option value='abi'>ABI Function</option>
-                      <option value='sig'>Function Signature</option>
-                    </select>
-                  </div>
-
-                  {builderMode === 'abi' && (
-                    <div className='space-y-2'>
-                      <div>
-                        <label className='block text-xs text-gray-600 mb-1'>
-                          ABI JSON
-                        </label>
-                        <textarea
-                          className='w-full border rounded px-2 py-1 font-mono text-xs'
-                          rows={4}
-                          placeholder='[ { "type": "function", "name": "transfer", "inputs": [ { "name": "to", "type": "address" }, { "name": "amount", "type": "uint256" } ] } ]'
-                          value={builderAbiText}
-                          onChange={(e) => setBuilderAbiText(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-xs text-gray-600 mb-1'>
-                          Function Name
-                        </label>
-                        <input
-                          className='w-full border rounded px-2 py-1 text-sm'
-                          placeholder='transfer'
-                          value={builderFnName}
-                          onChange={(e) => setBuilderFnName(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-xs text-gray-600 mb-1'>
-                          Args (JSON array)
-                        </label>
-                        <input
-                          className='w-full border rounded px-2 py-1 font-mono text-xs'
-                          placeholder='["0xabc...", "1"]'
-                          value={builderArgsText}
-                          onChange={(e) => setBuilderArgsText(e.target.value)}
-                        />
-                      </div>
-                      {builderError && (
-                        <div className='text-xs text-red-600'>
-                          {builderError}
-                        </div>
-                      )}
-                      <button
-                        className='px-3 py-1.5 border rounded bg-white'
-                        onClick={buildCalldataFromAbi}
-                      >
-                        Build Calldata
-                      </button>
-                    </div>
+                                <div className='text-xs'>
+                                  Target:{' '}
+                                  <span className='font-mono'>{t.target}</span>
+                                </div>
+                                <div className='text-xs'>
+                                  Value: {formatEther(t.value)} ETH
+                                </div>
+                                <div className='text-xs'>
+                                  Selector:{' '}
+                                  <span className='font-mono'>
+                                    {selectorFromData(t.data)}
+                                  </span>
+                                </div>
+                                <details>
+                                  <summary className='text-xs text-gray-600 cursor-pointer'>
+                                    Data
+                                  </summary>
+                                  <div className='font-mono text-xs break-all'>
+                                    {t.data}
+                                  </div>
+                                </details>
+                              </div>
+                            ))}
+                          </div>
+                        </td>
+                        <td className='py-2 pr-4 text-xs'>
+                          {op.timestamp === 0n
+                            ? '—'
+                            : new Date(
+                                Number(op.timestamp) * 1000
+                              ).toLocaleString()}
+                        </td>
+                        <td className='py-2 pr-4'>
+                          {op.state === OperationState.Ready ? (
+                            <span className='px-2 py-0.5 rounded bg-green-100 text-green-700 text-xs'>
+                              Ready
+                            </span>
+                          ) : op.state === OperationState.Waiting ? (
+                            <span className='px-2 py-0.5 rounded bg-yellow-100 text-yellow-700 text-xs'>
+                              Waiting
+                            </span>
+                          ) : op.state === OperationState.Done ? (
+                            <span className='px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs'>
+                              Done
+                            </span>
+                          ) : (
+                            <span className='px-2 py-0.5 rounded bg-gray-100 text-gray-600 text-xs'>
+                              Unset
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))
                   )}
-
-                  {builderMode === 'sig' && (
-                    <div className='space-y-2'>
-                      <div>
-                        <label className='block text-xs text-gray-600 mb-1'>
-                          Function Signature
-                        </label>
-                        <input
-                          className='w-full border rounded px-2 py-1 text-sm'
-                          placeholder='transfer(address,uint256)'
-                          value={builderFnName}
-                          onChange={(e) => setBuilderFnName(e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <label className='block text-xs text-gray-600 mb-1'>
-                          Args (JSON array)
-                        </label>
-                        <input
-                          className='w-full border rounded px-2 py-1 font-mono text-xs'
-                          placeholder='["0xabc...", "1"]'
-                          value={builderArgsText}
-                          onChange={(e) => setBuilderArgsText(e.target.value)}
-                        />
-                      </div>
-                      {builderError && (
-                        <div className='text-xs text-red-600'>
-                          {builderError}
-                        </div>
-                      )}
-                      <button
-                        className='px-3 py-1.5 border rounded bg-white'
-                        onClick={buildCalldataFromSignature}
-                      >
-                        Build Calldata
-                      </button>
-                    </div>
-                  )}
-
-                  {builderMode === 'raw' && (
-                    <div className='text-xs text-gray-600'>
-                      Enter hex calldata above. Builder is optional.
-                    </div>
-                  )}
-                </div>
-              </details>
+                </tbody>
+              </table>
             </div>
-            <div className='grid grid-cols-2 gap-3'>
-              <div>
-                <label className='block text-xs text-gray-600 mb-1'>
-                  Predecessor (bytes32)
-                </label>
-                <input
-                  className='w-full border rounded px-2 py-1 font-mono text-xs'
-                  value={singlePredecessor}
-                  onChange={(e) => setSinglePredecessor(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className='block text-xs text-gray-600 mb-1'>
-                  Salt (bytes32)
-                </label>
-                <input
-                  className='w-full border rounded px-2 py-1 font-mono text-xs'
-                  value={singleSalt}
-                  onChange={(e) => setSingleSalt(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='grid grid-cols-2 gap-3 items-end'>
-              <div>
-                <label className='block text-xs text-gray-600 mb-1'>
-                  Delay (seconds)
-                </label>
-                <input
-                  className='w-full border rounded px-2 py-1'
-                  placeholder='0'
-                  value={singleDelay}
-                  onChange={(e) => setSingleDelay(e.target.value)}
-                />
-                <div className='text-xs text-gray-500 mt-1'>
-                  Required min:{' '}
-                  {singleMinDelay !== null ? `${singleMinDelay} s` : '—'}
-                </div>
-              </div>
-              <div className='flex items-center gap-2'>
-                <button
-                  onClick={computeSingleMinDelay}
-                  disabled={!canInteract}
-                  className='px-3 py-1.5 rounded bg-gray-100 border'
-                >
-                  Check Min Delay
-                </button>
-                <button
-                  onClick={onScheduleSingle}
-                  disabled={scheduling || !canInteract}
-                  className='px-3 py-1.5 rounded bg-indigo-600 text-white disabled:opacity-60'
-                >
-                  {scheduling ? 'Scheduling…' : 'Schedule'}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className='space-y-3'>
-            <h2 className='font-semibold'>Schedule — Batch</h2>
-            <div className='space-y-2'>
-              {batchRows.map((row, i) => (
-                <div key={i} className='grid grid-cols-12 gap-2 items-end'>
-                  <div className='col-span-4'>
-                    <label className='block text-xs text-gray-600 mb-1'>
-                      Target
-                    </label>
-                    <input
-                      className='w-full border rounded px-2 py-1'
-                      value={row.target}
-                      onChange={(e) => {
-                        const next = [...batchRows]
-                        next[i].target = e.target.value
-                        setBatchRows(next)
-                      }}
-                    />
-                  </div>
-                  <div className='col-span-2'>
-                    <label className='block text-xs text-gray-600 mb-1'>
-                      Value (ETH)
-                    </label>
-                    <input
-                      className='w-full border rounded px-2 py-1'
-                      value={row.valueEth}
-                      onChange={(e) => {
-                        const next = [...batchRows]
-                        next[i].valueEth = e.target.value
-                        setBatchRows(next)
-                      }}
-                    />
-                  </div>
-                  <div className='col-span-5'>
-                    <label className='block text-xs text-gray-600 mb-1'>
-                      Calldata (hex)
-                    </label>
-                    <input
-                      className='w-full border rounded px-2 py-1 font-mono text-xs'
-                      value={row.data}
-                      onChange={(e) => {
-                        const next = [...batchRows]
-                        next[i].data = e.target.value
-                        setBatchRows(next)
-                      }}
-                    />
-                  </div>
-                  <div className='col-span-1 flex gap-2'>
-                    <button
-                      className='px-2 py-1 border rounded'
-                      onClick={() =>
-                        setBatchRows((rows) => rows.filter((_, j) => j !== i))
-                      }
-                    >
-                      −
-                    </button>
-                  </div>
-                </div>
-              ))}
-              <button
-                className='px-3 py-1.5 border rounded'
-                onClick={() =>
-                  setBatchRows((r) => [
-                    ...r,
-                    { target: '', valueEth: '0', data: '0x' },
-                  ])
-                }
-              >
-                + Add Row
-              </button>
-            </div>
-            <div className='grid grid-cols-2 gap-3'>
-              <div>
-                <label className='block text-xs text-gray-600 mb-1'>
-                  Predecessor (bytes32)
-                </label>
-                <input
-                  className='w-full border rounded px-2 py-1 font-mono text-xs'
-                  value={batchPredecessor}
-                  onChange={(e) => setBatchPredecessor(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className='block text-xs text-gray-600 mb-1'>
-                  Salt (bytes32)
-                </label>
-                <input
-                  className='w-full border rounded px-2 py-1 font-mono text-xs'
-                  value={batchSalt}
-                  onChange={(e) => setBatchSalt(e.target.value)}
-                />
-              </div>
-            </div>
-            <div className='grid grid-cols-2 gap-3 items-end'>
-              <div>
-                <label className='block text-xs text-gray-600 mb-1'>
-                  Delay (seconds)
-                </label>
-                <input
-                  className='w-full border rounded px-2 py-1'
-                  placeholder='0'
-                  value={batchDelay}
-                  onChange={(e) => setBatchDelay(e.target.value)}
-                />
-              </div>
-              <div>
-                <button
-                  onClick={onScheduleBatch}
-                  disabled={scheduling || !canInteract}
-                  className='px-3 py-1.5 rounded bg-indigo-600 text-white disabled:opacity-60'
-                >
-                  {scheduling ? 'Scheduling…' : 'Schedule Batch'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
+          </section>
         )}
 
         {activeTab === 'acl' && (
-        <section className='bg-white rounded border p-4 space-y-3'>
-          <div className='flex items-center justify-between'>
-            <h2 className='font-semibold'>Access Control</h2>
-            <button onClick={async () => {
-              if (!effectivePublicClient || !contractAddress) return
-              setRolesLoading(true)
-              try {
-                const myToken = ++aclTokenRef.current
-                const from = BigInt(fromBlock || '0')
-                const latest = await effectivePublicClient.getBlockNumber()
-                const maxSpan = BigInt(Number(maxBlocksPerQuery || '9999'))
-                const getLogsChunked = async (params: any, start: bigint, end: bigint) => {
-                  let cur = start
-                  const out: any[] = []
-                  while (cur <= end) {
-                    if (aclTokenRef.current !== myToken) throw new Error('canceled')
-                    const chunkTo = cur + maxSpan > end ? end : cur + maxSpan
-                    const part = await effectivePublicClient.getLogs({ ...params, fromBlock: cur, toBlock: chunkTo } as any)
-                    out.push(...part)
-                    cur = chunkTo + 1n
+          <section className='bg-white rounded border p-4 space-y-3'>
+            <div className='flex items-center justify-between'>
+              <h2 className='font-semibold'>Access Control</h2>
+              <button
+                onClick={async () => {
+                  if (!effectivePublicClient || !contractAddress) return
+                  setRolesLoading(true)
+                  try {
+                    const myToken = ++aclTokenRef.current
+                    const from = BigInt(fromBlock || '0')
+                    const latest = await effectivePublicClient.getBlockNumber()
+                    const maxSpan = BigInt(Number(maxBlocksPerQuery || '9999'))
+                    const getLogsChunked = async (
+                      params: any,
+                      start: bigint,
+                      end: bigint
+                    ) => {
+                      let cur = start
+                      const out: any[] = []
+                      while (cur <= end) {
+                        if (aclTokenRef.current !== myToken)
+                          throw new Error('canceled')
+                        const chunkTo =
+                          cur + maxSpan > end ? end : cur + maxSpan
+                        const part = await effectivePublicClient.getLogs({
+                          ...params,
+                          fromBlock: cur,
+                          toBlock: chunkTo,
+                        } as any)
+                        out.push(...part)
+                        cur = chunkTo + 1n
+                      }
+                      return out
+                    }
+
+                    // Fetch grants & revokes
+                    const [grants, revokes] = await Promise.all([
+                      getLogsChunked(
+                        {
+                          address: contractAddress as `0x${string}`,
+                          event: {
+                            type: 'event',
+                            name: 'RoleGranted',
+                            inputs: [
+                              { name: 'role', type: 'bytes32', indexed: true },
+                              {
+                                name: 'account',
+                                type: 'address',
+                                indexed: true,
+                              },
+                              {
+                                name: 'sender',
+                                type: 'address',
+                                indexed: true,
+                              },
+                            ],
+                            anonymous: false,
+                          } as const,
+                        },
+                        from,
+                        latest
+                      ),
+                      getLogsChunked(
+                        {
+                          address: contractAddress as `0x${string}`,
+                          event: {
+                            type: 'event',
+                            name: 'RoleRevoked',
+                            inputs: [
+                              { name: 'role', type: 'bytes32', indexed: true },
+                              {
+                                name: 'account',
+                                type: 'address',
+                                indexed: true,
+                              },
+                              {
+                                name: 'sender',
+                                type: 'address',
+                                indexed: true,
+                              },
+                            ],
+                            anonymous: false,
+                          } as const,
+                        },
+                        from,
+                        latest
+                      ),
+                    ])
+
+                    // Build member sets
+                    if (aclTokenRef.current !== myToken) return
+                    const members = new Map<string, Set<`0x${string}`>>()
+                    for (const log of grants) {
+                      // @ts-ignore
+                      const role: Hex = log.args.role
+                      // @ts-ignore
+                      const account: `0x${string}` = log.args.account
+                      const set = members.get(role) ?? new Set()
+                      set.add(account)
+                      members.set(role, set)
+                    }
+                    for (const log of revokes) {
+                      // @ts-ignore
+                      const role: Hex = log.args.role
+                      // @ts-ignore
+                      const account: `0x${string}` = log.args.account
+                      const set = members.get(role)
+                      if (set) set.delete(account)
+                    }
+
+                    // Try to resolve known role names via constant getters
+                    const known: { [k: string]: string } = {}
+                    const tryRead = async (fn: string, name: string) => {
+                      try {
+                        const id = (await effectivePublicClient.readContract({
+                          address: contractAddress as `0x${string}`,
+                          abi: networkAbi,
+                          functionName: fn as any,
+                        })) as Hex
+                        known[id] = name
+                      } catch {}
+                    }
+                    await Promise.all([
+                      tryRead('DEFAULT_ADMIN_ROLE', 'DEFAULT_ADMIN_ROLE'),
+                      tryRead('PROPOSER_ROLE', 'PROPOSER_ROLE'),
+                      tryRead('EXECUTOR_ROLE', 'EXECUTOR_ROLE'),
+                      tryRead('CANCELLER_ROLE', 'CANCELLER_ROLE'),
+                      tryRead('NAME_UPDATE_ROLE', 'NAME_UPDATE_ROLE'),
+                      tryRead(
+                        'METADATA_URI_UPDATE_ROLE',
+                        'METADATA_URI_UPDATE_ROLE'
+                      ),
+                    ])
+
+                    // Collect all role ids
+                    if (aclTokenRef.current !== myToken) return
+                    const roleIds = Array.from(members.keys())
+                    if (Object.keys(known).length) {
+                      for (const k of Object.keys(known))
+                        if (!roleIds.includes(k)) roleIds.push(k)
+                    }
+
+                    // Fetch admins
+                    const entries: RoleEntry[] = []
+                    for (const role of roleIds) {
+                      if (aclTokenRef.current !== myToken) return
+                      let admin: Hex | null = null
+                      try {
+                        admin = (await effectivePublicClient.readContract({
+                          address: contractAddress as `0x${string}`,
+                          abi: networkAbi,
+                          functionName: 'getRoleAdmin',
+                          args: [role as Hex],
+                        })) as Hex
+                      } catch {}
+                      const mems = Array.from(members.get(role) ?? [])
+                      entries.push({
+                        role: role as Hex,
+                        name: known[role],
+                        admin,
+                        members: mems,
+                      })
+                    }
+
+                    // Sort: named first, then by role id
+                    if (aclTokenRef.current !== myToken) return
+                    entries.sort(
+                      (a, b) =>
+                        (a.name ? 0 : 1) - (b.name ? 0 : 1) ||
+                        a.role.localeCompare(b.role)
+                    )
+                    if (aclTokenRef.current === myToken) setRoles(entries)
+                  } finally {
+                    setRolesLoading(false)
                   }
-                  return out
+                }}
+                disabled={
+                  rolesLoading || !contractAddress || !effectivePublicClient
                 }
+                className='px-3 py-1.5 rounded bg-indigo-600 text-white text-sm disabled:opacity-60'
+              >
+                {rolesLoading ? 'Loading…' : 'Load Access Control'}
+              </button>
+              {rolesLoading && (
+                <button
+                  onClick={() => {
+                    aclTokenRef.current++
+                    setRolesLoading(false)
+                  }}
+                  className='px-3 py-1.5 rounded bg-gray-100 border text-sm'
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
 
-                // Fetch grants & revokes
-                const [grants, revokes] = await Promise.all([
-                  getLogsChunked({
-                    address: contractAddress as `0x${string}`,
-                    event: { type: 'event', name: 'RoleGranted', inputs: [
-                      { name: 'role', type: 'bytes32', indexed: true },
-                      { name: 'account', type: 'address', indexed: true },
-                      { name: 'sender', type: 'address', indexed: true },
-                    ], anonymous: false } as const,
-                  }, from, latest),
-                  getLogsChunked({
-                    address: contractAddress as `0x${string}`,
-                    event: { type: 'event', name: 'RoleRevoked', inputs: [
-                      { name: 'role', type: 'bytes32', indexed: true },
-                      { name: 'account', type: 'address', indexed: true },
-                      { name: 'sender', type: 'address', indexed: true },
-                    ], anonymous: false } as const,
-                  }, from, latest),
-                ])
-
-                // Build member sets
-                if (aclTokenRef.current !== myToken) return
-                const members = new Map<string, Set<`0x${string}`>>()
-                for (const log of grants) {
-                  // @ts-ignore
-                  const role: Hex = log.args.role
-                  // @ts-ignore
-                  const account: `0x${string}` = log.args.account
-                  const set = members.get(role) ?? new Set()
-                  set.add(account)
-                  members.set(role, set)
-                }
-                for (const log of revokes) {
-                  // @ts-ignore
-                  const role: Hex = log.args.role
-                  // @ts-ignore
-                  const account: `0x${string}` = log.args.account
-                  const set = members.get(role)
-                  if (set) set.delete(account)
-                }
-
-                // Try to resolve known role names via constant getters
-                const known: { [k: string]: string } = {}
-                const tryRead = async (fn: string, name: string) => {
-                  try {
-                    const id = await effectivePublicClient.readContract({ address: contractAddress as `0x${string}`, abi: networkAbi, functionName: fn as any }) as Hex
-                    known[id] = name
-                  } catch {}
-                }
-                await Promise.all([
-                  tryRead('DEFAULT_ADMIN_ROLE', 'DEFAULT_ADMIN_ROLE'),
-                  tryRead('PROPOSER_ROLE', 'PROPOSER_ROLE'),
-                  tryRead('EXECUTOR_ROLE', 'EXECUTOR_ROLE'),
-                  tryRead('CANCELLER_ROLE', 'CANCELLER_ROLE'),
-                  tryRead('NAME_UPDATE_ROLE', 'NAME_UPDATE_ROLE'),
-                  tryRead('METADATA_URI_UPDATE_ROLE', 'METADATA_URI_UPDATE_ROLE'),
-                ])
-
-                // Collect all role ids
-                if (aclTokenRef.current !== myToken) return
-                const roleIds = Array.from(members.keys())
-                if (Object.keys(known).length) {
-                  for (const k of Object.keys(known)) if (!roleIds.includes(k)) roleIds.push(k)
-                }
-
-                // Fetch admins
-                const entries: RoleEntry[] = []
-                for (const role of roleIds) {
-                  if (aclTokenRef.current !== myToken) return
-                  let admin: Hex | null = null
-                  try {
-                    admin = (await effectivePublicClient.readContract({ address: contractAddress as `0x${string}`, abi: networkAbi, functionName: 'getRoleAdmin', args: [role as Hex] })) as Hex
-                  } catch {}
-                  const mems = Array.from(members.get(role) ?? [])
-                  entries.push({ role: role as Hex, name: known[role], admin, members: mems })
-                }
-
-                // Sort: named first, then by role id
-                if (aclTokenRef.current !== myToken) return
-                entries.sort((a,b)=> (a.name?0:1)-(b.name?0:1) || a.role.localeCompare(b.role))
-                if (aclTokenRef.current === myToken) setRoles(entries)
-              } finally {
-                setRolesLoading(false)
-              }
-            }} disabled={rolesLoading || !contractAddress || !effectivePublicClient} className='px-3 py-1.5 rounded bg-indigo-600 text-white text-sm disabled:opacity-60'>
-              {rolesLoading ? 'Loading…' : 'Load Access Control'}
-            </button>
-            {rolesLoading && (
-              <button onClick={() => { aclTokenRef.current++; setRolesLoading(false) }} className='px-3 py-1.5 rounded bg-gray-100 border text-sm'>Cancel</button>
-            )}
-          </div>
-
-          <div className='overflow-x-auto'>
-            <table className='min-w-full text-sm'>
-              <thead>
-                <tr className='text-left text-gray-500'>
-                  <th className='py-2 pr-4'>Role</th>
-                  <th className='py-2 pr-4'>Role Id</th>
-                  <th className='py-2 pr-4'>Admin</th>
-                  <th className='py-2 pr-4'>Members</th>
-                </tr>
-              </thead>
-              <tbody>
-                {roles.length === 0 ? (
-                  <tr><td className='py-3 text-gray-400' colSpan={4}>No roles loaded</td></tr>
-                ) : roles.map((r)=> (
-                  <tr key={r.role} className='border-t align-top'>
-                    <td className='py-2 pr-4'>{r.name || '—'}</td>
-                    <td className='py-2 pr-4 font-mono text-xs'>{r.role}</td>
-                    <td className='py-2 pr-4 font-mono text-xs'>{r.admin || '—'}</td>
-                    <td className='py-2 pr-4'>
-                      {r.members.length === 0 ? (
-                        <span className='text-xs text-gray-500'>No members</span>
-                      ) : (
-                        <div className='space-y-1'>
-                          {r.members.map((m)=> (
-                            <div key={`${r.role}-${m}`} className='font-mono text-xs'>{m}</div>
-                          ))}
-                        </div>
-                      )}
-                    </td>
+            <div className='overflow-x-auto'>
+              <table className='min-w-full text-sm'>
+                <thead>
+                  <tr className='text-left text-gray-500'>
+                    <th className='py-2 pr-4'>Role</th>
+                    <th className='py-2 pr-4'>Role Id</th>
+                    <th className='py-2 pr-4'>Admin</th>
+                    <th className='py-2 pr-4'>Members</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                </thead>
+                <tbody>
+                  {roles.length === 0 ? (
+                    <tr>
+                      <td className='py-3 text-gray-400' colSpan={4}>
+                        No roles loaded
+                      </td>
+                    </tr>
+                  ) : (
+                    roles.map((r) => (
+                      <tr key={r.role} className='border-t align-top'>
+                        <td className='py-2 pr-4'>{r.name || '—'}</td>
+                        <td className='py-2 pr-4 font-mono text-xs'>
+                          {r.role}
+                        </td>
+                        <td className='py-2 pr-4 font-mono text-xs'>
+                          {r.admin || '—'}
+                        </td>
+                        <td className='py-2 pr-4'>
+                          {r.members.length === 0 ? (
+                            <span className='text-xs text-gray-500'>
+                              No members
+                            </span>
+                          ) : (
+                            <div className='space-y-1'>
+                              {r.members.map((m) => (
+                                <div
+                                  key={`${r.role}-${m}`}
+                                  className='font-mono text-xs'
+                                >
+                                  {m}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
         )}
       </div>
     </div>
