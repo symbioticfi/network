@@ -5,13 +5,21 @@ import "./base/SetMaxNetworkLimitBase.sol";
 
 contract SetMaxNetworkLimit is SetMaxNetworkLimitBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
+
+    // Address of the Network
     address NETWORK = address(0);
+    // Address of the Vault
     address VAULT = address(0);
+    // Maximum amount of delegation that network is ready to receive
     uint256 MAX_NETWORK_LIMIT = 0;
+    // Delay for the action to be executed
     uint256 DELAY = 0;
 
     // Optional
+
+    // Subnetwork Identifier (multiple subnetworks can be used, e.g., to have different max network limits for the same network)
     uint96 SUBNETWORK_IDENTIFIER = 0;
+    // Salt for TimelockController operations
     bytes32 SALT = "SetMaxNetworkLimit";
 
     /**

@@ -1,0 +1,54 @@
+{
+  "name": "@symbioticfi/network",
+  "version": "1.0.0-alpha.0",
+  "description": "Symbiotic Network contract provides a flexible and secure mechanism to manage network operations with customizable delays.",
+  "homepage": "https://symbiotic.fi/network",
+  "bugs": "https://github.com/symbioticfi/network/issues",
+  "license": "MIT",
+  "author": "Symbiotic Team",
+  "files": [
+    "examples/**/*",
+    "src/**/*",
+    "script/**/*",
+    "test/mocks/**/*",
+    "out/**/*"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/symbioticfi/network.git"
+  },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "smart",
+    "contracts",
+    "security"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.56.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "viem": "^2.21.0",
+    "wagmi": "^2.12.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.16.11",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

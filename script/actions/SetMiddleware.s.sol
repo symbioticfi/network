@@ -5,11 +5,17 @@ import "./base/SetMiddlewareBase.sol";
 
 contract SetMiddleware is SetMiddlewareBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
+
+    // Address of the Network
     address NETWORK = address(0);
+    // Address of the Middleware
     address MIDDLEWARE = address(0);
-    uint256 DELAY = 0;
+    // Delay for the action to be executed
+    uint256 DELAY = 14 days;
 
     // Optional
+
+    // Salt for TimelockController operations
     bytes32 SALT = "SetMiddleware";
 
     /**

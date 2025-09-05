@@ -5,12 +5,19 @@ import "./base/ArbitraryCallBase.sol";
 
 contract ArbitraryCall is ArbitraryCallBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
+
+    // Address of the Network
     address NETWORK = address(0);
+    // Address of the Target
     address TARGET = address(0);
+    // Data to pass to the Target
     bytes DATA = new bytes(0);
-    uint256 DELAY = 0;
+    // Delay for the action to be executed
+    uint256 DELAY = 3 days;
 
     // Optional
+
+    // Salt for TimelockController operations
     bytes32 SALT = "ArbitraryCall";
 
     /**

@@ -8,7 +8,7 @@ import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.s
 import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {ITransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 
-contract UpgradeNetworkBase is ActionBase {
+contract UpgradeProxyBase is ActionBase {
     function runSchedule(
         address network,
         address newImplementation,

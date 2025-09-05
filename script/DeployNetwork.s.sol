@@ -12,15 +12,24 @@ import {INetwork} from "../src/interfaces/INetwork.sol";
  */
 contract DeployNetwork is DeployNetworkBase {
     // Configuration constants - UPDATE THESE BEFORE DEPLOYMENT
+
+    // Name of the Network
     string NAME = "My Network";
-    string METADATA_URI = "";
+    // Default minimum delay (will be applied for any action that doesn't have a specific delay yet)
     uint256 DEFAULT_MIN_DELAY = 3 days;
+    // Cold actions delay (a delay that will be applied for major actions like upgradeProxy and setMiddleware)
     uint256 COLD_ACTIONS_DELAY = 14 days;
+    // Hot actions delay (a delay that will be applied for minor actions like setMaxNetworkLimit and setResolver)
     uint256 HOT_ACTIONS_DELAY = 0;
+    // Admin address (will become executor, proposer, and default admin by default)
     address ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
     // Optional
-    bytes11 SALT = "SymNetwork";
+
+    // Metadata URI of the Network
+    string METADATA_URI = "";
+    // Salt for deterministic deployment
+    bytes11 SALT = "Test2";
 
     function run() public {
         address[] memory proposers = new address[](1);

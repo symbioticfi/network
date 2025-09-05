@@ -12,19 +12,32 @@ import {DeployNetworkForVaultBase} from "./base/DeployNetworkForVaultBase.sol";
  */
 contract DeployNetworkForVault is DeployNetworkForVaultBase {
     // Configuration constants - UPDATE THESE BEFORE DEPLOYMENT
+
+    // Name of the Network
     string NAME = "My Network";
-    string METADATA_URI = "";
+    // Default minimum delay (will be applied for any action that doesn't have a specific delay yet)
     uint256 DEFAULT_MIN_DELAY = 3 days;
+    // Cold actions delay (a delay that will be applied for major actions like upgradeProxy and setMiddleware)
     uint256 COLD_ACTIONS_DELAY = 14 days;
+    // Hot actions delay (a delay that will be applied for minor actions like setMaxNetworkLimit and setResolver)
     uint256 HOT_ACTIONS_DELAY = 0;
+    // Admin address (will become executor, proposer, and default admin by default)
     address ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-    address VAULT = address(0);
-    uint256 MAX_NETWORK_LIMIT = 0;
-    address RESOLVER = address(0);
+    // Vault address to opt-in to
+    address VAULT = 0x49fC19bAE549e0b5F99B5b42d7222Caf09E8d2a1;
+    // Maximum amount of delegation that network is ready to receive
+    uint256 MAX_NETWORK_LIMIT = 1000;
+    // Resolver address (optional, is applied only if VetoSlasher is used)
+    address RESOLVER = 0xbf616b04c463b818e3336FF3767e61AB44103243;
 
     // Optional
+
+    // Subnetwork Identifier (multiple subnetworks can be used, e.g., to have different resolvers for the same network)
     uint96 SUBNETWORK_ID = 0;
-    bytes11 SALT = "SymNetwork";
+    // Metadata URI of the Network
+    string METADATA_URI = "";
+    // Salt for deterministic deployment
+    bytes11 SALT = "Test3";
 
     function run() public {
         address[] memory proposers = new address[](1);
