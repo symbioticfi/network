@@ -19,13 +19,13 @@ contract SetMaxNetworkLimitBase is ActionBase {
         uint256 delay,
         bytes32 salt
     ) public {
-        address delegator = IVault(vault).delegator();
+        (address delegator, bytes memory payload) = getTargetAndPayload(vault, subnetworkId, maxNetworkLimit);
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: false,
                 target: delegator,
-                data: abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (subnetworkId, maxNetworkLimit)),
+                data: payload,
                 delay: delay,
                 salt: salt
             })
@@ -57,13 +57,13 @@ contract SetMaxNetworkLimitBase is ActionBase {
         uint256 maxNetworkLimit,
         bytes32 salt
     ) public {
-        address delegator = IVault(vault).delegator();
+        (address delegator, bytes memory payload) = getTargetAndPayload(vault, subnetworkId, maxNetworkLimit);
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: true,
                 target: delegator,
-                data: abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (subnetworkId, maxNetworkLimit)),
+                data: payload,
                 delay: 0,
                 salt: salt
             })
@@ -97,5 +97,14 @@ contract SetMaxNetworkLimitBase is ActionBase {
     ) public {
         runSchedule(network, vault, subnetworkId, maxNetworkLimit, 0, salt);
         runExecute(network, vault, subnetworkId, maxNetworkLimit, salt);
+    }
+
+    function getTargetAndPayload(
+        address vault,
+        uint96 subnetworkId,
+        uint256 maxNetworkLimit
+    ) public view returns (address target, bytes memory payload) {
+        target = IVault(vault).delegator();
+        payload = abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (subnetworkId, maxNetworkLimit));
     }
 }

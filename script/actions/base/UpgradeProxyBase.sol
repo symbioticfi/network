@@ -16,15 +16,13 @@ contract UpgradeProxyBase is ActionBase {
         uint256 delay,
         bytes32 salt
     ) public {
-        address proxyAdmin = _getProxyAdmin(network);
+        (address target, bytes memory data) = getTargetAndPayload(network, newImplementation, upgradeData);
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: false,
-                target: proxyAdmin,
-                data: abi.encodeCall(
-                    ProxyAdmin.upgradeAndCall, (ITransparentUpgradeableProxy(network), newImplementation, upgradeData)
-                ),
+                target: target,
+                data: data,
                 delay: delay,
                 salt: salt
             })
@@ -35,8 +33,8 @@ contract UpgradeProxyBase is ActionBase {
                 "Scheduled upgrade for",
                 "\n    network:",
                 vm.toString(network),
-                "\n    proxyAdmin:",
-                vm.toString(proxyAdmin),
+                "\n    upgradeData:",
+                string(upgradeData),
                 "\n    newImplementation:",
                 vm.toString(newImplementation),
                 "\n    delay:",
@@ -48,15 +46,13 @@ contract UpgradeProxyBase is ActionBase {
     }
 
     function runExecute(address network, address newImplementation, bytes memory upgradeData, bytes32 salt) public {
-        address proxyAdmin = _getProxyAdmin(network);
+        (address target, bytes memory data) = getTargetAndPayload(network, newImplementation, upgradeData);
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: true,
-                target: proxyAdmin,
-                data: abi.encodeCall(
-                    ProxyAdmin.upgradeAndCall, (ITransparentUpgradeableProxy(network), newImplementation, upgradeData)
-                ),
+                target: target,
+                data: data,
                 delay: 0,
                 salt: salt
             })
@@ -67,8 +63,8 @@ contract UpgradeProxyBase is ActionBase {
                 "Executed upgrade for",
                 "\n    network:",
                 vm.toString(network),
-                "\n    proxyAdmin:",
-                vm.toString(proxyAdmin),
+                "\n    upgradeData:",
+                string(upgradeData),
                 "\n    newImplementation:",
                 vm.toString(newImplementation),
                 "\n    salt:",
@@ -93,5 +89,16 @@ contract UpgradeProxyBase is ActionBase {
         address proxy
     ) internal view returns (address admin) {
         return address(uint160(uint256(vm.load(proxy, ERC1967Utils.ADMIN_SLOT))));
+    }
+
+    function getTargetAndPayload(
+        address network,
+        address newImplementation,
+        bytes memory upgradeData
+    ) public view returns (address target, bytes memory payload) {
+        target = _getProxyAdmin(network);
+        payload = abi.encodeCall(
+            ProxyAdmin.upgradeAndCall, (ITransparentUpgradeableProxy(network), newImplementation, upgradeData)
+        );
     }
 }

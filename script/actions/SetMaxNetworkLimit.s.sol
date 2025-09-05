@@ -2,8 +2,9 @@
 pragma solidity ^0.8.25;
 
 import "./base/SetMaxNetworkLimitBase.sol";
+import {ITimelockAction} from "./interfaces/ITimelockAction.sol";
 
-contract SetMaxNetworkLimit is SetMaxNetworkLimitBase {
+contract SetMaxNetworkLimit is SetMaxNetworkLimitBase, ITimelockAction {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
@@ -42,5 +43,12 @@ contract SetMaxNetworkLimit is SetMaxNetworkLimitBase {
      */
     function runSE() public {
         runScheduleAndExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, SALT);
+    }
+
+    /**
+     * @notice Get the target and payload of the setMaxNetworkLimit
+     */
+    function getTargetAndPayload() public view returns (address, bytes memory) {
+        return getTargetAndPayload(VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT);
     }
 }

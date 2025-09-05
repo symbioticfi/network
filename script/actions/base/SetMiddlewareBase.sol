@@ -9,12 +9,13 @@ import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/Symbiot
 
 contract SetMiddlewareBase is ActionBase {
     function runSchedule(address network, address middleware, uint256 delay, bytes32 salt) public {
+        (address target, bytes memory data) = getTargetAndPayload(middleware);
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: false,
-                target: address(SymbioticCoreConstants.core().networkMiddlewareService),
-                data: abi.encodeCall(INetworkMiddlewareService.setMiddleware, (middleware)),
+                target: target,
+                data: data,
                 delay: delay,
                 salt: salt
             })
@@ -36,12 +37,13 @@ contract SetMiddlewareBase is ActionBase {
     }
 
     function runExecute(address network, address middleware, bytes32 salt) public {
+        (address target, bytes memory data) = getTargetAndPayload(middleware);
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: true,
-                target: address(SymbioticCoreConstants.core().networkMiddlewareService),
-                data: abi.encodeCall(INetworkMiddlewareService.setMiddleware, (middleware)),
+                target: target,
+                data: data,
                 delay: 0,
                 salt: salt
             })
@@ -65,5 +67,12 @@ contract SetMiddlewareBase is ActionBase {
     function runScheduleAndExecute(address network, address middleware, bytes32 salt) public {
         runSchedule(network, middleware, 0, salt);
         runExecute(network, middleware, salt);
+    }
+
+    function getTargetAndPayload(
+        address middleware
+    ) public view returns (address target, bytes memory payload) {
+        target = address(SymbioticCoreConstants.core().networkMiddlewareService);
+        payload = abi.encodeCall(INetworkMiddlewareService.setMiddleware, (middleware));
     }
 }

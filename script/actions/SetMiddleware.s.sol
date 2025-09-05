@@ -2,8 +2,9 @@
 pragma solidity ^0.8.25;
 
 import "./base/SetMiddlewareBase.sol";
+import {ITimelockAction} from "./interfaces/ITimelockAction.sol";
 
-contract SetMiddleware is SetMiddlewareBase {
+contract SetMiddleware is SetMiddlewareBase, ITimelockAction {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
@@ -38,5 +39,12 @@ contract SetMiddleware is SetMiddlewareBase {
      */
     function runSE() public {
         runScheduleAndExecute(NETWORK, MIDDLEWARE, SALT);
+    }
+
+    /**
+     * @notice Get the target and payload of the setMiddleware
+     */
+    function getTargetAndPayload() public view returns (address, bytes memory) {
+        return getTargetAndPayload(MIDDLEWARE);
     }
 }

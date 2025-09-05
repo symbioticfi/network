@@ -2,8 +2,9 @@
 pragma solidity ^0.8.25;
 
 import "./base/UpgradeProxyBase.sol";
+import {ITimelockAction} from "./interfaces/ITimelockAction.sol";
 
-contract UpgradeProxy is UpgradeProxyBase {
+contract UpgradeProxy is UpgradeProxyBase, ITimelockAction {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
@@ -40,5 +41,12 @@ contract UpgradeProxy is UpgradeProxyBase {
      */
     function runSE() public {
         runScheduleAndExecute(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, SALT);
+    }
+
+    /**
+     * @notice Get the target and payload of the network upgrade
+     */
+    function getTargetAndPayload() public view returns (address, bytes memory) {
+        return getTargetAndPayload(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA);
     }
 }

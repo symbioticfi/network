@@ -2,8 +2,9 @@
 pragma solidity ^0.8.25;
 
 import "./base/SetResolverBase.sol";
+import {ITimelockAction} from "./interfaces/ITimelockAction.sol";
 
-contract SetResolver is SetResolverBase {
+contract SetResolver is SetResolverBase, ITimelockAction {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
@@ -44,5 +45,12 @@ contract SetResolver is SetResolverBase {
      */
     function runSE() public {
         runScheduleAndExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, SALT);
+    }
+
+    /**
+     * @notice Get the target and payload of the setResolver
+     */
+    function getTargetAndPayload() public view returns (address, bytes memory) {
+        return getTargetAndPayload(VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS);
     }
 }

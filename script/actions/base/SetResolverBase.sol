@@ -19,12 +19,13 @@ contract SetResolverBase is ActionBase {
         uint256 delay,
         bytes32 salt
     ) public {
+        (address target, bytes memory data) = getTargetAndPayload(vault, identifier, resolver, hints);
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: false,
-                target: IVault(vault).slasher(),
-                data: abi.encodeCall(IVetoSlasher.setResolver, (identifier, resolver, hints)),
+                target: target,
+                data: data,
                 delay: delay,
                 salt: salt
             })
@@ -57,12 +58,13 @@ contract SetResolverBase is ActionBase {
         bytes memory hints,
         bytes32 salt
     ) public {
+        (address target, bytes memory data) = getTargetAndPayload(vault, identifier, resolver, hints);
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: true,
-                target: IVault(vault).slasher(),
-                data: abi.encodeCall(IVetoSlasher.setResolver, (identifier, resolver, hints)),
+                target: target,
+                data: data,
                 delay: 0,
                 salt: salt
             })
@@ -97,5 +99,15 @@ contract SetResolverBase is ActionBase {
     ) public {
         runSchedule(network, vault, identifier, resolver, hints, 0, salt);
         runExecute(network, vault, identifier, resolver, hints, salt);
+    }
+
+    function getTargetAndPayload(
+        address vault,
+        uint96 identifier,
+        address resolver,
+        bytes memory hints
+    ) public view returns (address target, bytes memory payload) {
+        target = IVault(vault).slasher();
+        payload = abi.encodeCall(IVetoSlasher.setResolver, (identifier, resolver, hints));
     }
 }
