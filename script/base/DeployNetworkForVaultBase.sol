@@ -156,10 +156,18 @@ contract DeployNetworkForVaultBase is DeployNetworkBase {
         vm.stopBroadcast();
 
         for (uint256 i; i < params.deployNetworkParams.proposers.length; ++i) {
-            assert(AccessControl(network).hasRole(Network(payable(network)).PROPOSER_ROLE(), params.deployNetworkParams.proposers[i]));
+            assert(
+                AccessControl(network).hasRole(
+                    Network(payable(network)).PROPOSER_ROLE(), params.deployNetworkParams.proposers[i]
+                )
+            );
         }
         for (uint256 i; i < params.deployNetworkParams.executors.length; ++i) {
-            assert(AccessControl(network).hasRole(Network(payable(network)).EXECUTOR_ROLE(), params.deployNetworkParams.executors[i]));
+            assert(
+                AccessControl(network).hasRole(
+                    Network(payable(network)).EXECUTOR_ROLE(), params.deployNetworkParams.executors[i]
+                )
+            );
         }
         if (!isDeployerProposer) {
             assert(!AccessControl(network).hasRole(Network(payable(network)).PROPOSER_ROLE(), deployer));

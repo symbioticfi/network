@@ -103,6 +103,18 @@ contract DeployNetworkBase is Script, Logs {
             proxy = ICreateX(CREATEX_FACTORY).deployCreate3(salt, proxyInitCode);
 
             assert(proxy == precomputedProxy);
+            assert(_getProxyAdmin(proxy) == precomputedProxyAdmin);
+            assert(keccak256(bytes(Network(payable(proxy)).name())) == keccak256(bytes(params.name)));
+            assert(keccak256(bytes(Network(payable(proxy)).metadataURI())) == keccak256(bytes(params.metadataURI)));
+            assert(Network(payable(proxy)).getMinDelay() == params.globalMinDelay);
+            for (uint256 i; i < delayParams.length; ++i) {
+                // if target is address(0), it means that the delay is for the any address
+                address target = delayParams[i].target == address(0) ? address(1) : delayParams[i].target;
+                assert(
+                    Network(payable(proxy)).getMinDelay(target, abi.encodePacked(delayParams[i].selector))
+                        == delayParams[i].delay
+                );
+            }
         }
 
         log(
@@ -122,5 +134,11 @@ contract DeployNetworkBase is Script, Logs {
         vm.stopBroadcast();
 
         return proxy;
+    }
+
+    function _getProxyAdmin(
+        address proxy
+    ) internal view returns (address admin) {
+        return address(uint160(uint256(vm.load(proxy, ERC1967Utils.ADMIN_SLOT))));
     }
 }

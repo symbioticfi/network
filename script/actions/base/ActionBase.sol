@@ -45,5 +45,13 @@ contract ActionBase is Script, Logs {
         );
 
         vm.stopBroadcast();
+
+        TimelockController timelockController = TimelockController(payable(params.network));
+        bytes32 id = timelockController.hashOperation(params.target, 0, params.data, predecessor, params.salt);
+        if (params.isExecutionMode) {
+            assert(timelockController.isOperationDone(id) == true);
+        } else {
+            assert(timelockController.isOperationPending(id) == true);
+        }
     }
 }
