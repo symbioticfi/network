@@ -59,4 +59,9 @@ contract SetMiddlewareBase is ActionBase {
             )
         );
     }
+
+    function runScheduleAndExecute(address network, address middleware, bytes32 salt) public {
+        runSchedule(network, middleware, 0, salt);
+        runExecute(network, middleware, salt);
+    }
 }

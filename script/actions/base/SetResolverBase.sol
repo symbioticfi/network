@@ -81,4 +81,16 @@ contract SetResolverBase is ActionBase {
             )
         );
     }
+
+    function runScheduleAndExecute(
+        address network,
+        address vault,
+        uint96 identifier,
+        address resolver,
+        bytes memory hints,
+        bytes32 salt
+    ) public {
+        runSchedule(network, vault, identifier, resolver, hints, 0, salt);
+        runExecute(network, vault, identifier, resolver, hints, salt);
+    }
 }

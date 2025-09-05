@@ -15,14 +15,22 @@ contract SetMiddleware is SetMiddlewareBase {
     /**
      * @notice Schedule a setMiddleware through the timelock
      */
-    function runSchedule() public {
+    function runS() public {
         runSchedule(NETWORK, MIDDLEWARE, DELAY, SALT);
     }
 
     /**
      * @notice Execute a setMiddleware immediately through the timelock
      */
-    function runExecute() public {
+    function runE() public {
         runExecute(NETWORK, MIDDLEWARE, SALT);
+    }
+
+    /**
+     * @notice Schedule and execute a setMiddleware through the timelock
+     * @dev It will succeed only if the delay is 0
+     */
+    function runSE() public {
+        runScheduleAndExecute(NETWORK, MIDDLEWARE, SALT);
     }
 }

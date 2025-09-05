@@ -46,7 +46,7 @@ contract DeployNetworkBase is Script, Logs {
 
         // Needed for permissioned deploy protection
         (,, address deployer) = vm.readCallers();
-         // CreateX-specific salt generation
+        // CreateX-specific salt generation
         bytes32 salt = bytes32(uint256(uint160(deployer)) << 96 | uint256(0x00) << 88 | uint256(uint88(params.salt)));
         bytes32 guardedSalt = Hashes.efficientKeccak256({a: bytes32(uint256(uint160(deployer))), b: salt});
 
@@ -58,9 +58,6 @@ contract DeployNetworkBase is Script, Logs {
         {
             address precomputedProxy = ICreateX(CREATEX_FACTORY).computeCreate3Address(guardedSalt);
             address precomputedProxyAdmin = ICreateX(CREATEX_FACTORY).computeCreateAddress(precomputedProxy, 1);
-
-            console2.log("precomputedProxy", precomputedProxy);
-            console2.log("precomputedProxyAdmin", precomputedProxyAdmin);
 
             INetwork.DelayParams[] memory delayParams = new INetwork.DelayParams[](4);
             delayParams[0] = INetwork.DelayParams({

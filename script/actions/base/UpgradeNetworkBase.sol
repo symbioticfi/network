@@ -77,6 +77,16 @@ contract UpgradeNetworkBase is ActionBase {
         );
     }
 
+    function runScheduleAndExecute(
+        address network,
+        address newImplementation,
+        bytes memory upgradeData,
+        bytes32 salt
+    ) public {
+        runSchedule(network, newImplementation, upgradeData, 0, salt);
+        runExecute(network, newImplementation, upgradeData, salt);
+    }
+
     function _getProxyAdmin(
         address proxy
     ) internal view returns (address admin) {

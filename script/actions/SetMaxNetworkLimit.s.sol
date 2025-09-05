@@ -17,14 +17,22 @@ contract SetMaxNetworkLimit is SetMaxNetworkLimitBase {
     /**
      * @notice Schedule a setMaxNetworkLimit through the timelock
      */
-    function runSchedule() public {
+    function runS() public {
         runSchedule(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, DELAY, SALT);
     }
 
     /**
      * @notice Execute a setMaxNetworkLimit immediately through the timelock
      */
-    function runExecute() public {
+    function runE() public {
         runExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, SALT);
+    }
+
+    /**
+     * @notice Schedule and execute a setMaxNetworkLimit through the timelock
+     * @dev It will succeed only if the delay is 0
+     */
+    function runSE() public {
+        runScheduleAndExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, SALT);
     }
 }

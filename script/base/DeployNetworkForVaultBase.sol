@@ -10,6 +10,7 @@ import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDe
 import {IVetoSlasher} from "@symbioticfi/core/src/interfaces/slasher/IVetoSlasher.sol";
 
 import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
+import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
 
 contract DeployNetworkForVaultBase is DeployNetworkBase {
     struct DeployNetworkForVaultParams {
@@ -84,48 +85,47 @@ contract DeployNetworkForVaultBase is DeployNetworkBase {
             uint256[] memory values = new uint256[](numCalls);
             bytes[] memory payloads = new bytes[](numCalls);
 
-            targets[0] = IVault(params.vault).delegator();
-            payloads[0] =
+            uint256 index;
+            targets[index] = IVault(params.vault).delegator();
+            payloads[index] =
                 abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (params.subnetworkId, params.maxNetworkLimit));
 
             if (params.resolver != address(0)) {
-                targets[1] = IVault(params.vault).slasher();
-                payloads[1] =
+                targets[++index] = IVault(params.vault).slasher();
+                payloads[index] =
                     abi.encodeCall(IVetoSlasher.setResolver, (params.subnetworkId, params.resolver, new bytes(0)));
             }
 
             if (originalGlobalMinDelay > 0) {
-                targets[2] = network;
-                payloads[2] = abi.encodeCall(
-                    INetwork.updateDelay, (address(0), INetwork.updateDelay.selector, true, originalGlobalMinDelay)
-                );
+                targets[++index] = network;
+                payloads[index] = abi.encodeCall(TimelockController.updateDelay, (originalGlobalMinDelay));
             }
 
             if (originalSetMaxNetworkLimitMinDelay > 0) {
-                targets[3] = network;
-                payloads[3] = abi.encodeCall(
+                targets[++index] = network;
+                payloads[index] = abi.encodeCall(
                     INetwork.updateDelay,
                     (address(0), IBaseDelegator.setMaxNetworkLimit.selector, true, originalSetMaxNetworkLimitMinDelay)
                 );
             }
 
             if (originalSetResolverMinDelay > 0) {
-                targets[4] = network;
-                payloads[4] = abi.encodeCall(
+                targets[++index] = network;
+                payloads[index] = abi.encodeCall(
                     INetwork.updateDelay,
                     (address(0), IVetoSlasher.setResolver.selector, true, originalSetResolverMinDelay)
                 );
             }
 
             if (!isDeployerProposer) {
-                targets[5] = network;
-                payloads[5] =
+                targets[++index] = network;
+                payloads[index] =
                     abi.encodeCall(AccessControl.revokeRole, (Network(payable(network)).PROPOSER_ROLE(), deployer));
             }
 
             if (!isDeployerExecutor) {
-                targets[6] = network;
-                payloads[6] =
+                targets[++index] = network;
+                payloads[index] =
                     abi.encodeCall(AccessControl.revokeRole, (Network(payable(network)).EXECUTOR_ROLE(), deployer));
             }
 

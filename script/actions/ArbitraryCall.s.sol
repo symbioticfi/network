@@ -16,14 +16,22 @@ contract ArbitraryCall is ArbitraryCallBase {
     /**
      * @notice Schedule an arbitrary function call through the timelock
      */
-    function runSchedule() public {
+    function runS() public {
         runSchedule(NETWORK, TARGET, DATA, DELAY, SALT);
     }
 
     /**
      * @notice Execute an arbitrary function call immediately through the timelock
      */
-    function runExecute() public {
+    function runE() public {
         runExecute(NETWORK, TARGET, DATA, SALT);
+    }
+
+    /**
+     * @notice Schedule and execute an arbitrary function call through the timelock
+     * @dev It will succeed only if the delay is 0
+     */
+    function runSE() public {
+        runScheduleAndExecute(NETWORK, TARGET, DATA, SALT);
     }
 }
