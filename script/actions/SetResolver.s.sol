@@ -18,14 +18,22 @@ contract SetResolver is SetResolverBase {
     /**
      * @notice Schedule a setResolver through the timelock
      */
-    function runSchedule() public {
+    function runS() public {
         runSchedule(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, DELAY, SALT);
     }
 
     /**
      * @notice Execute a setResolver immediately through the timelock
      */
-    function runExecute() public {
+    function runE() public {
         runExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, SALT);
+    }
+
+    /**
+     * @notice Schedule and execute a setResolver through the timelock
+     * @dev It will succeed only if the delay is 0
+     */
+    function runSE() public {
+        runScheduleAndExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, SALT);
     }
 }

@@ -16,14 +16,22 @@ contract UpgradeNetwork is UpgradeNetworkBase {
     /**
      * @notice Schedule a network upgrade through the timelock
      */
-    function runschedule() public {
+    function runS() public {
         runSchedule(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, DELAY, SALT);
     }
 
     /**
      * @notice Execute a network upgrade immediately through the timelock
      */
-    function runExecute() public {
+    function runE() public {
         runExecute(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, SALT);
+    }
+
+    /**
+     * @notice Schedule and execute a network upgrade through the timelock
+     * @dev It will succeed only if the delay is 0
+     */
+    function runSE() public {
+        runScheduleAndExecute(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, SALT);
     }
 }

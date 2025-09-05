@@ -86,4 +86,16 @@ contract SetResolverBase is ActionBase {
 
         assert(IVetoSlasher(IVault(vault).slasher()).resolver(network.subnetwork(identifier), bytes("")) == resolver);
     }
+
+    function runScheduleAndExecute(
+        address network,
+        address vault,
+        uint96 identifier,
+        address resolver,
+        bytes memory hints,
+        bytes32 salt
+    ) public {
+        runSchedule(network, vault, identifier, resolver, hints, 0, salt);
+        runExecute(network, vault, identifier, resolver, hints, salt);
+    }
 }

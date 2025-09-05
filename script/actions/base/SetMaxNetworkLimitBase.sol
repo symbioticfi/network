@@ -87,4 +87,15 @@ contract SetMaxNetworkLimitBase is ActionBase {
 
         assert(IBaseDelegator(delegator).maxNetworkLimit(network.subnetwork(subnetworkId)) == maxNetworkLimit);
     }
+
+    function runScheduleAndExecute(
+        address network,
+        address vault,
+        uint96 subnetworkId,
+        uint256 maxNetworkLimit,
+        bytes32 salt
+    ) public {
+        runSchedule(network, vault, subnetworkId, maxNetworkLimit, 0, salt);
+        runExecute(network, vault, subnetworkId, maxNetworkLimit, salt);
+    }
 }

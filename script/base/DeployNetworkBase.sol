@@ -58,9 +58,6 @@ contract DeployNetworkBase is Script, Logs {
             address precomputedProxy = ICreateX(CREATEX_FACTORY).computeCreate3Address(guardedSalt);
             address precomputedProxyAdmin = ICreateX(CREATEX_FACTORY).computeCreateAddress(precomputedProxy, 1);
 
-            console2.log("precomputedProxy", precomputedProxy);
-            console2.log("precomputedProxyAdmin", precomputedProxyAdmin);
-
             INetwork.DelayParams[] memory delayParams = new INetwork.DelayParams[](4);
             delayParams[0] = INetwork.DelayParams({
                 target: precomputedProxyAdmin,

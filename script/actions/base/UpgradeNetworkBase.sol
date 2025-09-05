@@ -79,6 +79,16 @@ contract UpgradeNetworkBase is ActionBase {
         assert(address(uint160(uint256(vm.load(network, ERC1967Utils.IMPLEMENTATION_SLOT)))) == newImplementation);
     }
 
+    function runScheduleAndExecute(
+        address network,
+        address newImplementation,
+        bytes memory upgradeData,
+        bytes32 salt
+    ) public {
+        runSchedule(network, newImplementation, upgradeData, 0, salt);
+        runExecute(network, newImplementation, upgradeData, salt);
+    }
+
     function _getProxyAdmin(
         address proxy
     ) internal view returns (address admin) {

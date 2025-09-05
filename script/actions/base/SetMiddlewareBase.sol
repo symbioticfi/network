@@ -61,4 +61,9 @@ contract SetMiddlewareBase is ActionBase {
 
         assert(SymbioticCoreConstants.core().networkMiddlewareService.middleware(network) == middleware);
     }
+
+    function runScheduleAndExecute(address network, address middleware, bytes32 salt) public {
+        runSchedule(network, middleware, 0, salt);
+        runExecute(network, middleware, salt);
+    }
 }
