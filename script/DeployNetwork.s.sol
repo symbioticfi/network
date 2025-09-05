@@ -1,57 +1,49 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-import {Script} from "forge-std/Script.sol";
-import {console2 as console} from "forge-std/console2.sol";
-
-import {Network} from "../src/contracts/Network.sol";
+import {DeployNetworkBase} from "./base/DeployNetworkBase.sol";
 import {INetwork} from "../src/interfaces/INetwork.sol";
-import {MyNetwork} from "../examples/MyNetwork.sol";
 
-import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/SymbioticCoreConstants.sol";
-
-import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-
-import {ICreateX} from "@createx/ICreateX.sol";
 /**
  * Deploys Network implementation and a TransparentUpgradeableProxy managed by ProxyAdmin.
  * Uses CREATE3 for deterministic proxy deployment.
  *
  * Configuration is handled entirely by inherited contract.
  */
+contract DeployNetwork is DeployNetworkBase {
+    // Configuration constants - UPDATE THESE BEFORE DEPLOYMENT
+    string NAME = "My Network";
+    string METADATA_URI = "";
+    uint256 DEFAULT_MIN_DELAY = 3 days;
+    uint256 COLD_ACTIONS_DELAY = 14 days;
+    uint256 HOT_ACTIONS_DELAY = 0;
+    address ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
 
-contract DeployNetwork is Script {
-    address public constant CREATEX_FACTORY = 0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed;
+    // Optional
+    bytes11 SALT = "SymNetwork";
 
-    struct NetworkDeployParams {
-        INetwork.NetworkInitParams initParams;
-        address proxyAdmin;
-        bytes32 salt; // Salt for CREATE3 deterministic deployment
-    }
-
-    function run(
-        NetworkDeployParams memory params
-    ) public returns (address) {
-        address networkRegistry = address(SymbioticCoreConstants.core().networkRegistry);
-        address networkMiddlewareService = address(SymbioticCoreConstants.core().networkMiddlewareService);
-
-        Network implementation = new MyNetwork(networkRegistry, networkMiddlewareService);
-
-        bytes memory initData = abi.encodeCall(MyNetwork.initialize, (params.initParams));
-
-        // Create initialization code for TransparentUpgradeableProxy
-        bytes memory proxyInitCode = abi.encodePacked(
-            type(TransparentUpgradeableProxy).creationCode,
-            abi.encode(address(implementation), params.proxyAdmin, initData)
+    function run() public {
+        address[] memory proposers = new address[](1);
+        proposers[0] = ADMIN;
+        address[] memory executors = new address[](1);
+        executors[0] = ADMIN;
+        run(
+            DeployNetworkParams({
+                name: NAME,
+                metadataURI: METADATA_URI,
+                proxyAdmin: ADMIN,
+                proposers: proposers,
+                executors: executors,
+                defaultAdminRoleHolder: ADMIN,
+                nameUpdateRoleHolder: ADMIN,
+                metadataURIUpdateRoleHolder: ADMIN,
+                globalMinDelay: DEFAULT_MIN_DELAY,
+                upgradeProxyMinDelay: COLD_ACTIONS_DELAY,
+                setMiddlewareMinDelay: COLD_ACTIONS_DELAY,
+                setMaxNetworkLimitMinDelay: HOT_ACTIONS_DELAY,
+                setResolverMinDelay: HOT_ACTIONS_DELAY,
+                salt: SALT
+            })
         );
-
-        // Deploy proxy using CREATE3
-        address proxy = ICreateX(CREATEX_FACTORY).deployCreate3(params.salt, proxyInitCode);
-
-        console.log("Network implementation:", address(implementation));
-        console.log("Network proxy:", proxy);
-
-        return proxy;
     }
 }

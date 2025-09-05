@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-import {INetwork} from "../interfaces/INetwork.sol";
-import {ISetMaxNetworkLimitHook} from "../interfaces/ISetMaxNetworkLimitHook.sol";
+import {INetwork} from "./interfaces/INetwork.sol";
+import {ISetMaxNetworkLimitHook} from "./interfaces/ISetMaxNetworkLimitHook.sol";
 
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {INetworkMiddlewareService} from "@symbioticfi/core/src/interfaces/service/INetworkMiddlewareService.sol";
@@ -65,6 +65,15 @@ contract Network is TimelockControllerUpgradeable, INetwork {
         assembly {
             $.slot := TimelockControllerStorageLocation
         }
+    }
+
+    /**
+     * @inheritdoc INetwork
+     */
+    function initialize(
+        NetworkInitParams memory networkInitParams
+    ) public virtual initializer {
+        __Network_init(networkInitParams);
     }
 
     function __Network_init(
