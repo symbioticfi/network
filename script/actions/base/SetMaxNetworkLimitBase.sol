@@ -6,8 +6,11 @@ import {Network} from "../../../src/Network.sol";
 
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
+import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
 
 contract SetMaxNetworkLimitBase is ActionBase {
+    using Subnetwork for address;
+
     function runSchedule(
         address network,
         address vault,
@@ -81,5 +84,7 @@ contract SetMaxNetworkLimitBase is ActionBase {
                 vm.toString(salt)
             )
         );
+
+        assert(IBaseDelegator(delegator).maxNetworkLimit(network.subnetwork(subnetworkId)) == maxNetworkLimit);
     }
 }

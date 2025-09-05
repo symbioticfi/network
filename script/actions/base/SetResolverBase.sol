@@ -5,8 +5,11 @@ import "./ActionBase.sol";
 
 import {IVetoSlasher} from "@symbioticfi/core/src/interfaces/slasher/IVetoSlasher.sol";
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
+import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
 
 contract SetResolverBase is ActionBase {
+    using Subnetwork for address;
+
     function runSchedule(
         address network,
         address vault,
@@ -80,5 +83,7 @@ contract SetResolverBase is ActionBase {
                 vm.toString(salt)
             )
         );
+
+        assert(IVetoSlasher(IVault(vault).slasher()).resolver(network.subnetwork(identifier), bytes("")) == resolver);
     }
 }

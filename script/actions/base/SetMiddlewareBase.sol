@@ -58,5 +58,7 @@ contract SetMiddlewareBase is ActionBase {
                 vm.toString(salt)
             )
         );
+
+        assert(SymbioticCoreConstants.core().networkMiddlewareService.middleware(network) == middleware);
     }
 }

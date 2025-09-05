@@ -36,7 +36,6 @@ contract DeployNetworkForVault is DeployNetworkForVaultBase {
                 deployNetworkParams: DeployNetworkParams({
                     name: NAME,
                     metadataURI: METADATA_URI,
-                    proxyAdmin: ADMIN,
                     proposers: proposers,
                     executors: executors,
                     defaultAdminRoleHolder: ADMIN,

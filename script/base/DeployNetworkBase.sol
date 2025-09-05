@@ -25,7 +25,6 @@ contract DeployNetworkBase is Script, Logs {
     struct DeployNetworkParams {
         string name;
         string metadataURI;
-        address proxyAdmin;
         address[] proposers;
         address[] executors;
         address defaultAdminRoleHolder;
@@ -46,7 +45,7 @@ contract DeployNetworkBase is Script, Logs {
 
         // Needed for permissioned deploy protection
         (,, address deployer) = vm.readCallers();
-         // CreateX-specific salt generation
+        // CreateX-specific salt generation
         bytes32 salt = bytes32(uint256(uint160(deployer)) << 96 | uint256(0x00) << 88 | uint256(uint88(params.salt)));
         bytes32 guardedSalt = Hashes.efficientKeccak256({a: bytes32(uint256(uint160(deployer))), b: salt});
 
@@ -100,11 +99,13 @@ contract DeployNetworkBase is Script, Logs {
 
             // Create initialization code for TransparentUpgradeableProxy
             bytes memory proxyInitCode = abi.encodePacked(
-                type(TransparentUpgradeableProxy).creationCode, abi.encode(implementation, params.proxyAdmin, initData)
+                type(TransparentUpgradeableProxy).creationCode, abi.encode(implementation, precomputedProxy, initData)
             );
 
             // Deploy proxy using CREATE3
             proxy = ICreateX(CREATEX_FACTORY).deployCreate3(salt, proxyInitCode);
+
+            assert(proxy == precomputedProxy);
         }
 
         log(

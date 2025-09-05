@@ -8,10 +8,13 @@ import {INetwork} from "../../src/interfaces/INetwork.sol";
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {IVetoSlasher} from "@symbioticfi/core/src/interfaces/slasher/IVetoSlasher.sol";
+import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
 
 import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
 contract DeployNetworkForVaultBase is DeployNetworkBase {
+    using Subnetwork for address;
+
     struct DeployNetworkForVaultParams {
         DeployNetworkParams deployNetworkParams;
         address vault;
@@ -151,6 +154,30 @@ contract DeployNetworkForVaultBase is DeployNetworkBase {
         );
 
         vm.stopBroadcast();
+
+        for (uint256 i; i < params.deployNetworkParams.proposers.length; ++i) {
+            assert(AccessControl(network).hasRole(Network(payable(network)).PROPOSER_ROLE(), params.deployNetworkParams.proposers[i]));
+        }
+        for (uint256 i; i < params.deployNetworkParams.executors.length; ++i) {
+            assert(AccessControl(network).hasRole(Network(payable(network)).EXECUTOR_ROLE(), params.deployNetworkParams.executors[i]));
+        }
+        if (!isDeployerProposer) {
+            assert(!AccessControl(network).hasRole(Network(payable(network)).PROPOSER_ROLE(), deployer));
+        }
+        if (!isDeployerExecutor) {
+            assert(!AccessControl(network).hasRole(Network(payable(network)).EXECUTOR_ROLE(), deployer));
+        }
+        if (params.resolver != address(0)) {
+            assert(
+                IVetoSlasher(IVault(params.vault).slasher()).resolver(
+                    network.subnetwork(params.subnetworkId), bytes("")
+                ) == params.resolver
+            );
+        }
+        assert(
+            IBaseDelegator(IVault(params.vault).delegator()).maxNetworkLimit(network.subnetwork(params.subnetworkId))
+                == params.maxNetworkLimit
+        );
 
         return network;
     }

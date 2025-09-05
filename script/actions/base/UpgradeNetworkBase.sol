@@ -75,6 +75,8 @@ contract UpgradeNetworkBase is ActionBase {
                 vm.toString(salt)
             )
         );
+
+        assert(address(uint160(uint256(vm.load(network, ERC1967Utils.IMPLEMENTATION_SLOT)))) == newImplementation);
     }
 
     function _getProxyAdmin(
