@@ -4,6 +4,12 @@ This repository contains a default Network contract and tooling to manage it. Ba
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/symbioticfi/network)
 
+## Documentation
+
+- [What is Network?](https://docs.symbiotic.fi/modules/counterparties/networks)
+- [What are Resolvers?](https://docs.symbiotic.fi/modules/counterparties/resolvers)
+- [Network Registration](https://docs.symbiotic.fi/modules/registries#network-registration-process)
+
 ## Usage
 
 ### Dependencies
@@ -17,7 +23,7 @@ This repository contains a default Network contract and tooling to manage it. Ba
 **Clone the repository**
 
 ```bash
-git clone --recurse-submodules https://github.com/symbioticfi/symbiotic-super-sum.git
+git clone --recurse-submodules https://github.com/symbioticfi/network.git
 ```
 
 **Install dependencies**
@@ -116,8 +122,8 @@ Opted network into vault
 
 There are 5 predefined [action-scripts](./script/actions/), that you can use from the start:
 
-- [SetMaxNetworkLimit](./script/actions/SetMaxNetworkLimit.s.sol) - set new maximum network limit for the vault
-- [SetResolver](./script/actions/SetResolver.s.sol) - set a new resolver for the vault (only if the vault uses [VetoSlasher](https://docs.symbiotic.fi/modules/vault/slashing#1-vetoslasher))
+- [SetMaxNetworkLimit](./script/actions/SetMaxNetworkLimit.s.sol) - set new [maximum network limit](https://docs.symbiotic.fi/modules/registries#3-network-to-vault-opt-in) for the vault
+- [SetResolver](./script/actions/SetResolver.s.sol) - set a new [resolver](https://docs.symbiotic.fi/modules/counterparties/resolvers) for the vault (only if the vault uses [VetoSlasher](https://docs.symbiotic.fi/modules/vault/slashing#1-vetoslasher))
 - [SetMiddleware](./script/actions/SetMiddleware.s.sol) - set a new middleware
 - [UpgradeProxy](./script/actions/UpgradeProxy.s.sol) - upgrade the proxy (network itself)
 - [ArbitraryCall](./script/actions/ArbitraryCall.s.sol) - make a call to any contract with any data
