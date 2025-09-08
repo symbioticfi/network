@@ -61,7 +61,7 @@ npm install
   Edit needed fields, and execute the script via:
 
   ```bash
-  forge script script/DeployNetwork.s.sol --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+  forge script script/DeployNetwork.s.sol --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --etherscan-api-key <ETHERSCAN_API_KEY> --broadcast --verify
   ```
 
 - If you need a Network deployment for already-deployed Vault
@@ -99,7 +99,7 @@ npm install
   Edit needed fields, and execute the script via:
 
   ```bash
-  forge script script/DeployNetworkForVaults.s.sol:DeployNetworkForVaults --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+  forge script script/DeployNetworkForVaults.s.sol:DeployNetworkForVaults --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --etherscan-api-key <ETHERSCAN_API_KEY> --broadcast --verify
   ```
 
 In the console, you will see logs like these:
