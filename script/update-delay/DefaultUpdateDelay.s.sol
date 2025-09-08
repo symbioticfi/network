@@ -8,31 +8,34 @@ contract DefaultUpdateDelay is DefaultUpdateDelayBase {
 
     // Address of the Network
     address NETWORK = address(0);
-    // Global minimum delay for all operations
+    // New default delay
     uint256 GLOBAL_MIN_DELAY = 0;
     // Delay for the action to be executed
     uint256 DELAY = 0;
+
+    // Optional
+
     // Salt for TimelockController operations
     bytes32 SALT = "DefaultUpdateDelay";
 
     constructor() DefaultUpdateDelayBase(NETWORK, GLOBAL_MIN_DELAY, DELAY, SALT) {}
 
     /**
-     * @notice Schedule a globalMinDelayUpdateDelay through the timelock
+     * @notice Schedule an update of the default delay through the timelock
      */
     function runS() public {
         runSchedule();
     }
 
     /**
-     * @notice Execute a globalMinDelayUpdateDelay immediately through the timelock
+     * @notice Execute an update of the default delay through the timelock
      */
     function runE() public {
         runExecute();
     }
 
     /**
-     * @notice Schedule and execute a globalMinDelayUpdateDelay through the timelock
+     * @notice Schedule and execute an update of the default delay through the timelock
      * @dev It will succeed only if the delay is 0
      */
     function runSE() public {

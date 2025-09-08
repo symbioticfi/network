@@ -8,31 +8,34 @@ contract SetResolverUpdateDelay is SetResolverUpdateDelayBase {
 
     // Address of the Network
     address NETWORK = address(0);
-    // Delay for setResolver operations
+    // New delay for setResolver operations
     uint256 SET_RESOLVER_DELAY = 0;
     // Delay for the action to be executed
     uint256 DELAY = 0;
+
+    // Optional
+
     // Salt for TimelockController operations
     bytes32 SALT = "SetResolverUpdateDelay";
 
     constructor() SetResolverUpdateDelayBase(NETWORK, SET_RESOLVER_DELAY, DELAY, SALT) {}
 
     /**
-     * @notice Schedule a setResolverUpdateDelay through the timelock
+     * @notice Schedule an update of the setResolver delay through the timelock
      */
     function runS() public {
         runSchedule();
     }
 
     /**
-     * @notice Execute a setResolverUpdateDelay immediately through the timelock
+     * @notice Execute an update of the setResolver delay through the timelock
      */
     function runE() public {
         runExecute();
     }
 
     /**
-     * @notice Schedule and execute a setResolverUpdateDelay through the timelock
+     * @notice Schedule and execute an update of the setResolver delay through the timelock
      * @dev It will succeed only if the delay is 0
      */
     function runSE() public {

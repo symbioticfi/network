@@ -3,7 +3,6 @@ pragma solidity ^0.8.25;
 
 import "../../actions/base/ActionBase.sol";
 import {Network} from "../../../src/Network.sol";
-import {INetwork} from "../../../src/interfaces/INetwork.sol";
 
 import {TimelockControllerUpgradeable} from
     "@openzeppelin/contracts-upgradeable/governance/TimelockControllerUpgradeable.sol";
@@ -51,12 +50,12 @@ contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function runExecute() public {
-        (address delegator, bytes memory payload) = getTargetAndPayload();
+        (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: true,
-                target: delegator,
+                target: target,
                 data: payload,
                 delay: 0,
                 salt: salt

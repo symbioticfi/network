@@ -10,10 +10,13 @@ contract ColdActionsUpdateDelay is ActionBase {
 
     // Address of the Network
     address NETWORK = address(0);
-    // Cold Actions Delay
+    // New delay for cold actions
     uint256 COLD_ACTIONS_DELAY = 14 days;
     // Delay for the action to be executed
     uint256 DELAY = 0;
+
+    // Optional
+
     // Salt for TimelockController operations
     bytes32 SALT = "ColdActionsUpdateDelay";
 
@@ -32,29 +35,35 @@ contract ColdActionsUpdateDelay is ActionBase {
         }
     }
 
+    /**
+     * @notice Schedule an update of the cold actions delay through the timelock
+     */
     function runS() public {
-        TimelockBatchParams memory params = TimelockBatchParams({
-            network: NETWORK,
-            isExecutionMode: false,
-            targets: targets,
-            payloads: payloads,
-            delay: DELAY,
-            salt: SALT
-        });
-
-        callTimelockBatch(params);
+        callTimelockBatch(
+            TimelockBatchParams({
+                network: NETWORK,
+                isExecutionMode: false,
+                targets: targets,
+                payloads: payloads,
+                delay: DELAY,
+                salt: SALT
+            })
+        );
     }
 
+    /**
+     * @notice Execute an update of the cold actions delay through the timelock
+     */
     function runE() public {
-        TimelockBatchParams memory params = TimelockBatchParams({
-            network: NETWORK,
-            isExecutionMode: true,
-            targets: targets,
-            payloads: payloads,
-            delay: 0,
-            salt: SALT
-        });
-
-        callTimelockBatch(params);
+        callTimelockBatch(
+            TimelockBatchParams({
+                network: NETWORK,
+                isExecutionMode: true,
+                targets: targets,
+                payloads: payloads,
+                delay: 0,
+                salt: SALT
+            })
+        );
     }
 }

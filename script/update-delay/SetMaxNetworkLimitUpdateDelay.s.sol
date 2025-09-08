@@ -8,31 +8,34 @@ contract SetMaxNetworkLimitUpdateDelay is SetMaxNetworkLimitUpdateDelayBase {
 
     // Address of the Network
     address NETWORK = address(0);
-    // Maximum amount of delegation that network is ready to receive
+    // New delay for setMaxNetworkLimit operations
     uint256 SET_MAX_NETWORK_LIMIT_DELAY = 0;
     // Delay for the action to be executed
     uint256 DELAY = 0;
+
+    // Optional
+
     // Salt for TimelockController operations
     bytes32 SALT = "SetMaxNetworkLimitUpdateDelay";
 
     constructor() SetMaxNetworkLimitUpdateDelayBase(NETWORK, SET_MAX_NETWORK_LIMIT_DELAY, DELAY, SALT) {}
 
     /**
-     * @notice Schedule a setMaxNetworkLimit through the timelock
+     * @notice Schedule an update of the setMaxNetworkLimit delay through the timelock
      */
     function runS() public {
         runSchedule();
     }
 
     /**
-     * @notice Execute a setMaxNetworkLimit immediately through the timelock
+     * @notice Execute an update of the setMaxNetworkLimit delay through the timelock
      */
     function runE() public {
         runExecute();
     }
 
     /**
-     * @notice Schedule and execute a setMaxNetworkLimit through the timelock
+     * @notice Schedule and execute an update of the setMaxNetworkLimit delay through the timelock
      * @dev It will succeed only if the delay is 0
      */
     function runSE() public {

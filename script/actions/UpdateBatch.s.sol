@@ -67,28 +67,33 @@ contract UpdateBatch is ActionBase {
     }
 
     function runS() public {
-        TimelockBatchParams memory params = TimelockBatchParams({
-            network: NETWORK,
-            isExecutionMode: false,
-            targets: targets,
-            payloads: payloads,
-            delay: DELAY,
-            salt: SALT
-        });
-
-        callTimelockBatch(params);
+        callTimelockBatch(
+            TimelockBatchParams({
+                network: NETWORK,
+                isExecutionMode: false,
+                targets: targets,
+                payloads: payloads,
+                delay: DELAY,
+                salt: SALT
+            })
+        );
     }
 
     function runE() public {
-        TimelockBatchParams memory params = TimelockBatchParams({
-            network: NETWORK,
-            isExecutionMode: true,
-            targets: targets,
-            payloads: payloads,
-            delay: 0,
-            salt: SALT
-        });
+        callTimelockBatch(
+            TimelockBatchParams({
+                network: NETWORK,
+                isExecutionMode: true,
+                targets: targets,
+                payloads: payloads,
+                delay: 0,
+                salt: SALT
+            })
+        );
+    }
 
-        callTimelockBatch(params);
+    function runSE() public {
+        runS();
+        runE();
     }
 }

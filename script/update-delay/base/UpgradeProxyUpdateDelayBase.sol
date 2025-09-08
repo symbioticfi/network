@@ -7,7 +7,6 @@ import {INetwork} from "../../../src/interfaces/INetwork.sol";
 import {ITimelockAction} from "../../actions/interfaces/ITimelockAction.sol";
 
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
-import {ITransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
@@ -24,12 +23,12 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function runSchedule() public {
-        (address delegator, bytes memory payload) = getTargetAndPayload();
+        (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: false,
-                target: delegator,
+                target: target,
                 data: payload,
                 delay: delay,
                 salt: salt
@@ -52,12 +51,12 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function runExecute() public {
-        (address delegator, bytes memory payload) = getTargetAndPayload();
+        (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: true,
-                target: delegator,
+                target: target,
                 data: payload,
                 delay: 0,
                 salt: salt

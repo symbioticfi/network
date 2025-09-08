@@ -51,12 +51,12 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function runExecute() public {
-        (address delegator, bytes memory payload) = getTargetAndPayload();
+        (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
                 isExecutionMode: true,
-                target: delegator,
+                target: target,
                 data: payload,
                 delay: 0,
                 salt: salt
