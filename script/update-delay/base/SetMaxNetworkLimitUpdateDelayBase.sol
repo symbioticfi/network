@@ -77,6 +77,11 @@ contract SetMaxNetworkLimitUpdateDelayBase is ActionBase, ITimelockAction {
                 vm.toString(salt)
             )
         );
+
+        assert(
+            INetwork(network).getMinDelay(address(1), abi.encodePacked(IBaseDelegator.setMaxNetworkLimit.selector))
+                == setMaxNetworkLimitDelay
+        );
     }
 
     function runScheduleAndExecute() public {

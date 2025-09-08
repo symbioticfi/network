@@ -76,6 +76,13 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
                 vm.toString(salt)
             )
         );
+
+        assert(
+            INetwork(network).getMinDelay(
+                address(SymbioticCoreConstants.core().networkMiddlewareService),
+                abi.encodePacked(INetworkMiddlewareService.setMiddleware.selector)
+            ) == setMiddlewareDelay
+        );
     }
 
     function runScheduleAndExecute() public {

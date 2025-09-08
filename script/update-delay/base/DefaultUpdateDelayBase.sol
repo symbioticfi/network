@@ -76,6 +76,8 @@ contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
                 vm.toString(salt)
             )
         );
+
+        assert(TimelockControllerUpgradeable(payable(network)).getMinDelay() == globalMinDelay);
     }
 
     function runScheduleAndExecute() public {
@@ -85,8 +87,6 @@ contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
         target = network;
-        payload = abi.encodeCall(
-            INetwork.updateDelay, (network, TimelockControllerUpgradeable.updateDelay.selector, true, globalMinDelay)
-        );
+        payload = abi.encodeCall(TimelockControllerUpgradeable.updateDelay, (globalMinDelay));
     }
 }

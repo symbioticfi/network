@@ -75,6 +75,11 @@ contract SetResolverUpdateDelayBase is ActionBase, ITimelockAction {
                 vm.toString(salt)
             )
         );
+
+        assert(
+            INetwork(network).getMinDelay(address(1), abi.encodePacked(IVetoSlasher.setResolver.selector))
+                == setResolverDelay
+        );
     }
 
     function runScheduleAndExecute() public {

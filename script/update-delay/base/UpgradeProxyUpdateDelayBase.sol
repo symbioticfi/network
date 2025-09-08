@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-import "../../actions/base/ActionBase.sol";
+import {ActionBase} from "../../actions/base/ActionBase.sol";
 import {Network} from "../../../src/Network.sol";
 import {INetwork} from "../../../src/interfaces/INetwork.sol";
+import {ITimelockAction} from "../../actions/interfaces/ITimelockAction.sol";
 
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import {ITransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
-import {ITimelockAction} from "../../actions/interfaces/ITimelockAction.sol";
+import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
     address public network;
@@ -76,6 +77,11 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
                 vm.toString(salt)
             )
         );
+
+        assert(
+            INetwork(network).getMinDelay(_getProxyAdmin(network), abi.encodePacked(ProxyAdmin.upgradeAndCall.selector))
+                == upgradeProxyDelay
+        );
     }
 
     function runScheduleAndExecute() public {
@@ -86,7 +92,13 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
         target = network;
         payload = abi.encodeCall(
-            INetwork.updateDelay, (address(0), ProxyAdmin.upgradeAndCall.selector, true, upgradeProxyDelay)
+            INetwork.updateDelay, (_getProxyAdmin(network), ProxyAdmin.upgradeAndCall.selector, true, upgradeProxyDelay)
         );
+    }
+
+    function _getProxyAdmin(
+        address proxy
+    ) internal view returns (address admin) {
+        return address(uint160(uint256(vm.load(proxy, ERC1967Utils.ADMIN_SLOT))));
     }
 }
