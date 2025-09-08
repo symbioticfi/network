@@ -1,6 +1,6 @@
 **[Symbiotic Protocol](https://symbiotic.fi) is an extremely flexible and permissionless shared security system.**
 
-This repository contains a default Network contract and tooling to manage it. Basically, a Network contract is an (OZ's TimelockController)[https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/TimelockController.sol] with additional functionality to define delays for either (exact target | exact selector) or (any target | exact selector) pairs.
+This repository contains a default Network contract and tooling to manage it. Basically, a Network contract is an [OZ's TimelockController](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/TimelockController.sol) with additional functionality to define delays for either (exact target | exact selector) or (any target | exact selector) pairs.
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/symbioticfi/network)
 
@@ -182,12 +182,12 @@ Any action that can be made by the Network is protected by the corresponding del
 
 We provide "update delay" scripts for actions mentioned above, and also some additional ones:
 
-- [SetMaxNetworkLimitUpdateDelay](./script/update-delay/SetMaxNetworkLimitUpdateDelayUpdateDelay.s.sol)
+- [SetMaxNetworkLimitUpdateDelay](./script/update-delay/SetMaxNetworkLimitUpdateDelay.s.sol)
 - [SetResolverUpdateDelay](./script/update-delay/SetResolverUpdateDelay.s.sol)
 - [SetMiddlewareUpdateDelay](./script/update-delay/SetMiddlewareUpdateDelay.s.sol)
 - [UpgradeProxyUpdateDelay](./script/update-delay/UpgradeProxyUpdateDelay.s.sol)
 - [HotActionsUpdateDelay](./script/update-delay/HotActionsUpdateDelay.s.sol) - update a delay for [SetMiddlewareUpdateDelay](./script/update-delay/SetMiddlewareUpdateDelay.s.sol) and [SetResolverUpdateDelay](./script/update-delay/SetResolverUpdateDelay.s.sol)
-- [ColdActionsUpdateDelay](./script/update-delay/ColdActionsUpdateDelay.s.sol) - update a delay for [SetMaxNetworkLimitUpdateDelay](./script/update-delay/SetMaxNetworkLimitUpdateDelayUpdateDelay.s.sol) and [UpgradeProxyUpdateDelay](./script/update-delay/UpgradeProxyUpdateDelay.s.sol)
+- [ColdActionsUpdateDelay](./script/update-delay/ColdActionsUpdateDelay.s.sol) - update a delay for [SetMaxNetworkLimitUpdateDelay](./script/update-delay/SetMaxNetworkLimitUpdateDelay.s.sol) and [UpgradeProxyUpdateDelay](./script/update-delay/UpgradeProxyUpdateDelay.s.sol)
 - [DefaultUpdateDelay](./script/update-delay/DefaultUpdateDelay.s.sol) - update a delay for unconstrained actions
 - [ArbitraryUpdateDelay](./script/update-delay/ArbitraryCallUpdateDelay.s.sol) - update a delay for an arbitrary call:
   - set a delay for the exact target address and the exact selector
