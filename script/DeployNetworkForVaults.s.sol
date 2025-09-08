@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-import {DeployNetworkForVaultBase} from "./base/DeployNetworkForVaultBase.sol";
+import {DeployNetworkForVaultsBase} from "./base/DeployNetworkForVaultsBase.sol";
 
 /**
  * Deploys Network implementation and a TransparentUpgradeableProxy managed by ProxyAdmin.
@@ -10,7 +10,7 @@ import {DeployNetworkForVaultBase} from "./base/DeployNetworkForVaultBase.sol";
  *
  * Configuration is handled entirely by inherited contract.
  */
-contract DeployNetworkForVault is DeployNetworkForVaultBase {
+contract DeployNetworkForVaults is DeployNetworkForVaultsBase {
     // Configuration constants - UPDATE THESE BEFORE DEPLOYMENT
 
     // Name of the Network
@@ -23,12 +23,12 @@ contract DeployNetworkForVault is DeployNetworkForVaultBase {
     uint256 HOT_ACTIONS_DELAY = 0;
     // Admin address (will become executor, proposer, and default admin by default)
     address ADMIN = 0x0000000000000000000000000000000000000000;
-    // Vault address to opt-in to
-    address VAULT = 0x0000000000000000000000000000000000000000;
-    // Maximum amount of delegation that network is ready to receive
-    uint256 MAX_NETWORK_LIMIT = 0;
-    // Resolver address (optional, is applied only if VetoSlasher is used)
-    address RESOLVER = 0x0000000000000000000000000000000000000000;
+    // Vault address to opt-in to (multiple vaults can be set)
+    address[] VAULTS = [0x0000000000000000000000000000000000000000];
+    // Maximum amount of delegation that network is ready to receive (multiple vaults can be set)
+    uint256[] MAX_NETWORK_LIMITS = [0];
+    // Resolver address (optional, is applied only if VetoSlasher is used) (multiple vaults can be set)
+    address[] RESOLVERS = [0x0000000000000000000000000000000000000000];
 
     // Optional
 
@@ -45,7 +45,7 @@ contract DeployNetworkForVault is DeployNetworkForVaultBase {
         address[] memory executors = new address[](1);
         executors[0] = ADMIN;
         run(
-            DeployNetworkForVaultParams({
+            DeployNetworkForVaultsParams({
                 deployNetworkParams: DeployNetworkParams({
                     name: NAME,
                     metadataURI: METADATA_URI,
@@ -61,10 +61,10 @@ contract DeployNetworkForVault is DeployNetworkForVaultBase {
                     setResolverMinDelay: HOT_ACTIONS_DELAY,
                     salt: SALT
                 }),
-                vault: VAULT,
-                subnetworkId: SUBNETWORK_ID,
-                maxNetworkLimit: MAX_NETWORK_LIMIT,
-                resolver: RESOLVER
+                vaults: VAULTS,
+                maxNetworkLimits: MAX_NETWORK_LIMITS,
+                resolvers: RESOLVERS,
+                subnetworkId: SUBNETWORK_ID
             })
         );
     }

@@ -13,20 +13,24 @@ import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.s
 import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
 
-contract DeployNetworkForVaultBase is DeployNetworkBase {
+contract DeployNetworkForVaultsBase is DeployNetworkBase {
     using Subnetwork for address;
 
-    struct DeployNetworkForVaultParams {
+    struct DeployNetworkForVaultsParams {
         DeployNetworkParams deployNetworkParams;
-        address vault;
+        address[] vaults;
+        uint256[] maxNetworkLimits;
+        address[] resolvers;
         uint96 subnetworkId;
-        uint256 maxNetworkLimit;
-        address resolver;
     }
 
     function run(
-        DeployNetworkForVaultParams memory params
+        DeployNetworkForVaultsParams memory params
     ) public returns (address) {
+        assert(params.vaults.length > 0);
+        assert(params.vaults.length == params.maxNetworkLimits.length);
+        assert(params.vaults.length == params.resolvers.length);
+
         vm.startBroadcast();
 
         (,, address deployer) = vm.readCallers();
@@ -77,8 +81,10 @@ contract DeployNetworkForVaultBase is DeployNetworkBase {
         vm.startBroadcast();
 
         {
-            uint256 numCalls = 1;
-            if (params.resolver != address(0)) ++numCalls;
+            uint256 numCalls = params.vaults.length;
+            for (uint256 i; i < params.resolvers.length; ++i) {
+                if (params.resolvers[i] != address(0)) ++numCalls;
+            }
             if (originalGlobalMinDelay > 0) ++numCalls;
             if (originalSetMaxNetworkLimitMinDelay > 0) ++numCalls;
             if (originalSetResolverMinDelay > 0) ++numCalls;
@@ -89,45 +95,48 @@ contract DeployNetworkForVaultBase is DeployNetworkBase {
             bytes[] memory payloads = new bytes[](numCalls);
 
             uint256 index;
-            targets[index] = IVault(params.vault).delegator();
-            payloads[index] =
-                abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (params.subnetworkId, params.maxNetworkLimit));
+            for (uint256 i; i < params.vaults.length; ++i) {
+                targets[index] = IVault(params.vaults[i]).delegator();
+                payloads[index++] =
+                    abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (params.subnetworkId, params.maxNetworkLimits[i]));
 
-            if (params.resolver != address(0)) {
-                targets[++index] = IVault(params.vault).slasher();
-                payloads[index] =
-                    abi.encodeCall(IVetoSlasher.setResolver, (params.subnetworkId, params.resolver, new bytes(0)));
+                if (params.resolvers[i] != address(0)) {
+                    targets[index] = IVault(params.vaults[i]).slasher();
+                    payloads[index++] = abi.encodeCall(
+                        IVetoSlasher.setResolver, (params.subnetworkId, params.resolvers[i], new bytes(0))
+                    );
+                }
             }
 
             if (originalGlobalMinDelay > 0) {
-                targets[++index] = network;
-                payloads[index] = abi.encodeCall(TimelockController.updateDelay, (originalGlobalMinDelay));
+                targets[index] = network;
+                payloads[index++] = abi.encodeCall(TimelockController.updateDelay, (originalGlobalMinDelay));
             }
 
             if (originalSetMaxNetworkLimitMinDelay > 0) {
-                targets[++index] = network;
-                payloads[index] = abi.encodeCall(
+                targets[index] = network;
+                payloads[index++] = abi.encodeCall(
                     INetwork.updateDelay,
                     (address(0), IBaseDelegator.setMaxNetworkLimit.selector, true, originalSetMaxNetworkLimitMinDelay)
                 );
             }
 
             if (originalSetResolverMinDelay > 0) {
-                targets[++index] = network;
-                payloads[index] = abi.encodeCall(
+                targets[index] = network;
+                payloads[index++] = abi.encodeCall(
                     INetwork.updateDelay,
                     (address(0), IVetoSlasher.setResolver.selector, true, originalSetResolverMinDelay)
                 );
             }
 
             if (!isDeployerProposer) {
-                targets[++index] = network;
-                payloads[index] =
+                targets[index] = network;
+                payloads[index++] =
                     abi.encodeCall(AccessControl.revokeRole, (Network(payable(network)).PROPOSER_ROLE(), deployer));
             }
 
             if (!isDeployerExecutor) {
-                targets[++index] = network;
+                targets[index] = network;
                 payloads[index] =
                     abi.encodeCall(AccessControl.revokeRole, (Network(payable(network)).EXECUTOR_ROLE(), deployer));
             }
@@ -136,48 +145,58 @@ contract DeployNetworkForVaultBase is DeployNetworkBase {
             Network(payable(network)).executeBatch(targets, values, payloads, bytes32(0), bytes32(0));
         }
 
-        string memory logMessage = string.concat(
-            "Opted network into vault",
-            "\n    network:",
-            vm.toString(network),
-            "\n    vault:",
-            vm.toString(params.vault),
-            "\n    subnetworkId:",
-            vm.toString(params.subnetworkId),
-            "\n    maxNetworkLimit:",
-            vm.toString(params.maxNetworkLimit)
-        );
-        log(
-            params.resolver != address(0)
-                ? string.concat(logMessage, "\n    resolver:", vm.toString(params.resolver))
-                : logMessage
-        );
+        for (uint256 i; i < params.vaults.length; ++i) {
+            string memory logMessage = string.concat(
+                "Opted network into vault",
+                "\n    network:",
+                vm.toString(network),
+                "\n    vault:",
+                vm.toString(params.vaults[i]),
+                "\n    subnetworkId:",
+                vm.toString(params.subnetworkId),
+                "\n    maxNetworkLimit:",
+                vm.toString(params.maxNetworkLimits[i])
+            );
+            log(
+                params.resolvers[i] != address(0)
+                    ? string.concat(logMessage, "\n    resolver:", vm.toString(params.resolvers[i]))
+                    : logMessage
+            );
+        }
 
         vm.stopBroadcast();
 
         for (uint256 i; i < params.deployNetworkParams.proposers.length; ++i) {
             bool hasRole = AccessControl(network).hasRole(
-                    Network(payable(network)).PROPOSER_ROLE(), params.deployNetworkParams.proposers[i]
-                );
-            (params.deployNetworkParams.proposers[i] == deployer && !isDeployerProposer) ? assert(!hasRole) : assert(hasRole);
+                Network(payable(network)).PROPOSER_ROLE(), params.deployNetworkParams.proposers[i]
+            );
+            (params.deployNetworkParams.proposers[i] == deployer && !isDeployerProposer)
+                ? assert(!hasRole)
+                : assert(hasRole);
         }
         for (uint256 i; i < params.deployNetworkParams.executors.length; ++i) {
             bool hasRole = AccessControl(network).hasRole(
-                    Network(payable(network)).EXECUTOR_ROLE(), params.deployNetworkParams.executors[i]
-                );
-            (params.deployNetworkParams.executors[i] == deployer && !isDeployerExecutor) ? assert(!hasRole) : assert(hasRole);
+                Network(payable(network)).EXECUTOR_ROLE(), params.deployNetworkParams.executors[i]
+            );
+            (params.deployNetworkParams.executors[i] == deployer && !isDeployerExecutor)
+                ? assert(!hasRole)
+                : assert(hasRole);
         }
-        if (params.resolver != address(0)) {
+        for (uint256 i; i < params.resolvers.length; ++i) {
+            if (params.resolvers[i] != address(0)) {
+                assert(
+                    IVetoSlasher(IVault(params.vaults[i]).slasher()).resolver(
+                        network.subnetwork(params.subnetworkId), bytes("")
+                    ) == params.resolvers[i]
+                );
+            }
+
             assert(
-                IVetoSlasher(IVault(params.vault).slasher()).resolver(
-                    network.subnetwork(params.subnetworkId), bytes("")
-                ) == params.resolver
+                IBaseDelegator(IVault(params.vaults[i]).delegator()).maxNetworkLimit(
+                    network.subnetwork(params.subnetworkId)
+                ) == params.maxNetworkLimits[i]
             );
         }
-        assert(
-            IBaseDelegator(IVault(params.vault).delegator()).maxNetworkLimit(network.subnetwork(params.subnetworkId))
-                == params.maxNetworkLimit
-        );
 
         return network;
     }

@@ -60,7 +60,7 @@ npm install
 
 - If you need a Network deployment for already-deployed Vault
 
-  Open [DeployNetworkForVault.s.sol](./script/DeployNetworkForVault.s.sol), you will see config like this:
+  Open [DeployNetworkForVaults.s.sol](./script/DeployNetworkForVaults.s.sol), you will see config like this:
 
   ```solidity
   // Name of the Network
@@ -93,7 +93,7 @@ npm install
   Edit needed fields, and execute the script via:
 
   ```bash
-  forge script script/DeployNetworkForVault.s.sol:DeployNetworkForVault --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+  forge script script/DeployNetworkForVaults.s.sol:DeployNetworkForVaults --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
   ```
 
 In the console, you will see logs like these:
