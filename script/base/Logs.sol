@@ -11,9 +11,6 @@ contract Logs is Script {
         string memory data
     ) internal {
         console2.log(data);
-        (Vm.CallerMode callerMode,,) = vm.readCallers();
-        if (callerMode == VmSafe.CallerMode.Broadcast) {
-            vm.writeFile(LOG_FILE, string.concat(vm.readFile(LOG_FILE), data, "\n"));
-        }
+        vm.writeFile(LOG_FILE, string.concat(vm.readFile(LOG_FILE), data, "\n"));
     }
 }
