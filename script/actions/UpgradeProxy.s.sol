@@ -2,9 +2,8 @@
 pragma solidity ^0.8.25;
 
 import "./base/UpgradeProxyBase.sol";
-import {ITimelockAction} from "./interfaces/ITimelockAction.sol";
 
-contract UpgradeProxy is UpgradeProxyBase, ITimelockAction {
+contract UpgradeProxy is UpgradeProxyBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
@@ -21,18 +20,20 @@ contract UpgradeProxy is UpgradeProxyBase, ITimelockAction {
     // Salt for TimelockController operations
     bytes32 SALT = "UpgradeProxy";
 
+    constructor() UpgradeProxyBase(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, DELAY, SALT) {}
+
     /**
      * @notice Schedule a network upgrade through the timelock
      */
     function runS() public {
-        runSchedule(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, DELAY, SALT);
+        runSchedule();
     }
 
     /**
      * @notice Execute a network upgrade immediately through the timelock
      */
     function runE() public {
-        runExecute(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, SALT);
+        runExecute();
     }
 
     /**
@@ -40,13 +41,6 @@ contract UpgradeProxy is UpgradeProxyBase, ITimelockAction {
      * @dev It will succeed only if the delay is 0
      */
     function runSE() public {
-        runScheduleAndExecute(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, SALT);
-    }
-
-    /**
-     * @notice Get the target and payload of the network upgrade
-     */
-    function getTargetAndPayload() public view returns (address, bytes memory) {
-        return getTargetAndPayload(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA);
+        runScheduleAndExecute();
     }
 }

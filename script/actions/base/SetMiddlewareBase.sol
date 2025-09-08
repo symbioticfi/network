@@ -6,10 +6,23 @@ import {Network} from "../../../src/Network.sol";
 
 import {INetworkMiddlewareService} from "@symbioticfi/core/src/interfaces/service/INetworkMiddlewareService.sol";
 import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/SymbioticCoreConstants.sol";
+import {ITimelockAction} from "../interfaces/ITimelockAction.sol";
 
-contract SetMiddlewareBase is ActionBase {
-    function runSchedule(address network, address middleware, uint256 delay, bytes32 salt) public {
-        (address target, bytes memory data) = getTargetAndPayload(middleware);
+contract SetMiddlewareBase is ActionBase, ITimelockAction {
+    address public network;
+    address public middleware;
+    uint256 public delay;
+    bytes32 public salt;
+
+    constructor(address network_, address middleware_, uint256 delay_, bytes32 salt_) {
+        network = network_;
+        middleware = middleware_;
+        delay = delay_;
+        salt = salt_;
+    }
+
+    function runSchedule() public {
+        (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
@@ -24,20 +37,20 @@ contract SetMiddlewareBase is ActionBase {
         log(
             string.concat(
                 "Scheduled setMiddleware for",
-                "    network:",
+                "\n    network:",
                 vm.toString(network),
-                "    middleware:",
+                "\n    middleware:",
                 vm.toString(middleware),
-                "    delay:",
+                "\n    delay:",
                 vm.toString(delay),
-                "    salt:",
+                "\n    salt:",
                 vm.toString(salt)
             )
         );
     }
 
-    function runExecute(address network, address middleware, bytes32 salt) public {
-        (address target, bytes memory data) = getTargetAndPayload(middleware);
+    function runExecute() public {
+        (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
@@ -64,14 +77,12 @@ contract SetMiddlewareBase is ActionBase {
         assert(SymbioticCoreConstants.core().networkMiddlewareService.middleware(network) == middleware);
     }
 
-    function runScheduleAndExecute(address network, address middleware, bytes32 salt) public {
-        runSchedule(network, middleware, 0, salt);
-        runExecute(network, middleware, salt);
+    function runScheduleAndExecute() public {
+        runSchedule();
+        runExecute();
     }
 
-    function getTargetAndPayload(
-        address middleware
-    ) public view returns (address target, bytes memory payload) {
+    function getTargetAndPayload() public view returns (address target, bytes memory payload) {
         target = address(SymbioticCoreConstants.core().networkMiddlewareService);
         payload = abi.encodeCall(INetworkMiddlewareService.setMiddleware, (middleware));
     }

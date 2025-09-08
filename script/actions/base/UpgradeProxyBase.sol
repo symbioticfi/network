@@ -7,16 +7,31 @@ import {Network} from "../../../src/Network.sol";
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {ITransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
+import {ITimelockAction} from "../interfaces/ITimelockAction.sol";
 
-contract UpgradeProxyBase is ActionBase {
-    function runSchedule(
-        address network,
-        address newImplementation,
-        bytes memory upgradeData,
-        uint256 delay,
-        bytes32 salt
-    ) public {
-        (address target, bytes memory data) = getTargetAndPayload(network, newImplementation, upgradeData);
+contract UpgradeProxyBase is ActionBase, ITimelockAction {
+    address public network;
+    address public newImplementation;
+    uint256 public delay;
+    bytes32 public salt;
+    bytes public upgradeData;
+
+    constructor(
+        address network_,
+        address newImplementation_,
+        bytes memory upgradeData_,
+        uint256 delay_,
+        bytes32 salt_
+    ) {
+        network = network_;
+        newImplementation = newImplementation_;
+        upgradeData = upgradeData_;
+        delay = delay_;
+        salt = salt_;
+    }
+
+    function runSchedule() public {
+        (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
@@ -45,8 +60,8 @@ contract UpgradeProxyBase is ActionBase {
         );
     }
 
-    function runExecute(address network, address newImplementation, bytes memory upgradeData, bytes32 salt) public {
-        (address target, bytes memory data) = getTargetAndPayload(network, newImplementation, upgradeData);
+    function runExecute() public {
+        (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
@@ -75,14 +90,9 @@ contract UpgradeProxyBase is ActionBase {
         assert(address(uint160(uint256(vm.load(network, ERC1967Utils.IMPLEMENTATION_SLOT)))) == newImplementation);
     }
 
-    function runScheduleAndExecute(
-        address network,
-        address newImplementation,
-        bytes memory upgradeData,
-        bytes32 salt
-    ) public {
-        runSchedule(network, newImplementation, upgradeData, 0, salt);
-        runExecute(network, newImplementation, upgradeData, salt);
+    function runScheduleAndExecute() public {
+        runSchedule();
+        runExecute();
     }
 
     function _getProxyAdmin(
@@ -91,11 +101,7 @@ contract UpgradeProxyBase is ActionBase {
         return address(uint160(uint256(vm.load(proxy, ERC1967Utils.ADMIN_SLOT))));
     }
 
-    function getTargetAndPayload(
-        address network,
-        address newImplementation,
-        bytes memory upgradeData
-    ) public view returns (address target, bytes memory payload) {
+    function getTargetAndPayload() public view returns (address target, bytes memory payload) {
         target = _getProxyAdmin(network);
         payload = abi.encodeCall(
             ProxyAdmin.upgradeAndCall, (ITransparentUpgradeableProxy(network), newImplementation, upgradeData)

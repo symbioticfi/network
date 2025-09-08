@@ -2,9 +2,8 @@
 pragma solidity ^0.8.25;
 
 import "./base/SetMaxNetworkLimitBase.sol";
-import {ITimelockAction} from "./interfaces/ITimelockAction.sol";
 
-contract SetMaxNetworkLimit is SetMaxNetworkLimitBase, ITimelockAction {
+contract SetMaxNetworkLimit is SetMaxNetworkLimitBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
@@ -23,18 +22,20 @@ contract SetMaxNetworkLimit is SetMaxNetworkLimitBase, ITimelockAction {
     // Salt for TimelockController operations
     bytes32 SALT = "SetMaxNetworkLimit";
 
+    constructor() SetMaxNetworkLimitBase(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, DELAY, SALT) {}
+
     /**
      * @notice Schedule a setMaxNetworkLimit through the timelock
      */
     function runS() public {
-        runSchedule(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, DELAY, SALT);
+        runSchedule();
     }
 
     /**
      * @notice Execute a setMaxNetworkLimit immediately through the timelock
      */
     function runE() public {
-        runExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, SALT);
+        runExecute();
     }
 
     /**
@@ -42,13 +43,6 @@ contract SetMaxNetworkLimit is SetMaxNetworkLimitBase, ITimelockAction {
      * @dev It will succeed only if the delay is 0
      */
     function runSE() public {
-        runScheduleAndExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, SALT);
-    }
-
-    /**
-     * @notice Get the target and payload of the setMaxNetworkLimit
-     */
-    function getTargetAndPayload() public view returns (address, bytes memory) {
-        return getTargetAndPayload(VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT);
+        runScheduleAndExecute();
     }
 }

@@ -6,20 +6,39 @@ import "./ActionBase.sol";
 import {IVetoSlasher} from "@symbioticfi/core/src/interfaces/slasher/IVetoSlasher.sol";
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
 import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
+import {ITimelockAction} from "../interfaces/ITimelockAction.sol";
 
-contract SetResolverBase is ActionBase {
+contract SetResolverBase is ActionBase, ITimelockAction {
     using Subnetwork for address;
 
-    function runSchedule(
-        address network,
-        address vault,
-        uint96 identifier,
-        address resolver,
-        bytes memory hints,
-        uint256 delay,
-        bytes32 salt
-    ) public {
-        (address target, bytes memory data) = getTargetAndPayload(vault, identifier, resolver, hints);
+    address public network;
+    address public vault;
+    uint96 public identifier;
+    address public resolver;
+    uint256 public delay;
+    bytes32 public salt;
+    bytes public hints;
+
+    constructor(
+        address network_,
+        address vault_,
+        uint96 identifier_,
+        address resolver_,
+        bytes memory hints_,
+        uint256 delay_,
+        bytes32 salt_
+    ) {
+        network = network_;
+        vault = vault_;
+        identifier = identifier_;
+        resolver = resolver_;
+        hints = hints_;
+        delay = delay_;
+        salt = salt_;
+    }
+
+    function runSchedule() public {
+        (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
@@ -50,15 +69,8 @@ contract SetResolverBase is ActionBase {
         );
     }
 
-    function runExecute(
-        address network,
-        address vault,
-        uint96 identifier,
-        address resolver,
-        bytes memory hints,
-        bytes32 salt
-    ) public {
-        (address target, bytes memory data) = getTargetAndPayload(vault, identifier, resolver, hints);
+    function runExecute() public {
+        (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
@@ -89,24 +101,12 @@ contract SetResolverBase is ActionBase {
         assert(IVetoSlasher(IVault(vault).slasher()).resolver(network.subnetwork(identifier), bytes("")) == resolver);
     }
 
-    function runScheduleAndExecute(
-        address network,
-        address vault,
-        uint96 identifier,
-        address resolver,
-        bytes memory hints,
-        bytes32 salt
-    ) public {
-        runSchedule(network, vault, identifier, resolver, hints, 0, salt);
-        runExecute(network, vault, identifier, resolver, hints, salt);
+    function runScheduleAndExecute() public {
+        runSchedule();
+        runExecute();
     }
 
-    function getTargetAndPayload(
-        address vault,
-        uint96 identifier,
-        address resolver,
-        bytes memory hints
-    ) public view returns (address target, bytes memory payload) {
+    function getTargetAndPayload() public view returns (address target, bytes memory payload) {
         target = IVault(vault).slasher();
         payload = abi.encodeCall(IVetoSlasher.setResolver, (identifier, resolver, hints));
     }

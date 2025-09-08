@@ -2,9 +2,8 @@
 pragma solidity ^0.8.25;
 
 import "./base/SetResolverBase.sol";
-import {ITimelockAction} from "./interfaces/ITimelockAction.sol";
 
-contract SetResolver is SetResolverBase, ITimelockAction {
+contract SetResolver is SetResolverBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
@@ -25,18 +24,20 @@ contract SetResolver is SetResolverBase, ITimelockAction {
     // Salt for TimelockController operations
     bytes32 SALT = "SetResolver";
 
+    constructor() SetResolverBase(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, DELAY, SALT) {}
+
     /**
      * @notice Schedule a setResolver through the timelock
      */
     function runS() public {
-        runSchedule(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, DELAY, SALT);
+        runSchedule();
     }
 
     /**
      * @notice Execute a setResolver immediately through the timelock
      */
     function runE() public {
-        runExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, SALT);
+        runExecute();
     }
 
     /**
@@ -44,13 +45,6 @@ contract SetResolver is SetResolverBase, ITimelockAction {
      * @dev It will succeed only if the delay is 0
      */
     function runSE() public {
-        runScheduleAndExecute(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, SALT);
-    }
-
-    /**
-     * @notice Get the target and payload of the setResolver
-     */
-    function getTargetAndPayload() public view returns (address, bytes memory) {
-        return getTargetAndPayload(VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS);
+        runScheduleAndExecute();
     }
 }

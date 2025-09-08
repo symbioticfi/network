@@ -7,19 +7,36 @@ import {Network} from "../../../src/Network.sol";
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {IVault} from "@symbioticfi/core/src/interfaces/vault/IVault.sol";
 import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
+import {ITimelockAction} from "../interfaces/ITimelockAction.sol";
 
-contract SetMaxNetworkLimitBase is ActionBase {
+contract SetMaxNetworkLimitBase is ActionBase, ITimelockAction {
     using Subnetwork for address;
 
-    function runSchedule(
-        address network,
-        address vault,
-        uint96 subnetworkId,
-        uint256 maxNetworkLimit,
-        uint256 delay,
-        bytes32 salt
-    ) public {
-        (address delegator, bytes memory payload) = getTargetAndPayload(vault, subnetworkId, maxNetworkLimit);
+    address public network;
+    address public vault;
+    uint96 public subnetworkId;
+    uint256 public maxNetworkLimit;
+    uint256 public delay;
+    bytes32 public salt;
+
+    constructor(
+        address network_,
+        address vault_,
+        uint96 subnetworkId_,
+        uint256 maxNetworkLimit_,
+        uint256 delay_,
+        bytes32 salt_
+    ) {
+        network = network_;
+        vault = vault_;
+        subnetworkId = subnetworkId_;
+        maxNetworkLimit = maxNetworkLimit_;
+        delay = delay_;
+        salt = salt_;
+    }
+
+    function runSchedule() public {
+        (address delegator, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
@@ -50,14 +67,8 @@ contract SetMaxNetworkLimitBase is ActionBase {
         );
     }
 
-    function runExecute(
-        address network,
-        address vault,
-        uint96 subnetworkId,
-        uint256 maxNetworkLimit,
-        bytes32 salt
-    ) public {
-        (address delegator, bytes memory payload) = getTargetAndPayload(vault, subnetworkId, maxNetworkLimit);
+    function runExecute() public {
+        (address delegator, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
                 network: network,
@@ -88,22 +99,12 @@ contract SetMaxNetworkLimitBase is ActionBase {
         assert(IBaseDelegator(delegator).maxNetworkLimit(network.subnetwork(subnetworkId)) == maxNetworkLimit);
     }
 
-    function runScheduleAndExecute(
-        address network,
-        address vault,
-        uint96 subnetworkId,
-        uint256 maxNetworkLimit,
-        bytes32 salt
-    ) public {
-        runSchedule(network, vault, subnetworkId, maxNetworkLimit, 0, salt);
-        runExecute(network, vault, subnetworkId, maxNetworkLimit, salt);
+    function runScheduleAndExecute() public {
+        runSchedule();
+        runExecute();
     }
 
-    function getTargetAndPayload(
-        address vault,
-        uint96 subnetworkId,
-        uint256 maxNetworkLimit
-    ) public view returns (address target, bytes memory payload) {
+    function getTargetAndPayload() public view returns (address target, bytes memory payload) {
         target = IVault(vault).delegator();
         payload = abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (subnetworkId, maxNetworkLimit));
     }

@@ -5,17 +5,17 @@ interface ITimelockAction {
     /**
      * @notice Schedule the action through the timelock
      */
-    function runS() external;
+    function runSchedule() external;
 
     /**
      * @notice Execute the action immediately through the timelock
      */
-    function runE() external;
+    function runExecute() external;
 
     /**
      * @notice Schedule and execute the action through the timelock
      */
-    function runSE() external;
+    function runScheduleAndExecute() external;
 
     /**
      * @notice Get the target and payload of the action
