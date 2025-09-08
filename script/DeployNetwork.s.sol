@@ -2,7 +2,6 @@
 pragma solidity ^0.8.25;
 
 import {DeployNetworkBase} from "./base/DeployNetworkBase.sol";
-import {INetwork} from "../src/interfaces/INetwork.sol";
 
 /**
  * Deploys Network implementation and a TransparentUpgradeableProxy managed by ProxyAdmin.
@@ -22,14 +21,14 @@ contract DeployNetwork is DeployNetworkBase {
     // Hot actions delay (a delay that will be applied for minor actions like setMaxNetworkLimit and setResolver)
     uint256 HOT_ACTIONS_DELAY = 0;
     // Admin address (will become executor, proposer, and default admin by default)
-    address ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+    address ADMIN = 0x0000000000000000000000000000000000000000;
 
     // Optional
 
     // Metadata URI of the Network
     string METADATA_URI = "";
     // Salt for deterministic deployment
-    bytes11 SALT = "Test1";
+    bytes11 SALT = "SymNetwork";
 
     function run() public {
         address[] memory proposers = new address[](1);

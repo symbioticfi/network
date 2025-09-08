@@ -7,9 +7,9 @@ contract UpgradeProxy is UpgradeProxyBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the new implementation
-    address NEW_IMPLEMENTATION = address(0);
+    address NEW_IMPLEMENTATION = 0x0000000000000000000000000000000000000000;
     // Data to pass to the new implementation after upgrade
     bytes UPGRADE_DATA = new bytes(0);
     // Delay for the action to be executed

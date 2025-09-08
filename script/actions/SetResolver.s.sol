@@ -7,11 +7,11 @@ contract SetResolver is SetResolverBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the Vault
-    address VAULT = address(0);
+    address VAULT = 0x0000000000000000000000000000000000000000;
     // Address of the Resolver
-    address RESOLVER = address(0);
+    address RESOLVER = 0x0000000000000000000000000000000000000000;
     // Delay for the action to be executed
     uint256 DELAY = 0;
 

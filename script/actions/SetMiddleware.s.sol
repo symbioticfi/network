@@ -7,9 +7,9 @@ contract SetMiddleware is SetMiddlewareBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the Middleware
-    address MIDDLEWARE = address(0);
+    address MIDDLEWARE = 0x0000000000000000000000000000000000000000;
     // Delay for the action to be executed
     uint256 DELAY = 14 days;
 

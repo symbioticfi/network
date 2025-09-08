@@ -1,6 +1,6 @@
 **[Symbiotic Protocol](https://symbiotic.fi) is an extremely flexible and permissionless shared security system.**
 
-This repository contains a default Network contract and tooling to manage it. Basically, Network contract is an (OZ's TimelockController)[https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/TimelockController.sol] with additional functionality to define delays for either (exact target | exact selector) or (any target | exact selector) pairs.
+This repository contains a default Network contract and tooling to manage it. Basically, a Network contract is an (OZ's TimelockController)[https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/governance/TimelockController.sol] with additional functionality to define delays for either (exact target | exact selector) or (any target | exact selector) pairs.
 
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/symbioticfi/network)
 
@@ -28,7 +28,7 @@ npm install
 
 ### Deploy Your Network
 
-- If you need pure Network deployment
+- If you need a pure Network deployment
 
   Open [DeployNetwork.s.sol](./script/DeployNetwork.s.sol), you will see config like this:
 
@@ -58,7 +58,7 @@ npm install
   forge script script/DeployNetwork.s.sol --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
   ```
 
-- If you need Network deployment for already deployed Vault
+- If you need a Network deployment for already-deployed Vault
 
   Open [DeployNetworkForVault.s.sol](./script/DeployNetworkForVault.s.sol), you will see config like this:
 
@@ -75,7 +75,7 @@ npm install
   address ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
   // Vault address to opt-in to
   address VAULT = 0x49fC19bAE549e0b5F99B5b42d7222Caf09E8d2a1;
-  // Maximum amount of delegation that network is ready to receive
+  // Maximum amount of delegation that the network is ready to receive
   uint256 MAX_NETWORK_LIMIT = 1000;
   // Resolver address (optional, is applied only if VetoSlasher is used)
   address RESOLVER = 0xbf616b04c463b818e3336FF3767e61AB44103243;
@@ -96,7 +96,7 @@ npm install
   forge script script/DeployNetworkForVault.s.sol:DeployNetworkForVault --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
   ```
 
-In console, you will see logs like these:
+In the console, you will see logs like these:
 
 ```bash
 Deployed network
@@ -112,7 +112,7 @@ Opted network into vault
   resolver:0xbf616b04c463b818e3336FF3767e61AB44103243
 ```
 
-### Manage you network
+### Manage Your Network
 
 There are 5 predefined [action-scripts](./script/actions/), that you can use from the start:
 
@@ -122,13 +122,95 @@ There are 5 predefined [action-scripts](./script/actions/), that you can use fro
 - [UpgradeProxy](./script/actions/UpgradeProxy.s.sol) - upgrade the proxy (network itself)
 - [ArbitraryCall](./script/actions/ArbitraryCall.s.sol) - make a call to any contract with any data
 
-Interaction with different actions is similar, let's consider [SetMaxNetworkLimit](./script/actions/SetMaxNetworkLimit.s.sol) as an example:
+Interaction with different actions is similar; let's consider [SetMaxNetworkLimit](./script/actions/SetMaxNetworkLimit.s.sol) as an example:
 
-- ```bash
-  forge script script/actions/SetMaxNetworkLimit.s.sol:SetMaxNetworkLimit --rpc-url
-  ```
+1. Open [SetMaxNetworkLimit.s.sol](./script/actions/SetMaxNetworkLimit.s.sol), you will see config like this:
+
+   ```solidity
+   // Address of the Network
+   address NETWORK = 0x0000000000000000000000000000000000000000;
+   // Address of the Vault
+   address VAULT = 0x0000000000000000000000000000000000000000;
+   // Maximum amount of delegation that network is ready to receive
+   uint256 MAX_NETWORK_LIMIT = 0;
+   // Delay for the action to be executed
+   uint256 DELAY = 0;
+
+   // Optional
+
+   // Subnetwork Identifier (multiple subnetworks can be used, e.g., to have different max network limits for the same network)
+   uint96 SUBNETWORK_IDENTIFIER = 0;
+   // Salt for TimelockController operations
+   bytes32 SALT = "SetMaxNetworkLimit";
+   ```
+
+2. Edit needed fields, and choose an operation:
+
+   - `runS()` - schedule an action
+   - `runE` - execute an action
+   - `runSE()` - schedule and execute an action (possible only if a delay for the needed action is zero)
+
+3. Execute the operation:
+
+   - If you use an EOA and want to execute the script:
+
+     ```bash
+     forge script script/actions/SetMaxNetworkLimit.s.sol:SetMaxNetworkLimit --sig "runS()" --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --broadcast
+     ```
+
+   - If you use a Safe multisig and want to get a transaction calldata:
+
+     ```bash
+     forge script script/actions/SetMaxNetworkLimit.s.sol:SetMaxNetworkLimit --sig "runS()" --rpc-url <RPC_URL> --sender <MULTISIG_ADDRESS> --unlocked
+     ```
+
+     In the logs, you will see `callData` field like this:
+
+     ```bash
+     callData:0x01d5062a00000000000000000000000025ed2ee6e295880326bdeca245ee4d8b72c8f103000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000c000000000000000000000000000000000000000000000000000000000000000005365744d61784e6574776f726b4c696d697400000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000004423f752d500000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002b6700000000000000000000000000000000000000000000000000000000
+     ```
+
+     In Safe->TransactionBuilder, you should:
+
+     - enable "Custom data"
+     - enter **Network's address** as a target address
+     - use the `callData` (e.g., `0x01d5062a0000000000000000000000...`) received earlier as a `Data (Hex encoded)`
+
+### Update Delays
+
+Any action that can be made by the Network is protected by the corresponding delay (which can be any value from zero to infinity).
+
+We provide "update delay" scripts for actions mentioned above, and also some additional ones:
+
+- [SetMaxNetworkLimitUpdateDelay](./script/update-delay/SetMaxNetworkLimitUpdateDelayUpdateDelay.s.sol)
+- [SetResolverUpdateDelay](./script/update-delay/SetResolverUpdateDelay.s.sol)
+- [SetMiddlewareUpdateDelay](./script/update-delay/SetMiddlewareUpdateDelay.s.sol)
+- [UpgradeProxyUpdateDelay](./script/update-delay/UpgradeProxyUpdateDelay.s.sol)
+- [HotActionsUpdateDelay](./script/update-delay/HotActionsUpdateDelay.s.sol) - update a delay for [SetMiddlewareUpdateDelay](./script/update-delay/SetMiddlewareUpdateDelay.s.sol) and [SetResolverUpdateDelay](./script/update-delay/SetResolverUpdateDelay.s.sol)
+- [ColdActionsUpdateDelay](./script/update-delay/ColdActionsUpdateDelay.s.sol) - update a delay for [SetMaxNetworkLimitUpdateDelay](./script/update-delay/SetMaxNetworkLimitUpdateDelayUpdateDelay.s.sol) and [UpgradeProxyUpdateDelay](./script/update-delay/UpgradeProxyUpdateDelay.s.sol)
+- [DefaultUpdateDelay](./script/update-delay/DefaultUpdateDelay.s.sol) - update a delay for unconstrained actions
+- [ArbitraryUpdateDelay](./script/update-delay/ArbitraryCallUpdateDelay.s.sol) - update a delay for an arbitrary call:
+  - set a delay for the exact target address and the exact selector
+  - set a delay for any target address and the exact selector (by setting target address to `0x0000000000000000000000000000000000000000`)
+
+For example usage of similar scripts see ["Manage Your Network"](./README.md#manage-your-network).
 
 ### Dashboard
+
+**Note: work-in-progress, use with caution**
+
+`Network` contract inherits OpenZeppelin's `TimelockController`, while `TimelockController` inherits `AccessControl`. The similarity between `TimelockController` and `AccessControl` contracts' logic is that it is not possible to adequately determine their state (e.g., statuses of operations or holders of roles) using only the current chain's state via RPC calls. Hence, we provide a [Network Dashboard](./ui/) which allows you to:
+
+- Get delays for all operations
+- Get holders of any role
+- Get scheduled/executed operations
+- Schedule/execute arbitrary actions
+
+Run the command:
+
+```bash
+npm run dev
+```
 
 ## Security
 

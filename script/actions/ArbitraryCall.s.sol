@@ -7,9 +7,9 @@ contract ArbitraryCall is ArbitraryCallBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the Target
-    address TARGET = address(0);
+    address TARGET = 0x0000000000000000000000000000000000000000;
     // Data to pass to the Target
     bytes DATA = new bytes(0);
     // Delay for the action to be executed
