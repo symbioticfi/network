@@ -29,7 +29,7 @@ contract DeployNetwork is DeployNetworkBase {
     // Metadata URI of the Network
     string METADATA_URI = "";
     // Salt for deterministic deployment
-    bytes11 SALT = "DeployNetwork";
+    bytes11 SALT = "Test1";
 
     function run() public {
         address[] memory proposers = new address[](1);
