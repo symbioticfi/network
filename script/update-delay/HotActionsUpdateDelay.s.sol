@@ -25,7 +25,7 @@ contract HotActionsUpdateDelay is ActionBase {
         actions.push(new SetMaxNetworkLimitUpdateDelayBase(NETWORK, HOT_ACTIONS_DELAY, DELAY, SALT));
         actions.push(new SetResolverUpdateDelayBase(NETWORK, HOT_ACTIONS_DELAY, DELAY, SALT));
 
-        for (uint256 i = 0; i < actions.length; ++i) {
+        for (uint256 i; i < actions.length; ++i) {
             (address target, bytes memory payload) = actions[i].getTargetAndPayload();
             targets.push(target);
             payloads.push(payload);

@@ -25,7 +25,7 @@ contract ColdActionsUpdateDelay is ActionBase {
         actions.push(new SetMiddlewareUpdateDelayBase(NETWORK, COLD_ACTIONS_DELAY, DELAY, SALT));
         actions.push(new UpgradeProxyUpdateDelayBase(NETWORK, COLD_ACTIONS_DELAY, DELAY, SALT));
 
-        for (uint256 i = 0; i < actions.length; ++i) {
+        for (uint256 i; i < actions.length; ++i) {
             (address target, bytes memory payload) = actions[i].getTargetAndPayload();
             targets.push(target);
             payloads.push(payload);

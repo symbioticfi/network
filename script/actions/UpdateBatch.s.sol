@@ -59,7 +59,7 @@ contract UpdateBatch is ActionBase {
         actions.push(new SetResolverBase(NETWORK, VAULT1, SUBNETWORK_IDENTIFIER1, RESOLVER, HINTS, DELAY, SALT));
         actions.push(new UpgradeProxyBase(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, DELAY, SALT));
 
-        for (uint256 i = 0; i < actions.length; ++i) {
+        for (uint256 i; i < actions.length; ++i) {
             (address target, bytes memory payload) = actions[i].getTargetAndPayload();
             targets.push(target);
             payloads.push(payload);
