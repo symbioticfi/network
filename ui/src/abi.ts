@@ -2,8 +2,20 @@
 // Includes OpenZeppelin TimelockController functions/events and custom INetwork bits
 export const networkAbi = [
   // Metadata
-  { type: 'function', name: 'name', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'string' }] },
-  { type: 'function', name: 'metadataURI', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'string' }] },
+  {
+    type: 'function',
+    name: 'name',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'string' }],
+  },
+  {
+    type: 'function',
+    name: 'metadataURI',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'string' }],
+  },
 
   // Custom getMinDelay overrides
   {
@@ -65,9 +77,27 @@ export const networkAbi = [
     inputs: [{ name: 'id', type: 'bytes32' }],
     outputs: [{ name: '', type: 'uint8' }],
   },
-  { type: 'function', name: 'isOperation', stateMutability: 'view', inputs: [{ name: 'id', type: 'bytes32' }], outputs: [{ name: '', type: 'bool' }] },
-  { type: 'function', name: 'isOperationReady', stateMutability: 'view', inputs: [{ name: 'id', type: 'bytes32' }], outputs: [{ name: '', type: 'bool' }] },
-  { type: 'function', name: 'isOperationDone', stateMutability: 'view', inputs: [{ name: 'id', type: 'bytes32' }], outputs: [{ name: '', type: 'bool' }] },
+  {
+    type: 'function',
+    name: 'isOperation',
+    stateMutability: 'view',
+    inputs: [{ name: 'id', type: 'bytes32' }],
+    outputs: [{ name: '', type: 'bool' }],
+  },
+  {
+    type: 'function',
+    name: 'isOperationReady',
+    stateMutability: 'view',
+    inputs: [{ name: 'id', type: 'bytes32' }],
+    outputs: [{ name: '', type: 'bool' }],
+  },
+  {
+    type: 'function',
+    name: 'isOperationDone',
+    stateMutability: 'view',
+    inputs: [{ name: 'id', type: 'bytes32' }],
+    outputs: [{ name: '', type: 'bool' }],
+  },
 
   // Timelock actions
   {
@@ -195,9 +225,7 @@ export const networkAbi = [
   {
     type: 'event',
     name: 'Cancelled',
-    inputs: [
-      { name: 'id', type: 'bytes32', indexed: true },
-    ],
+    inputs: [{ name: 'id', type: 'bytes32', indexed: true }],
     anonymous: false,
   },
   // Global min delay change (OpenZeppelin)
@@ -225,16 +253,67 @@ export const networkAbi = [
     anonymous: false,
   },
   // AccessControl functions
-  { type: 'function', name: 'getRoleAdmin', stateMutability: 'view', inputs: [{ name: 'role', type: 'bytes32' }], outputs: [{ name: '', type: 'bytes32' }] },
-  { type: 'function', name: 'hasRole', stateMutability: 'view', inputs: [{ name: 'role', type: 'bytes32' }, { name: 'account', type: 'address' }], outputs: [{ name: '', type: 'bool' }] },
+  {
+    type: 'function',
+    name: 'getRoleAdmin',
+    stateMutability: 'view',
+    inputs: [{ name: 'role', type: 'bytes32' }],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+  {
+    type: 'function',
+    name: 'hasRole',
+    stateMutability: 'view',
+    inputs: [
+      { name: 'role', type: 'bytes32' },
+      { name: 'account', type: 'address' },
+    ],
+    outputs: [{ name: '', type: 'bool' }],
+  },
   // Role constant getters (Timelock & custom)
-  { type: 'function', name: 'DEFAULT_ADMIN_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
-  { type: 'function', name: 'PROPOSER_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
-  { type: 'function', name: 'EXECUTOR_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
-  { type: 'function', name: 'CANCELLER_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
-  { type: 'function', name: 'NAME_UPDATE_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
-  { type: 'function', name: 'METADATA_URI_UPDATE_ROLE', stateMutability: 'view', inputs: [], outputs: [{ name: '', type: 'bytes32' }] },
-];
+  {
+    type: 'function',
+    name: 'DEFAULT_ADMIN_ROLE',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+  {
+    type: 'function',
+    name: 'PROPOSER_ROLE',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+  {
+    type: 'function',
+    name: 'EXECUTOR_ROLE',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+  {
+    type: 'function',
+    name: 'CANCELLER_ROLE',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+  {
+    type: 'function',
+    name: 'NAME_UPDATE_ROLE',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+  {
+    type: 'function',
+    name: 'METADATA_URI_UPDATE_ROLE',
+    stateMutability: 'view',
+    inputs: [],
+    outputs: [{ name: '', type: 'bytes32' }],
+  },
+]
 
 export enum OperationState {
   Unset = 0,

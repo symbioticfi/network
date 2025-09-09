@@ -9,4 +9,7 @@ export default defineConfig({
     strictPort: true,
     open: true,
   },
+  define: {
+    'process.env': {},
+  },
 })

@@ -338,7 +338,9 @@ export default function TimelockDashboard() {
   }, [rpcUrl, wagmiPublicClient])
 
   // Derive chainId from custom RPC when wallet is not connected
-  const [rpcDerivedChainId, setRpcDerivedChainId] = useState<number | null>(null)
+  const [rpcDerivedChainId, setRpcDerivedChainId] = useState<number | null>(
+    null
+  )
   useEffect(() => {
     let cancelled = false
     async function fetchChainId() {
@@ -365,7 +367,9 @@ export default function TimelockDashboard() {
     return Boolean(effectivePublicClient && contractAddress)
   }, [effectivePublicClient, contractAddress])
   const canInteract = useMemo(() => {
-    return Boolean(effectivePublicClient && walletClient && account && contractAddress)
+    return Boolean(
+      effectivePublicClient && walletClient && account && contractAddress
+    )
   }, [effectivePublicClient, walletClient, account, contractAddress])
 
   // Explorer link for manual deployment block lookup (uses configured chains)
@@ -1105,7 +1109,9 @@ export default function TimelockDashboard() {
                     <td className='py-2 pr-4 font-mono text-xs'>any</td>
                     <td className='py-2 pr-4'>—</td>
                     <td className='py-2 pr-4'>
-                      {globalMinDelay !== null ? globalMinDelay.toString() : '—'}
+                      {globalMinDelay !== null
+                        ? globalMinDelay.toString()
+                        : '—'}
                     </td>
                   </tr>
                 </tbody>
