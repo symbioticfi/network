@@ -39,6 +39,7 @@ createAppKit({
   features: {
     analytics: false,
   },
+  themeMode: 'light',
 })
 
 export function AppKitProvider({ children }: { children: ReactNode }) {
