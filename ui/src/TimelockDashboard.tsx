@@ -14,12 +14,12 @@ import type { Abi, AbiFunction, PublicClient, WalletClient } from 'viem'
 import {
   useAccount,
   useChainId,
-  useConnect,
-  useDisconnect,
   usePublicClient as useWagmiPublicClient,
   useWalletClient,
 } from 'wagmi'
+import { wagmiAdapter } from './wagmiConfig'
 import { networkAbi, OperationState } from './abi'
+import { useAppKit } from '@reown/appkit/library/react'
 
 type ScheduledTx = {
   target: `0x${string}`
@@ -49,9 +49,7 @@ export default function TimelockDashboard() {
   const chainId = useChainId()
   const wagmiPublicClient = useWagmiPublicClient()
   const { data: walletClient } = useWalletClient()
-  const { connect, connectors } = useConnect()
-  const { disconnect } = useDisconnect()
-  const [showConnectMenu, setShowConnectMenu] = useState(false)
+  const { open } = useAppKit()
 
   const [contractName, setContractName] = useState<string>('')
   const [metadataURI, setMetadataURI] = useState<string>('')
@@ -281,10 +279,15 @@ export default function TimelockDashboard() {
     try {
       const myToken = ++detectTokenRef.current
       const latest = await effectivePublicClient.getBlockNumber()
-      const hasCodeLatest = await effectivePublicClient.getCode({
-        address: contractAddress as `0x${string}`,
-        blockNumber: latest,
-      })
+      const hasCodeLatest = await effectivePublicClient
+        .getCode({
+          address: contractAddress as `0x${string}`,
+          blockNumber: latest,
+        })
+        .catch((e: any) => {
+          console.error('Detect latest code error', e)
+          throw e
+        })
       if (!hasCodeLatest) {
         alert('No code found at the latest block — is the address correct?')
         return
@@ -294,16 +297,34 @@ export default function TimelockDashboard() {
       while (lo < hi) {
         if (detectTokenRef.current !== myToken) throw new Error('canceled')
         const mid = (lo + hi) >> 1n
-        const code = await effectivePublicClient.getCode({
-          address: contractAddress as `0x${string}`,
-          blockNumber: mid,
-        })
+        let code: Hex | undefined
+        try {
+          code = await effectivePublicClient.getCode({
+            address: contractAddress as `0x${string}`,
+            blockNumber: mid,
+          })
+        } catch (e: any) {
+          const msg = String(e?.message || e)
+          // Common non-archive errors from public providers
+          if (
+            msg.includes('missing trie node') ||
+            msg.includes('state') ||
+            msg.includes('Missing or invalid parameters')
+          ) {
+            alert(
+              'Archive RPC is required to detect the exact deployment block. Please provide an archive-capable RPC URL in the RPC URL field (e.g. Alchemy/Infura), or set From Block manually.'
+            )
+            throw new Error('archive-rpc-required')
+          }
+          throw e
+        }
         if (code) hi = mid
         else lo = mid + 1n
       }
       if (detectTokenRef.current === myToken) setFromBlock(lo.toString())
     } catch (e) {
-      console.error('Detect error', e)
+      if ((e as any)?.message !== 'archive-rpc-required')
+        console.error('Detect error', e)
     } finally {
       setDetectingFromBlock(false)
     }
@@ -314,15 +335,48 @@ export default function TimelockDashboard() {
     return wagmiPublicClient ?? null
   }, [rpcUrl, wagmiPublicClient])
 
+  // Derive chainId from custom RPC when wallet is not connected
+  const [rpcDerivedChainId, setRpcDerivedChainId] = useState<number | null>(null)
+  useEffect(() => {
+    let cancelled = false
+    async function fetchChainId() {
+      try {
+        if (rpcUrl && effectivePublicClient) {
+          const id = await (effectivePublicClient as any).getChainId?.()
+          if (!cancelled && typeof id === 'number') setRpcDerivedChainId(id)
+        } else {
+          if (!cancelled) setRpcDerivedChainId(null)
+        }
+      } catch {
+        if (!cancelled) setRpcDerivedChainId(null)
+      }
+    }
+    fetchChainId()
+    return () => {
+      cancelled = true
+    }
+  }, [rpcUrl, effectivePublicClient])
+
+  const effectiveChainId = rpcDerivedChainId ?? chainId
+
+  const canSchedule = useMemo(() => {
+    return Boolean(effectivePublicClient && contractAddress)
+  }, [effectivePublicClient, contractAddress])
   const canInteract = useMemo(() => {
-    return effectivePublicClient && walletClient && account && contractAddress
+    return Boolean(effectivePublicClient && walletClient && account && contractAddress)
   }, [effectivePublicClient, walletClient, account, contractAddress])
 
-  const onDisconnect = () => {
-    disconnect()
-    setScheduling(false)
-    setExecuting('')
-  }
+  // Explorer link for manual deployment block lookup (uses configured chains)
+  const explorerAddressUrl = useMemo(() => {
+    if (!contractAddress) return ''
+    const chain = wagmiAdapter?.wagmiConfig?.chains?.find(
+      (c) => c.id === effectiveChainId
+    )
+    const base = chain?.blockExplorers?.default?.url
+    if (!base) return ''
+    const trimmed = base.endsWith('/') ? base.slice(0, -1) : base
+    return `${trimmed}/address/${contractAddress}`
+  }, [effectiveChainId, contractAddress])
 
   const readHeader = async () => {
     if (!effectivePublicClient || !contractAddress) return
@@ -636,8 +690,14 @@ export default function TimelockDashboard() {
   // Single schedule removed
 
   const onScheduleBatch = async () => {
-    if (!walletClient || !effectivePublicClient || !account || !contractAddress)
+    if (!effectivePublicClient || !contractAddress) return
+    if (!walletClient || !account) {
+      // Prompt user to connect if not connected
+      try {
+        await open?.()
+      } catch {}
       return
+    }
     setScheduling(true)
     try {
       const targets = batchRows.map(
@@ -818,57 +878,8 @@ export default function TimelockDashboard() {
               View delays and role holders, schedule actions, execute when ready
             </p>
           </div>
-          <div className='flex items-center gap-2 relative'>
-            {!account ? (
-              <>
-                <button
-                  onClick={() => setShowConnectMenu((v) => !v)}
-                  className='px-3 py-1.5 rounded bg-indigo-600 text-white text-sm'
-                >
-                  Connect Wallet
-                </button>
-                {showConnectMenu && (
-                  <div className='absolute right-0 top-full mt-2 w-72 bg-white border rounded shadow z-10'>
-                    <div className='p-2 text-xs text-gray-600'>
-                      Detected Wallets
-                    </div>
-                    <div className='max-h-64 overflow-auto'>
-                      {connectors.length === 0 ? (
-                        <div className='p-3 text-sm text-gray-500'>
-                          No connectors available
-                        </div>
-                      ) : (
-                        connectors.map((c) => (
-                          <button
-                            key={c.uid}
-                            onClick={() => {
-                              connect({ connector: c })
-                              setShowConnectMenu(false)
-                            }}
-                            className='w-full text-left p-2 hover:bg-gray-50'
-                          >
-                            {c.name}
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <span className='text-sm text-gray-600'>
-                  {account.slice(0, 6)}…{account.slice(-4)}
-                  {chainId ? ` · Chain ${chainId}` : ''}
-                </span>
-                <button
-                  onClick={onDisconnect}
-                  className='px-3 py-1.5 rounded bg-gray-100 border text-sm'
-                >
-                  Disconnect
-                </button>
-              </>
-            )}
+          <div className='flex items-center gap-2'>
+            <appkit-button />
           </div>
         </header>
 
@@ -941,6 +952,21 @@ export default function TimelockDashboard() {
               <div className='text-xs text-gray-500 mt-1'>
                 Use a recent block to limit queries. Detect finds the deployment
                 block.
+                {explorerAddressUrl ? (
+                  <>
+                    {' '}
+                    Or get it from{' '}
+                    <a
+                      href={explorerAddressUrl}
+                      target='_blank'
+                      rel='noreferrer'
+                      className='text-indigo-600 hover:underline'
+                    >
+                      explorer
+                    </a>
+                    .
+                  </>
+                ) : null}
               </div>
             </div>
             <div>
@@ -1322,7 +1348,7 @@ export default function TimelockDashboard() {
                 <div className='col-span-2 flex items-center justify-end gap-2'>
                   <button
                     onClick={onScheduleBatch}
-                    disabled={scheduling || !canInteract}
+                    disabled={scheduling || !canSchedule}
                     className='px-3 py-1.5 rounded bg-indigo-600 text-white disabled:opacity-60'
                   >
                     {scheduling ? 'Scheduling…' : 'Schedule'}
