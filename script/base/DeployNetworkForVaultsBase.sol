@@ -31,15 +31,41 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         assert(params.vaults.length == params.maxNetworkLimits.length);
         assert(params.vaults.length == params.resolvers.length);
 
-        vm.startBroadcast();
+        // update deploy network params to include deployer as proposer and executor
+        DeployNetworkParams memory updatedDeployNetworkParams =
+            updateDeployParamsForDeployer(params.deployNetworkParams);
+        // deploy network
+        address network = run(updatedDeployNetworkParams);
+        // update network for vaults
+        updateNetworkForVaults(network, params, updatedDeployNetworkParams);
+
+        return network;
+    }
+
+    function updateDeployParamsForDeployer(
+        DeployNetworkParams memory deployNetworkParams
+    ) public returns (DeployNetworkParams memory updatedDeployNetworkParams) {
+        updatedDeployNetworkParams.name = deployNetworkParams.name;
+        updatedDeployNetworkParams.metadataURI = deployNetworkParams.metadataURI;
+        updatedDeployNetworkParams.proposers = deployNetworkParams.proposers;
+        updatedDeployNetworkParams.executors = deployNetworkParams.executors;
+        updatedDeployNetworkParams.defaultAdminRoleHolder = deployNetworkParams.defaultAdminRoleHolder;
+        updatedDeployNetworkParams.nameUpdateRoleHolder = deployNetworkParams.nameUpdateRoleHolder;
+        updatedDeployNetworkParams.metadataURIUpdateRoleHolder = deployNetworkParams.metadataURIUpdateRoleHolder;
+        updatedDeployNetworkParams.globalMinDelay = 0;
+        updatedDeployNetworkParams.setMaxNetworkLimitMinDelay = 0;
+        updatedDeployNetworkParams.setResolverMinDelay = 0;
+        updatedDeployNetworkParams.upgradeProxyMinDelay = deployNetworkParams.upgradeProxyMinDelay;
+        updatedDeployNetworkParams.setMiddlewareMinDelay = deployNetworkParams.setMiddlewareMinDelay;
+        updatedDeployNetworkParams.salt = deployNetworkParams.salt;
 
         (,, address deployer) = vm.readCallers();
 
         bool isDeployerProposer;
         {
-            address[] memory tempProposers = new address[](params.deployNetworkParams.proposers.length + 1);
-            for (uint256 i; i < params.deployNetworkParams.proposers.length; ++i) {
-                tempProposers[i] = params.deployNetworkParams.proposers[i];
+            address[] memory tempProposers = new address[](deployNetworkParams.proposers.length + 1);
+            for (uint256 i; i < deployNetworkParams.proposers.length; ++i) {
+                tempProposers[i] = deployNetworkParams.proposers[i];
                 if (tempProposers[i] == deployer) {
                     isDeployerProposer = true;
                     break;
@@ -47,15 +73,15 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
             }
             if (!isDeployerProposer) {
                 tempProposers[tempProposers.length - 1] = deployer;
-                params.deployNetworkParams.proposers = tempProposers;
+                updatedDeployNetworkParams.proposers = tempProposers;
             }
         }
 
         bool isDeployerExecutor;
         {
-            address[] memory tempExecutors = new address[](params.deployNetworkParams.executors.length + 1);
-            for (uint256 i; i < params.deployNetworkParams.executors.length; ++i) {
-                tempExecutors[i] = params.deployNetworkParams.executors[i];
+            address[] memory tempExecutors = new address[](deployNetworkParams.executors.length + 1);
+            for (uint256 i; i < deployNetworkParams.executors.length; ++i) {
+                tempExecutors[i] = deployNetworkParams.executors[i];
                 if (tempExecutors[i] == deployer) {
                     isDeployerExecutor = true;
                     break;
@@ -63,31 +89,32 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
             }
             if (!isDeployerExecutor) {
                 tempExecutors[tempExecutors.length - 1] = deployer;
-                params.deployNetworkParams.executors = tempExecutors;
+                updatedDeployNetworkParams.executors = tempExecutors;
             }
         }
+    }
 
-        uint256 originalGlobalMinDelay = params.deployNetworkParams.globalMinDelay;
-        params.deployNetworkParams.globalMinDelay = 0;
-        uint256 originalSetMaxNetworkLimitMinDelay = params.deployNetworkParams.setMaxNetworkLimitMinDelay;
-        params.deployNetworkParams.setMaxNetworkLimitMinDelay = 0;
-        uint256 originalSetResolverMinDelay = params.deployNetworkParams.setResolverMinDelay;
-        params.deployNetworkParams.setResolverMinDelay = 0;
-
-        vm.stopBroadcast();
-
-        address network = run(params.deployNetworkParams);
-
+    function updateNetworkForVaults(
+        address network,
+        DeployNetworkForVaultsParams memory params,
+        DeployNetworkParams memory updatedDeployNetworkParams
+    ) public {
         vm.startBroadcast();
+
+        (,, address deployer) = vm.readCallers();
+        bool isDeployerProposer =
+            params.deployNetworkParams.proposers.length == updatedDeployNetworkParams.proposers.length;
+        bool isDeployerExecutor =
+            params.deployNetworkParams.executors.length == updatedDeployNetworkParams.executors.length;
 
         {
             uint256 numCalls = params.vaults.length;
             for (uint256 i; i < params.resolvers.length; ++i) {
                 if (params.resolvers[i] != address(0)) ++numCalls;
             }
-            if (originalGlobalMinDelay > 0) ++numCalls;
-            if (originalSetMaxNetworkLimitMinDelay > 0) ++numCalls;
-            if (originalSetResolverMinDelay > 0) ++numCalls;
+            if (params.deployNetworkParams.globalMinDelay > 0) ++numCalls;
+            if (params.deployNetworkParams.setMaxNetworkLimitMinDelay > 0) ++numCalls;
+            if (params.deployNetworkParams.setResolverMinDelay > 0) ++numCalls;
             if (!isDeployerProposer) ++numCalls;
             if (!isDeployerExecutor) ++numCalls;
             address[] memory targets = new address[](numCalls);
@@ -108,24 +135,35 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
                 }
             }
 
-            if (originalGlobalMinDelay > 0) {
+            if (params.deployNetworkParams.globalMinDelay > 0) {
                 targets[index] = network;
-                payloads[index++] = abi.encodeCall(TimelockController.updateDelay, (originalGlobalMinDelay));
+                payloads[index++] =
+                    abi.encodeCall(TimelockController.updateDelay, (params.deployNetworkParams.globalMinDelay));
             }
 
-            if (originalSetMaxNetworkLimitMinDelay > 0) {
+            if (params.deployNetworkParams.setMaxNetworkLimitMinDelay > 0) {
                 targets[index] = network;
                 payloads[index++] = abi.encodeCall(
                     INetwork.updateDelay,
-                    (address(0), IBaseDelegator.setMaxNetworkLimit.selector, true, originalSetMaxNetworkLimitMinDelay)
+                    (
+                        address(0),
+                        IBaseDelegator.setMaxNetworkLimit.selector,
+                        true,
+                        params.deployNetworkParams.setMaxNetworkLimitMinDelay
+                    )
                 );
             }
 
-            if (originalSetResolverMinDelay > 0) {
+            if (params.deployNetworkParams.setResolverMinDelay > 0) {
                 targets[index] = network;
                 payloads[index++] = abi.encodeCall(
                     INetwork.updateDelay,
-                    (address(0), IVetoSlasher.setResolver.selector, true, originalSetResolverMinDelay)
+                    (
+                        address(0),
+                        IVetoSlasher.setResolver.selector,
+                        true,
+                        params.deployNetworkParams.setResolverMinDelay
+                    )
                 );
             }
 
@@ -197,7 +235,5 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
                 ) == params.maxNetworkLimits[i]
             );
         }
-
-        return network;
     }
 }
