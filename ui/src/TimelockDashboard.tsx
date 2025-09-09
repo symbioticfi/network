@@ -10,7 +10,7 @@ import {
   parseEther,
   parseAbiItem,
 } from 'viem'
-import type { Abi, AbiFunction, PublicClient, WalletClient } from 'viem'
+import type { Abi, AbiFunction, PublicClient } from 'viem'
 import {
   useAccount,
   useChainId,
@@ -21,6 +21,18 @@ import { wagmiAdapter } from './wagmiConfig'
 import { networkAbi, OperationState } from './abi'
 import { useAppKit } from '@reown/appkit/library/react'
 
+// Constants
+const ZERO_32: Hex =
+  '0x0000000000000000000000000000000000000000000000000000000000000000'
+const ZERO_ADDRESS =
+  '0x0000000000000000000000000000000000000000' as `0x${string}`
+const DEFAULT_MAX_BLOCKS_PER_QUERY = '10000'
+const DEFAULT_BATCH_DELAY = '0'
+const DEFAULT_BATCH_BUILDER_ARGS = '[]'
+const DEFAULT_BATCH_BUILDER_ROW = '0'
+const NATIVE_ASSET_TRANSFER_SELECTOR = '0xeeeeeeee'
+
+// Types
 type ScheduledTx = {
   target: `0x${string}`
   value: bigint
@@ -38,10 +50,112 @@ type OperationEntry = {
   state: OperationState
 }
 
-const zero32: Hex =
-  '0x0000000000000000000000000000000000000000000000000000000000000000'
-const zeroAddress =
-  '0x0000000000000000000000000000000000000000' as `0x${string}`
+type RoleEntry = {
+  role: Hex
+  name?: string
+  admin?: Hex | null
+  members: `0x${string}`[]
+}
+
+type DelayEntry = {
+  key: string
+  target: `0x${string}`
+  selector: string
+  enabled: boolean
+  delay: bigint
+}
+
+type BatchRow = {
+  target: string
+  valueEth: string
+  data: string
+}
+
+type BatchBuilderMode = 'raw' | 'abi' | 'sig'
+
+type ActiveTab = 'main' | 'acl'
+
+// Utility functions
+const selectorFromData = (data: string): string => {
+  try {
+    const d = (data || '').toLowerCase()
+    if (!d || d === '0x') return NATIVE_ASSET_TRANSFER_SELECTOR
+    return d.startsWith('0x') ? d.slice(0, 10) : '0x' + d.slice(0, 8)
+  } catch {
+    return '0x'
+  }
+}
+
+const getLogsChunked = async (
+  client: PublicClient,
+  params: any,
+  start: bigint,
+  end: bigint,
+  maxSpan: bigint,
+  tokenRef: React.MutableRefObject<number>,
+  myToken: number
+) => {
+  let cur = start
+  const out: any[] = []
+  while (cur <= end) {
+    if (tokenRef.current !== myToken) throw new Error('canceled')
+    const chunkTo = cur + maxSpan > end ? end : cur + maxSpan
+    const part = await client.getLogs({
+      ...params,
+      fromBlock: cur,
+      toBlock: chunkTo,
+    } as any)
+    out.push(...part)
+    cur = chunkTo + 1n
+  }
+  return out
+}
+
+const isArchiveRpcError = (error: any): boolean => {
+  const msg = String(error?.message || error)
+  return (
+    msg.includes('missing trie node') ||
+    msg.includes('state') ||
+    msg.includes('Missing or invalid parameters')
+  )
+}
+
+const handleError = (error: any, context: string) => {
+  console.error(`${context} error:`, error)
+  // Could add user-facing error notifications here
+}
+
+// Custom hooks
+const useRpcChainId = (
+  rpcUrl: string,
+  effectivePublicClient: PublicClient | null
+) => {
+  const [rpcDerivedChainId, setRpcDerivedChainId] = useState<number | null>(
+    null
+  )
+
+  useEffect(() => {
+    let cancelled = false
+    async function fetchChainId() {
+      try {
+        if (rpcUrl && effectivePublicClient) {
+          const id = await (effectivePublicClient as any).getChainId?.()
+          if (!cancelled && typeof id === 'number') setRpcDerivedChainId(id)
+        } else {
+          if (!cancelled) setRpcDerivedChainId(null)
+        }
+      } catch {
+        if (!cancelled) setRpcDerivedChainId(null)
+      }
+    }
+    fetchChainId()
+    return () => {
+      cancelled = true
+    }
+  }, [rpcUrl, effectivePublicClient])
+
+  return rpcDerivedChainId
+}
 
 export default function TimelockDashboard() {
   const [rpcUrl, setRpcUrl] = useState<string>('')
@@ -56,58 +170,51 @@ export default function TimelockDashboard() {
   const [contractName, setContractName] = useState<string>('')
   const [metadataURI, setMetadataURI] = useState<string>('')
   const [globalMinDelay, setGlobalMinDelay] = useState<bigint | null>(null)
-  const [activeTab, setActiveTab] = useState<'main' | 'acl'>('main')
+  const [activeTab, setActiveTab] = useState<ActiveTab>('main')
 
-  const [delayEntries, setDelayEntries] = useState<
-    {
-      key: string
-      target: `0x${string}`
-      selector: string
-      enabled: boolean
-      delay: bigint
-    }[]
-  >([])
+  const [delayEntries, setDelayEntries] = useState<DelayEntry[]>([])
 
   const [ops, setOps] = useState<OperationEntry[]>([])
+  // Loading states
   const [loadingDelays, setLoadingDelays] = useState(false)
   const [loadingOps, setLoadingOps] = useState(false)
   const [scheduling, setScheduling] = useState(false)
   const [executing, setExecuting] = useState<string>('') // id being executed
 
-  // Single schedule form state
-  // Batch scheduling only (single schedule removed previously)
-  // Batch calldata builder state
-  const [batchBuilderMode, setBatchBuilderMode] = useState<
-    'raw' | 'abi' | 'sig'
-  >('raw')
+  // Batch builder state
+  const [batchBuilderMode, setBatchBuilderMode] =
+    useState<BatchBuilderMode>('raw')
   const [batchBuilderAbiText, setBatchBuilderAbiText] = useState<string>('')
   const [batchBuilderFnName, setBatchBuilderFnName] = useState<string>('')
-  const [batchBuilderArgsText, setBatchBuilderArgsText] = useState<string>('[]')
+  const [batchBuilderArgsText, setBatchBuilderArgsText] = useState<string>(
+    DEFAULT_BATCH_BUILDER_ARGS
+  )
   const [batchBuilderError, setBatchBuilderError] = useState<string>('')
-  const [batchBuilderRow, setBatchBuilderRow] = useState<string>('0')
+  const [batchBuilderRow, setBatchBuilderRow] = useState<string>(
+    DEFAULT_BATCH_BUILDER_ROW
+  )
 
-  // Batch schedule form state
-  const [batchRows, setBatchRows] = useState<
-    Array<{ target: string; valueEth: string; data: string }>
-  >([{ target: '', valueEth: '0', data: '0x' }])
-  const [batchPredecessor, setBatchPredecessor] = useState<string>(zero32)
-  const [batchSalt, setBatchSalt] = useState<string>(zero32)
-  const [batchDelay, setBatchDelay] = useState<string>('0')
+  // Batch schedule state
+  const [batchRows, setBatchRows] = useState<BatchRow[]>([
+    { target: '', valueEth: '0', data: '0x' },
+  ])
+  const [batchPredecessor, setBatchPredecessor] = useState<string>(ZERO_32)
+  const [batchSalt, setBatchSalt] = useState<string>(ZERO_32)
+  const [batchDelay, setBatchDelay] = useState<string>(DEFAULT_BATCH_DELAY)
   const [batchMinDelay, setBatchMinDelay] = useState<bigint | null>(null)
-  const [maxBlocksPerQuery, setMaxBlocksPerQuery] = useState<string>('10000')
+
+  // Configuration state
+  const [maxBlocksPerQuery, setMaxBlocksPerQuery] = useState<string>(
+    DEFAULT_MAX_BLOCKS_PER_QUERY
+  )
   const [detectingFromBlock, setDetectingFromBlock] = useState(false)
+  // Token refs for cancellation
   const delaysTokenRef = useRef(0)
   const opsTokenRef = useRef(0)
   const aclTokenRef = useRef(0)
   const detectTokenRef = useRef(0)
 
   // Access Control state
-  type RoleEntry = {
-    role: Hex
-    name?: string
-    admin?: Hex | null
-    members: `0x${string}`[]
-  }
   const [rolesLoading, setRolesLoading] = useState(false)
   const [roles, setRoles] = useState<RoleEntry[]>([])
 
@@ -122,30 +229,13 @@ export default function TimelockDashboard() {
       const myToken = ++aclTokenRef.current
       const from = BigInt(fromBlock || '0')
       const latest = await effectivePublicClient.getBlockNumber()
-      const maxSpan = BigInt(Number(maxBlocksPerQuery || '10000'))
-      const getLogsChunked = async (
-        params: any,
-        start: bigint,
-        end: bigint
-      ) => {
-        let cur = start
-        const out: any[] = []
-        while (cur <= end) {
-          if (aclTokenRef.current !== myToken) throw new Error('canceled')
-          const chunkTo = cur + maxSpan > end ? end : cur + maxSpan
-          const part = await effectivePublicClient.getLogs({
-            ...params,
-            fromBlock: cur,
-            toBlock: chunkTo,
-          } as any)
-          out.push(...part)
-          cur = chunkTo + 1n
-        }
-        return out
-      }
+      const maxSpan = BigInt(
+        Number(maxBlocksPerQuery || DEFAULT_MAX_BLOCKS_PER_QUERY)
+      )
 
       const [grants, revokes] = await Promise.all([
         getLogsChunked(
+          effectivePublicClient,
           {
             address: contractAddress as `0x${string}`,
             event: {
@@ -160,9 +250,13 @@ export default function TimelockDashboard() {
             } as const,
           },
           from,
-          latest
+          latest,
+          maxSpan,
+          aclTokenRef,
+          myToken
         ),
         getLogsChunked(
+          effectivePublicClient,
           {
             address: contractAddress as `0x${string}`,
             event: {
@@ -177,7 +271,10 @@ export default function TimelockDashboard() {
             } as const,
           },
           from,
-          latest
+          latest,
+          maxSpan,
+          aclTokenRef,
+          myToken
         ),
       ])
 
@@ -261,19 +358,25 @@ export default function TimelockDashboard() {
   }
 
   // Unified load and cancel controls
-  const loadAll = () => {
-    loadDelays()
-    loadOperations()
-    loadAccessControl()
-  }
-  const cancelAllLoads = () => {
-    delaysTokenRef.current++
-    opsTokenRef.current++
-    aclTokenRef.current++
-    setLoadingDelays(false)
-    setLoadingOps(false)
-    setRolesLoading(false)
-  }
+
+  const cancelAllLoads = useMemo(
+    () => () => {
+      delaysTokenRef.current++
+      opsTokenRef.current++
+      aclTokenRef.current++
+      setLoadingDelays(false)
+      setLoadingOps(false)
+      setRolesLoading(false)
+    },
+    [
+      delaysTokenRef,
+      opsTokenRef,
+      aclTokenRef,
+      setLoadingDelays,
+      setLoadingOps,
+      setRolesLoading,
+    ]
+  )
 
   const detectDeploymentBlock = async () => {
     if (!effectivePublicClient || !contractAddress) return
@@ -306,13 +409,7 @@ export default function TimelockDashboard() {
             blockNumber: mid,
           })
         } catch (e: any) {
-          const msg = String(e?.message || e)
-          // Common non-archive errors from public providers
-          if (
-            msg.includes('missing trie node') ||
-            msg.includes('state') ||
-            msg.includes('Missing or invalid parameters')
-          ) {
+          if (isArchiveRpcError(e)) {
             alert(
               'Archive RPC is required to detect the exact deployment block. Please provide an archive-capable RPC URL in the RPC URL field (e.g. Alchemy/Infura), or set From Block manually.'
             )
@@ -326,7 +423,7 @@ export default function TimelockDashboard() {
       if (detectTokenRef.current === myToken) setFromBlock(lo.toString())
     } catch (e) {
       if ((e as any)?.message !== 'archive-rpc-required')
-        console.error('Detect error', e)
+        handleError(e, 'Detect deployment block')
     } finally {
       setDetectingFromBlock(false)
     }
@@ -338,29 +435,7 @@ export default function TimelockDashboard() {
   }, [rpcUrl, wagmiPublicClient])
 
   // Derive chainId from custom RPC when wallet is not connected
-  const [rpcDerivedChainId, setRpcDerivedChainId] = useState<number | null>(
-    null
-  )
-  useEffect(() => {
-    let cancelled = false
-    async function fetchChainId() {
-      try {
-        if (rpcUrl && effectivePublicClient) {
-          const id = await (effectivePublicClient as any).getChainId?.()
-          if (!cancelled && typeof id === 'number') setRpcDerivedChainId(id)
-        } else {
-          if (!cancelled) setRpcDerivedChainId(null)
-        }
-      } catch {
-        if (!cancelled) setRpcDerivedChainId(null)
-      }
-    }
-    fetchChainId()
-    return () => {
-      cancelled = true
-    }
-  }, [rpcUrl, effectivePublicClient])
-
+  const rpcDerivedChainId = useRpcChainId(rpcUrl, effectivePublicClient)
   const effectiveChainId = rpcDerivedChainId ?? chainId
 
   const canSchedule = useMemo(() => {
@@ -415,7 +490,7 @@ export default function TimelockDashboard() {
       setMetadataURI(meta as string)
       setGlobalMinDelay(global as bigint | null)
     } catch (e) {
-      console.error(e)
+      handleError(e, 'Read header')
     }
   }
 
@@ -431,30 +506,11 @@ export default function TimelockDashboard() {
       const from = BigInt(fromBlock || '0')
       const latest = await effectivePublicClient.getBlockNumber()
 
-      // Chunked logs fetch to avoid provider 10k block range limits
-      const getLogsChunked = async (
-        params: any,
-        start: bigint,
-        end: bigint
-      ) => {
-        const maxSpan = BigInt(Number(maxBlocksPerQuery || '10000'))
-        let cur = start
-        const out: any[] = []
-        while (cur <= end) {
-          if (delaysTokenRef.current !== myToken) throw new Error('canceled')
-          const chunkTo = cur + maxSpan > end ? end : cur + maxSpan
-          const part = await effectivePublicClient.getLogs({
-            ...params,
-            fromBlock: cur,
-            toBlock: chunkTo,
-          } as any)
-          out.push(...part)
-          cur = chunkTo + 1n
-        }
-        return out
-      }
-
+      const maxSpan = BigInt(
+        Number(maxBlocksPerQuery || DEFAULT_MAX_BLOCKS_PER_QUERY)
+      )
       const logs = await getLogsChunked(
+        effectivePublicClient,
         {
           address: contractAddress as `0x${string}`,
           event: {
@@ -472,7 +528,10 @@ export default function TimelockDashboard() {
           } as const,
         },
         from,
-        latest
+        latest,
+        maxSpan,
+        delaysTokenRef,
+        myToken
       )
 
       // Decode only the custom MinDelayChange by trying both event defs and accepting the address+bytes4 one
@@ -525,7 +584,7 @@ export default function TimelockDashboard() {
       )
       if (delaysTokenRef.current === myToken) setDelayEntries(arr)
     } catch (e) {
-      console.error(e)
+      handleError(e, 'Load delays')
     } finally {
       setLoadingDelays(false)
     }
@@ -539,31 +598,13 @@ export default function TimelockDashboard() {
       const from = BigInt(fromBlock || '0')
       const latest = await effectivePublicClient.getBlockNumber()
 
-      // Chunk helper
-      const getLogsChunked = async (
-        params: any,
-        start: bigint,
-        end: bigint
-      ) => {
-        const maxSpan = BigInt(Number(maxBlocksPerQuery || '10000'))
-        let cur = start
-        const out: any[] = []
-        while (cur <= end) {
-          if (opsTokenRef.current !== myToken) throw new Error('canceled')
-          const chunkTo = cur + maxSpan > end ? end : cur + maxSpan
-          const part = await effectivePublicClient.getLogs({
-            ...params,
-            fromBlock: cur,
-            toBlock: chunkTo,
-          } as any)
-          out.push(...part)
-          cur = chunkTo + 1n
-        }
-        return out
-      }
+      const maxSpan = BigInt(
+        Number(maxBlocksPerQuery || DEFAULT_MAX_BLOCKS_PER_QUERY)
+      )
 
       // Fetch CallScheduled logs
       const scheduled = await getLogsChunked(
+        effectivePublicClient,
         {
           address: contractAddress as `0x${string}`,
           event: {
@@ -582,11 +623,15 @@ export default function TimelockDashboard() {
           } as const,
         },
         from,
-        latest
+        latest,
+        maxSpan,
+        opsTokenRef,
+        myToken
       )
 
       // Fetch CallSalt logs
       const salts = await getLogsChunked(
+        effectivePublicClient,
         {
           address: contractAddress as `0x${string}`,
           event: {
@@ -600,7 +645,10 @@ export default function TimelockDashboard() {
           } as const,
         },
         from,
-        latest
+        latest,
+        maxSpan,
+        opsTokenRef,
+        myToken
       )
 
       const saltById = new Map<string, Hex>()
@@ -632,7 +680,7 @@ export default function TimelockDashboard() {
           byId.set(id, {
             id,
             predecessor,
-            salt: saltById.get(id) ?? zero32,
+            salt: saltById.get(id) ?? ZERO_32,
             delay,
             txs: [{ index, target, value, data }],
             timestamp: 0n,
@@ -687,11 +735,20 @@ export default function TimelockDashboard() {
 
       if (opsTokenRef.current === myToken) setOps(entries)
     } catch (e) {
-      console.error(e)
+      handleError(e, 'Load operations')
     } finally {
       setLoadingOps(false)
     }
   }
+
+  const loadAll = useMemo(
+    () => () => {
+      loadDelays()
+      loadOperations()
+      loadAccessControl()
+    },
+    [loadDelays, loadOperations, loadAccessControl]
+  )
 
   // Single schedule removed
 
@@ -719,9 +776,9 @@ export default function TimelockDashboard() {
           targets,
           values,
           payloads,
-          (batchPredecessor || zero32) as Hex,
-          (batchSalt || zero32) as Hex,
-          BigInt(batchDelay || '0'),
+          (batchPredecessor || ZERO_32) as Hex,
+          (batchSalt || ZERO_32) as Hex,
+          BigInt(batchDelay || DEFAULT_BATCH_DELAY),
         ],
         account,
         chain: undefined,
@@ -730,7 +787,7 @@ export default function TimelockDashboard() {
       await effectivePublicClient.waitForTransactionReceipt({ hash })
       await loadOperations()
     } catch (e) {
-      console.error(e)
+      handleError(e, 'Schedule batch')
     } finally {
       setScheduling(false)
     }
@@ -768,19 +825,9 @@ export default function TimelockDashboard() {
       }
       await loadOperations()
     } catch (e) {
-      console.error(e)
+      handleError(e, 'Execute operation')
     } finally {
       setExecuting('')
-    }
-  }
-
-  const selectorFromData = (data: string) => {
-    try {
-      const d = (data || '').toLowerCase()
-      if (!d || d === '0x') return '0xeeeeeeee'
-      return d.startsWith('0x') ? d.slice(0, 10) : '0x' + d.slice(0, 8)
-    } catch {
-      return '0x'
     }
   }
 
@@ -868,17 +915,21 @@ export default function TimelockDashboard() {
       )
       const max = mins.reduce((acc, v) => (v > acc ? v : acc), 0n)
       setBatchMinDelay(max)
-      if ((batchDelay || '0') === '0') setBatchDelay(String(max))
+      if ((batchDelay || DEFAULT_BATCH_DELAY) === DEFAULT_BATCH_DELAY)
+        setBatchDelay(String(max))
     } catch (e) {
-      console.error(e)
+      handleError(e, 'Compute batch min delay')
     }
   }
 
   // Keep required min delay up to date when inputs change
+  const batchRowsStringified = useMemo(
+    () => JSON.stringify(batchRows),
+    [batchRows]
+  )
   useEffect(() => {
     computeBatchMinDelay()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [effectivePublicClient, contractAddress, JSON.stringify(batchRows)])
+  }, [effectivePublicClient, contractAddress, batchRowsStringified])
 
   return (
     <div className='min-h-screen bg-gray-50 text-gray-900'>
@@ -1082,11 +1133,8 @@ export default function TimelockDashboard() {
                     <>
                       {delayEntries.map((d) => {
                         const displayTarget =
-                          d.target === zeroAddress ? 'any' : d.target
-                        const displaySelector =
-                          d.selector?.toLowerCase() === '0xeeeeeeee'
-                            ? 'any'
-                            : d.selector
+                          d.target === ZERO_ADDRESS ? 'any' : d.target
+                        const displaySelector = d.selector
                         return (
                           <tr key={d.key} className='border-t'>
                             <td className='py-2 pr-4 font-mono text-xs'>
