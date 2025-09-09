@@ -45,19 +45,11 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
     function updateDeployParamsForDeployer(
         DeployNetworkParams memory deployNetworkParams
     ) public returns (DeployNetworkParams memory updatedDeployNetworkParams) {
-        updatedDeployNetworkParams.name = deployNetworkParams.name;
-        updatedDeployNetworkParams.metadataURI = deployNetworkParams.metadataURI;
-        updatedDeployNetworkParams.proposers = deployNetworkParams.proposers;
-        updatedDeployNetworkParams.executors = deployNetworkParams.executors;
-        updatedDeployNetworkParams.defaultAdminRoleHolder = deployNetworkParams.defaultAdminRoleHolder;
-        updatedDeployNetworkParams.nameUpdateRoleHolder = deployNetworkParams.nameUpdateRoleHolder;
-        updatedDeployNetworkParams.metadataURIUpdateRoleHolder = deployNetworkParams.metadataURIUpdateRoleHolder;
+        // clone the struct
+        updatedDeployNetworkParams = abi.decode(abi.encode(deployNetworkParams), (DeployNetworkParams));
         updatedDeployNetworkParams.globalMinDelay = 0;
         updatedDeployNetworkParams.setMaxNetworkLimitMinDelay = 0;
         updatedDeployNetworkParams.setResolverMinDelay = 0;
-        updatedDeployNetworkParams.upgradeProxyMinDelay = deployNetworkParams.upgradeProxyMinDelay;
-        updatedDeployNetworkParams.setMiddlewareMinDelay = deployNetworkParams.setMiddlewareMinDelay;
-        updatedDeployNetworkParams.salt = deployNetworkParams.salt;
 
         (,, address deployer) = vm.readCallers();
 
