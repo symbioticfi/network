@@ -18,7 +18,16 @@ contract SetMaxNetworkLimitUpdateDelay is SetMaxNetworkLimitUpdateDelayBase {
     // Salt for TimelockController operations
     bytes32 SALT = "SetMaxNetworkLimitUpdateDelay";
 
-    constructor() SetMaxNetworkLimitUpdateDelayBase(NETWORK, SET_MAX_NETWORK_LIMIT_DELAY, DELAY, SALT) {}
+    constructor()
+        SetMaxNetworkLimitUpdateDelayBase(
+            SetMaxNetworkLimitUpdateDelayBase.SetMaxNetworkLimitUpdateDelayParams({
+                network: NETWORK,
+                setMaxNetworkLimitDelay: SET_MAX_NETWORK_LIMIT_DELAY,
+                delay: DELAY,
+                salt: SALT
+            })
+        )
+    {}
 
     /**
      * @notice Schedule an update of the setMaxNetworkLimit delay through the timelock

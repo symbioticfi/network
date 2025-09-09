@@ -18,7 +18,16 @@ contract SetResolverUpdateDelay is SetResolverUpdateDelayBase {
     // Salt for TimelockController operations
     bytes32 SALT = "SetResolverUpdateDelay";
 
-    constructor() SetResolverUpdateDelayBase(NETWORK, SET_RESOLVER_DELAY, DELAY, SALT) {}
+    constructor()
+        SetResolverUpdateDelayBase(
+            SetResolverUpdateDelayBase.SetResolverUpdateDelayParams({
+                network: NETWORK,
+                setResolverDelay: SET_RESOLVER_DELAY,
+                delay: DELAY,
+                salt: SALT
+            })
+        )
+    {}
 
     /**
      * @notice Schedule an update of the setResolver delay through the timelock

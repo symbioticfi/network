@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
 import {ITimelockAction} from "./interfaces/ITimelockAction.sol";
@@ -50,14 +51,63 @@ contract UpdateBatch is ActionBase {
     constructor() {
         // Add all actions needed for the update batch to the array
         actions.push(
-            new SetMaxNetworkLimitBase(NETWORK, VAULT1, SUBNETWORK_IDENTIFIER1, MAX_NETWORK_LIMIT1, DELAY, SALT)
+            new SetMaxNetworkLimitBase(
+                SetMaxNetworkLimitBase.SetMaxNetworkLimitParams({
+                    network: NETWORK,
+                    vault: VAULT1,
+                    subnetworkId: SUBNETWORK_IDENTIFIER1,
+                    maxNetworkLimit: MAX_NETWORK_LIMIT1,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
         );
         actions.push(
-            new SetMaxNetworkLimitBase(NETWORK, VAULT2, SUBNETWORK_IDENTIFIER2, MAX_NETWORK_LIMIT2, DELAY, SALT)
+            new SetMaxNetworkLimitBase(
+                SetMaxNetworkLimitBase.SetMaxNetworkLimitParams({
+                    network: NETWORK,
+                    vault: VAULT2,
+                    subnetworkId: SUBNETWORK_IDENTIFIER2,
+                    maxNetworkLimit: MAX_NETWORK_LIMIT2,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
         );
-        actions.push(new SetMiddlewareBase(NETWORK, MIDDLEWARE, DELAY, SALT));
-        actions.push(new SetResolverBase(NETWORK, VAULT1, SUBNETWORK_IDENTIFIER1, RESOLVER, HINTS, DELAY, SALT));
-        actions.push(new UpgradeProxyBase(NETWORK, NEW_IMPLEMENTATION, UPGRADE_DATA, DELAY, SALT));
+        actions.push(
+            new SetMiddlewareBase(
+                SetMiddlewareBase.SetMiddlewareParams({
+                    network: NETWORK,
+                    middleware: MIDDLEWARE,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
+        );
+        actions.push(
+            new SetResolverBase(
+                SetResolverBase.SetResolverParams({
+                    network: NETWORK,
+                    vault: VAULT1,
+                    identifier: SUBNETWORK_IDENTIFIER1,
+                    resolver: RESOLVER,
+                    hints: HINTS,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
+        );
+        actions.push(
+            new UpgradeProxyBase(
+                UpgradeProxyBase.UpgradeProxyParams({
+                    network: NETWORK,
+                    newImplementation: NEW_IMPLEMENTATION,
+                    upgradeData: UPGRADE_DATA,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
+        );
 
         for (uint256 i; i < actions.length; ++i) {
             (address target, bytes memory payload) = actions[i].getTargetAndPayload();

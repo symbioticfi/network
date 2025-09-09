@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
 import {ITimelockAction} from "../actions/interfaces/ITimelockAction.sol";
@@ -25,8 +26,26 @@ contract HotActionsUpdateDelay is ActionBase {
     bytes[] public payloads;
 
     constructor() {
-        actions.push(new SetMaxNetworkLimitUpdateDelayBase(NETWORK, HOT_ACTIONS_DELAY, DELAY, SALT));
-        actions.push(new SetResolverUpdateDelayBase(NETWORK, HOT_ACTIONS_DELAY, DELAY, SALT));
+        actions.push(
+            new SetMaxNetworkLimitUpdateDelayBase(
+                SetMaxNetworkLimitUpdateDelayBase.SetMaxNetworkLimitUpdateDelayParams({
+                    network: NETWORK,
+                    setMaxNetworkLimitDelay: HOT_ACTIONS_DELAY,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
+        );
+        actions.push(
+            new SetResolverUpdateDelayBase(
+                SetResolverUpdateDelayBase.SetResolverUpdateDelayParams({
+                    network: NETWORK,
+                    setResolverDelay: HOT_ACTIONS_DELAY,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
+        );
 
         for (uint256 i; i < actions.length; ++i) {
             (address target, bytes memory payload) = actions[i].getTargetAndPayload();

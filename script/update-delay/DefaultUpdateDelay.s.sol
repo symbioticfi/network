@@ -18,7 +18,16 @@ contract DefaultUpdateDelay is DefaultUpdateDelayBase {
     // Salt for TimelockController operations
     bytes32 SALT = "DefaultUpdateDelay";
 
-    constructor() DefaultUpdateDelayBase(NETWORK, GLOBAL_MIN_DELAY, DELAY, SALT) {}
+    constructor()
+        DefaultUpdateDelayBase(
+            DefaultUpdateDelayBase.DefaultUpdateDelayParams({
+                network: NETWORK,
+                globalMinDelay: GLOBAL_MIN_DELAY,
+                delay: DELAY,
+                salt: SALT
+            })
+        )
+    {}
 
     /**
      * @notice Schedule an update of the default delay through the timelock

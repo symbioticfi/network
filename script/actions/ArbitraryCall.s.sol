@@ -20,18 +20,24 @@ contract ArbitraryCall is ArbitraryCallBase {
     // Salt for TimelockController operations
     bytes32 SALT = "ArbitraryCall";
 
+    constructor()
+        ArbitraryCallBase(
+            ArbitraryCallBase.ArbitraryCallParams({network: NETWORK, target: TARGET, data: DATA, delay: DELAY, salt: SALT})
+        )
+    {}
+
     /**
      * @notice Schedule an arbitrary function call through the timelock
      */
     function runS() public {
-        runSchedule(NETWORK, TARGET, DATA, DELAY, SALT);
+        runSchedule();
     }
 
     /**
      * @notice Execute an arbitrary function call immediately through the timelock
      */
     function runE() public {
-        runExecute(NETWORK, TARGET, DATA, SALT);
+        runExecute();
     }
 
     /**
@@ -39,6 +45,6 @@ contract ArbitraryCall is ArbitraryCallBase {
      * @dev It will succeed only if the delay is 0
      */
     function runSE() public {
-        runScheduleAndExecute(NETWORK, TARGET, DATA, SALT);
+        runScheduleAndExecute();
     }
 }

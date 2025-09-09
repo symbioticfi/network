@@ -9,28 +9,31 @@ import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDe
 import {ITimelockAction} from "../../actions/interfaces/ITimelockAction.sol";
 
 contract SetMaxNetworkLimitUpdateDelayBase is ActionBase, ITimelockAction {
-    address public network;
-    uint256 public setMaxNetworkLimitDelay;
-    uint256 public delay;
-    bytes32 public salt;
+    struct SetMaxNetworkLimitUpdateDelayParams {
+        address network;
+        uint256 setMaxNetworkLimitDelay;
+        uint256 delay;
+        bytes32 salt;
+    }
 
-    constructor(address network_, uint256 setMaxNetworkLimitDelay_, uint256 delay_, bytes32 salt_) {
-        network = network_;
-        setMaxNetworkLimitDelay = setMaxNetworkLimitDelay_;
-        delay = delay_;
-        salt = salt_;
+    SetMaxNetworkLimitUpdateDelayParams public params;
+
+    constructor(
+        SetMaxNetworkLimitUpdateDelayParams memory params_
+    ) {
+        params = params_;
     }
 
     function runSchedule() public {
         (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: target,
                 data: payload,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -38,13 +41,13 @@ contract SetMaxNetworkLimitUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled setMaxNetworkLimitUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    setMaxNetworkLimitDelay:",
-                vm.toString(setMaxNetworkLimitDelay),
+                vm.toString(params.setMaxNetworkLimitDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -53,12 +56,12 @@ contract SetMaxNetworkLimitUpdateDelayBase is ActionBase, ITimelockAction {
         (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: target,
                 data: payload,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -66,19 +69,20 @@ contract SetMaxNetworkLimitUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed setMaxNetworkLimitUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    setMaxNetworkLimitDelay:",
-                vm.toString(setMaxNetworkLimitDelay),
+                vm.toString(params.setMaxNetworkLimitDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
 
         assert(
-            INetwork(network).getMinDelay(address(1), abi.encodePacked(IBaseDelegator.setMaxNetworkLimit.selector))
-                == setMaxNetworkLimitDelay
+            INetwork(params.network).getMinDelay(
+                address(1), abi.encodePacked(IBaseDelegator.setMaxNetworkLimit.selector)
+            ) == params.setMaxNetworkLimitDelay
         );
     }
 
@@ -88,10 +92,10 @@ contract SetMaxNetworkLimitUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
-        target = network;
+        target = params.network;
         payload = abi.encodeCall(
             INetwork.updateDelay,
-            (address(0), IBaseDelegator.setMaxNetworkLimit.selector, true, setMaxNetworkLimitDelay)
+            (address(0), IBaseDelegator.setMaxNetworkLimit.selector, true, params.setMaxNetworkLimitDelay)
         );
     }
 }

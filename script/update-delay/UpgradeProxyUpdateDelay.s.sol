@@ -18,7 +18,16 @@ contract UpgradeProxyUpdateDelay is UpgradeProxyUpdateDelayBase {
     // Salt for TimelockController operations
     bytes32 SALT = "UpgradeProxyUpdateDelay";
 
-    constructor() UpgradeProxyUpdateDelayBase(NETWORK, UPGRADE_PROXY_DELAY, DELAY, SALT) {}
+    constructor()
+        UpgradeProxyUpdateDelayBase(
+            UpgradeProxyUpdateDelayBase.UpgradeProxyUpdateDelayParams({
+                network: NETWORK,
+                upgradeProxyDelay: UPGRADE_PROXY_DELAY,
+                delay: DELAY,
+                salt: SALT
+            })
+        )
+    {}
 
     /**
      * @notice Schedule an update of the upgradeProxy delay through the timelock

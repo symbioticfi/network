@@ -12,39 +12,33 @@ import {ITimelockAction} from "../interfaces/ITimelockAction.sol";
 contract SetMaxNetworkLimitBase is ActionBase, ITimelockAction {
     using Subnetwork for address;
 
-    address public network;
-    address public vault;
-    uint96 public subnetworkId;
-    uint256 public maxNetworkLimit;
-    uint256 public delay;
-    bytes32 public salt;
+    struct SetMaxNetworkLimitParams {
+        address network;
+        address vault;
+        uint96 subnetworkId;
+        uint256 maxNetworkLimit;
+        uint256 delay;
+        bytes32 salt;
+    }
+
+    SetMaxNetworkLimitParams public params;
 
     constructor(
-        address network_,
-        address vault_,
-        uint96 subnetworkId_,
-        uint256 maxNetworkLimit_,
-        uint256 delay_,
-        bytes32 salt_
+        SetMaxNetworkLimitParams memory params_
     ) {
-        network = network_;
-        vault = vault_;
-        subnetworkId = subnetworkId_;
-        maxNetworkLimit = maxNetworkLimit_;
-        delay = delay_;
-        salt = salt_;
+        params = params_;
     }
 
     function runSchedule() public {
         (address delegator, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: delegator,
                 data: payload,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -52,17 +46,17 @@ contract SetMaxNetworkLimitBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled setMaxNetworkLimit for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    delegator:",
                 vm.toString(delegator),
                 "\n    subnetworkId:",
-                vm.toString(subnetworkId),
+                vm.toString(params.subnetworkId),
                 "\n    maxNetworkLimit ",
-                vm.toString(maxNetworkLimit),
+                vm.toString(params.maxNetworkLimit),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -71,12 +65,12 @@ contract SetMaxNetworkLimitBase is ActionBase, ITimelockAction {
         (address delegator, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: delegator,
                 data: payload,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -84,19 +78,22 @@ contract SetMaxNetworkLimitBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed setMaxNetworkLimit for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    delegator:",
                 vm.toString(delegator),
                 "\n    subnetworkId:",
-                vm.toString(subnetworkId),
+                vm.toString(params.subnetworkId),
                 "\n    maxNetworkLimit ",
-                vm.toString(maxNetworkLimit),
+                vm.toString(params.maxNetworkLimit),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
 
-        assert(IBaseDelegator(delegator).maxNetworkLimit(network.subnetwork(subnetworkId)) == maxNetworkLimit);
+        assert(
+            IBaseDelegator(delegator).maxNetworkLimit(params.network.subnetwork(params.subnetworkId))
+                == params.maxNetworkLimit
+        );
     }
 
     function runScheduleAndExecute() public {
@@ -105,7 +102,7 @@ contract SetMaxNetworkLimitBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
-        target = IVault(vault).delegator();
-        payload = abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (subnetworkId, maxNetworkLimit));
+        target = IVault(params.vault).delegator();
+        payload = abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (params.subnetworkId, params.maxNetworkLimit));
     }
 }

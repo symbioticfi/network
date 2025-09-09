@@ -10,28 +10,31 @@ import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/Symbiot
 import {INetworkMiddlewareService} from "@symbioticfi/core/src/interfaces/service/INetworkMiddlewareService.sol";
 
 contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
-    address public network;
-    uint256 public setMiddlewareDelay;
-    uint256 public delay;
-    bytes32 public salt;
+    struct SetMiddlewareUpdateDelayParams {
+        address network;
+        uint256 setMiddlewareDelay;
+        uint256 delay;
+        bytes32 salt;
+    }
 
-    constructor(address network_, uint256 setMiddlewareDelay_, uint256 delay_, bytes32 salt_) {
-        network = network_;
-        setMiddlewareDelay = setMiddlewareDelay_;
-        delay = delay_;
-        salt = salt_;
+    SetMiddlewareUpdateDelayParams public params;
+
+    constructor(
+        SetMiddlewareUpdateDelayParams memory params_
+    ) {
+        params = params_;
     }
 
     function runSchedule() public {
         (address delegator, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: delegator,
                 data: payload,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -39,13 +42,13 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled setMiddlewareUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    setMiddlewareDelay:",
-                vm.toString(setMiddlewareDelay),
+                vm.toString(params.setMiddlewareDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -54,12 +57,12 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
         (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: target,
                 data: payload,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -67,21 +70,21 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed setMiddlewareUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    setMiddlewareDelay:",
-                vm.toString(setMiddlewareDelay),
+                vm.toString(params.setMiddlewareDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
 
         assert(
-            INetwork(network).getMinDelay(
+            INetwork(params.network).getMinDelay(
                 address(SymbioticCoreConstants.core().networkMiddlewareService),
                 abi.encodePacked(INetworkMiddlewareService.setMiddleware.selector)
-            ) == setMiddlewareDelay
+            ) == params.setMiddlewareDelay
         );
     }
 
@@ -91,7 +94,7 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
-        target = network;
+        target = params.network;
 
         SymbioticCoreConstants.Core memory core = SymbioticCoreConstants.core();
         payload = abi.encodeCall(
@@ -100,7 +103,7 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
                 address(core.networkMiddlewareService),
                 INetworkMiddlewareService.setMiddleware.selector,
                 true,
-                setMiddlewareDelay
+                params.setMiddlewareDelay
             )
         );
     }

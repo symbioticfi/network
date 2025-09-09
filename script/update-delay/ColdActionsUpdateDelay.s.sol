@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
 import {ITimelockAction} from "../actions/interfaces/ITimelockAction.sol";
@@ -25,8 +26,26 @@ contract ColdActionsUpdateDelay is ActionBase {
     bytes[] public payloads;
 
     constructor() {
-        actions.push(new SetMiddlewareUpdateDelayBase(NETWORK, COLD_ACTIONS_DELAY, DELAY, SALT));
-        actions.push(new UpgradeProxyUpdateDelayBase(NETWORK, COLD_ACTIONS_DELAY, DELAY, SALT));
+        actions.push(
+            new SetMiddlewareUpdateDelayBase(
+                SetMiddlewareUpdateDelayBase.SetMiddlewareUpdateDelayParams({
+                    network: NETWORK,
+                    setMiddlewareDelay: COLD_ACTIONS_DELAY,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
+        );
+        actions.push(
+            new UpgradeProxyUpdateDelayBase(
+                UpgradeProxyUpdateDelayBase.UpgradeProxyUpdateDelayParams({
+                    network: NETWORK,
+                    upgradeProxyDelay: COLD_ACTIONS_DELAY,
+                    delay: DELAY,
+                    salt: SALT
+                })
+            )
+        );
 
         for (uint256 i; i < actions.length; ++i) {
             (address target, bytes memory payload) = actions[i].getTargetAndPayload();
