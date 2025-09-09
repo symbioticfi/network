@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   createPublicClient,
   decodeEventLog,
@@ -40,6 +40,8 @@ type OperationEntry = {
 
 const zero32: Hex =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
+const zeroAddress =
+  '0x0000000000000000000000000000000000000000' as `0x${string}`
 
 export default function TimelockDashboard() {
   const [rpcUrl, setRpcUrl] = useState<string>('')
@@ -73,7 +75,7 @@ export default function TimelockDashboard() {
   const [executing, setExecuting] = useState<string>('') // id being executed
 
   // Single schedule form state
-  // Single schedule removed
+  // Batch scheduling only (single schedule removed previously)
   // Batch calldata builder state
   const [batchBuilderMode, setBatchBuilderMode] = useState<
     'raw' | 'abi' | 'sig'
@@ -868,6 +870,12 @@ export default function TimelockDashboard() {
     }
   }
 
+  // Keep required min delay up to date when inputs change
+  useEffect(() => {
+    computeBatchMinDelay()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [effectivePublicClient, contractAddress, JSON.stringify(batchRows)])
+
   return (
     <div className='min-h-screen bg-gray-50 text-gray-900'>
       <div className='max-w-6xl mx-auto p-4 space-y-6'>
@@ -1067,21 +1075,39 @@ export default function TimelockDashboard() {
                       </td>
                     </tr>
                   ) : (
-                    delayEntries.map((d) => (
-                      <tr key={d.key} className='border-t'>
-                        <td className='py-2 pr-4 font-mono text-xs'>
-                          {d.target}
-                        </td>
-                        <td className='py-2 pr-4 font-mono text-xs'>
-                          {d.selector}
-                        </td>
-                        <td className='py-2 pr-4'>
-                          {d.enabled ? 'Yes' : 'No'}
-                        </td>
-                        <td className='py-2 pr-4'>{d.delay.toString()}</td>
-                      </tr>
-                    ))
+                    <>
+                      {delayEntries.map((d) => {
+                        const displayTarget =
+                          d.target === zeroAddress ? 'any' : d.target
+                        const displaySelector =
+                          d.selector?.toLowerCase() === '0xeeeeeeee'
+                            ? 'any'
+                            : d.selector
+                        return (
+                          <tr key={d.key} className='border-t'>
+                            <td className='py-2 pr-4 font-mono text-xs'>
+                              {displayTarget}
+                            </td>
+                            <td className='py-2 pr-4 font-mono text-xs'>
+                              {displaySelector}
+                            </td>
+                            <td className='py-2 pr-4'>
+                              {d.enabled ? 'Yes' : 'No'}
+                            </td>
+                            <td className='py-2 pr-4'>{d.delay.toString()}</td>
+                          </tr>
+                        )
+                      })}
+                    </>
                   )}
+                  <tr className='border-t bg-gray-50'>
+                    <td className='py-2 pr-4 font-mono text-xs'>any</td>
+                    <td className='py-2 pr-4 font-mono text-xs'>any</td>
+                    <td className='py-2 pr-4'>—</td>
+                    <td className='py-2 pr-4'>
+                      {globalMinDelay !== null ? globalMinDelay.toString() : '—'}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
