@@ -64,7 +64,7 @@ npm install
   forge script script/DeployNetwork.s.sol --rpc-url <RPC_URL> --private-key <PRIVATE_KEY> --etherscan-api-key <ETHERSCAN_API_KEY> --broadcast --verify
   ```
 
-- If you need a Network deployment for already-deployed Vault
+- If you need a Network deployment for already-deployed Vaults
 
   Open [DeployNetworkForVaults.s.sol](./script/DeployNetworkForVaults.s.sol), you will see config like this:
 
@@ -78,13 +78,13 @@ npm install
   // Hot actions delay (a delay that will be applied for minor actions like setMaxNetworkLimit and setResolver)
   uint256 HOT_ACTIONS_DELAY = 0;
   // Admin address (will become executor, proposer, and default admin by default)
-  address ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-  // Vault address to opt-in to
-  address VAULT = 0x49fC19bAE549e0b5F99B5b42d7222Caf09E8d2a1;
-  // Maximum amount of delegation that the network is ready to receive
-  uint256 MAX_NETWORK_LIMIT = 1000;
-  // Resolver address (optional, is applied only if VetoSlasher is used)
-  address RESOLVER = 0xbf616b04c463b818e3336FF3767e61AB44103243;
+  address ADMIN = 0x0000000000000000000000000000000000000000;
+  // Vault address to opt-in to (multiple vaults can be set)
+  address[] VAULTS = [0x0000000000000000000000000000000000000000];
+  // Maximum amount of delegation that network is ready to receive (multiple vaults can be set)
+  uint256[] MAX_NETWORK_LIMITS = [0];
+  // Resolver address (optional, is applied only if VetoSlasher is used) (multiple vaults can be set)
+  address[] RESOLVERS = [0x0000000000000000000000000000000000000000];
 
   // Optional
 
@@ -93,7 +93,7 @@ npm install
   // Metadata URI of the Network
   string METADATA_URI = "";
   // Salt for deterministic deployment
-  bytes11 SALT = "Test1";
+  bytes11 SALT = "SymNetwork";
   ```
 
   Edit needed fields, and execute the script via:
