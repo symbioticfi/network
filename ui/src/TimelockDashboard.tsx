@@ -956,7 +956,7 @@ export default function TimelockDashboard() {
                 className='w-full border rounded px-2 py-1'
                 placeholder='http(s)://...'
                 value={rpcUrl}
-                onChange={(e) => setRpcUrl(e.target.value)}
+                onChange={(e) => setRpcUrl(e.target.value.trim())}
               />
               <p className='text-xs text-gray-500 mt-1'>
                 If empty, uses injected wallet provider.
@@ -970,7 +970,7 @@ export default function TimelockDashboard() {
                 className='w-full border rounded px-2 py-1'
                 placeholder='0x...'
                 value={contractAddress}
-                onChange={(e) => setContractAddress(e.target.value)}
+                onChange={(e) => setContractAddress(e.target.value.trim())}
               />
               <div className='text-xs text-gray-500 mt-1'>
                 Timelock-enabled Network contract
@@ -985,7 +985,7 @@ export default function TimelockDashboard() {
                   className='w-full border rounded px-2 py-1'
                   placeholder='0'
                   value={fromBlock}
-                  onChange={(e) => setFromBlock(e.target.value)}
+                  onChange={(e) => setFromBlock(e.target.value.trim())}
                 />
                 <div className='flex gap-2'>
                   <button
