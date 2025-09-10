@@ -54,35 +54,31 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         (,, address deployer) = vm.readCallers();
 
         bool isDeployerProposer;
-        {
-            address[] memory tempProposers = new address[](deployNetworkParams.proposers.length + 1);
-            for (uint256 i; i < deployNetworkParams.proposers.length; ++i) {
-                tempProposers[i] = deployNetworkParams.proposers[i];
-                if (tempProposers[i] == deployer) {
-                    isDeployerProposer = true;
-                    break;
-                }
+        address[] memory tempProposers = new address[](deployNetworkParams.proposers.length + 1);
+        for (uint256 i; i < deployNetworkParams.proposers.length; ++i) {
+            tempProposers[i] = deployNetworkParams.proposers[i];
+            if (tempProposers[i] == deployer) {
+                isDeployerProposer = true;
+                break;
             }
-            if (!isDeployerProposer) {
-                tempProposers[tempProposers.length - 1] = deployer;
-                updatedDeployNetworkParams.proposers = tempProposers;
-            }
+        }
+        if (!isDeployerProposer) {
+            tempProposers[tempProposers.length - 1] = deployer;
+            updatedDeployNetworkParams.proposers = tempProposers;
         }
 
         bool isDeployerExecutor;
-        {
-            address[] memory tempExecutors = new address[](deployNetworkParams.executors.length + 1);
-            for (uint256 i; i < deployNetworkParams.executors.length; ++i) {
-                tempExecutors[i] = deployNetworkParams.executors[i];
-                if (tempExecutors[i] == deployer) {
-                    isDeployerExecutor = true;
-                    break;
-                }
+        address[] memory tempExecutors = new address[](deployNetworkParams.executors.length + 1);
+        for (uint256 i; i < deployNetworkParams.executors.length; ++i) {
+            tempExecutors[i] = deployNetworkParams.executors[i];
+            if (tempExecutors[i] == deployer) {
+                isDeployerExecutor = true;
+                break;
             }
-            if (!isDeployerExecutor) {
-                tempExecutors[tempExecutors.length - 1] = deployer;
-                updatedDeployNetworkParams.executors = tempExecutors;
-            }
+        }
+        if (!isDeployerExecutor) {
+            tempExecutors[tempExecutors.length - 1] = deployer;
+            updatedDeployNetworkParams.executors = tempExecutors;
         }
     }
 
