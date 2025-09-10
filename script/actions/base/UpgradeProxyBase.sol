@@ -10,36 +10,32 @@ import {ITransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transp
 import {ITimelockAction} from "../interfaces/ITimelockAction.sol";
 
 contract UpgradeProxyBase is ActionBase, ITimelockAction {
-    address public network;
-    address public newImplementation;
-    uint256 public delay;
-    bytes32 public salt;
-    bytes public upgradeData;
+    struct UpgradeProxyParams {
+        address network;
+        address newImplementation;
+        bytes upgradeData;
+        uint256 delay;
+        bytes32 salt;
+    }
+
+    UpgradeProxyParams public params;
 
     constructor(
-        address network_,
-        address newImplementation_,
-        bytes memory upgradeData_,
-        uint256 delay_,
-        bytes32 salt_
+        UpgradeProxyParams memory params_
     ) {
-        network = network_;
-        newImplementation = newImplementation_;
-        upgradeData = upgradeData_;
-        delay = delay_;
-        salt = salt_;
+        params = params_;
     }
 
     function runSchedule() public {
         (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: target,
                 data: data,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -47,15 +43,15 @@ contract UpgradeProxyBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled upgrade for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    upgradeData:",
-                string(upgradeData),
+                string(params.upgradeData),
                 "\n    newImplementation:",
-                vm.toString(newImplementation),
+                vm.toString(params.newImplementation),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -64,12 +60,12 @@ contract UpgradeProxyBase is ActionBase, ITimelockAction {
         (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: target,
                 data: data,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -77,17 +73,20 @@ contract UpgradeProxyBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed upgrade for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    upgradeData:",
-                string(upgradeData),
+                string(params.upgradeData),
                 "\n    newImplementation:",
-                vm.toString(newImplementation),
+                vm.toString(params.newImplementation),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
 
-        assert(address(uint160(uint256(vm.load(network, ERC1967Utils.IMPLEMENTATION_SLOT)))) == newImplementation);
+        assert(
+            address(uint160(uint256(vm.load(params.network, ERC1967Utils.IMPLEMENTATION_SLOT))))
+                == params.newImplementation
+        );
     }
 
     function runScheduleAndExecute() public {
@@ -102,9 +101,10 @@ contract UpgradeProxyBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
-        target = _getProxyAdmin(network);
+        target = _getProxyAdmin(params.network);
         payload = abi.encodeCall(
-            ProxyAdmin.upgradeAndCall, (ITransparentUpgradeableProxy(network), newImplementation, upgradeData)
+            ProxyAdmin.upgradeAndCall,
+            (ITransparentUpgradeableProxy(params.network), params.newImplementation, params.upgradeData)
         );
     }
 }

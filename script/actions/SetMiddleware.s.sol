@@ -18,7 +18,11 @@ contract SetMiddleware is SetMiddlewareBase {
     // Salt for TimelockController operations
     bytes32 SALT = "SetMiddleware";
 
-    constructor() SetMiddlewareBase(NETWORK, MIDDLEWARE, DELAY, SALT) {}
+    constructor()
+        SetMiddlewareBase(
+            SetMiddlewareBase.SetMiddlewareParams({network: NETWORK, middleware: MIDDLEWARE, delay: DELAY, salt: SALT})
+        )
+    {}
 
     /**
      * @notice Schedule a setMiddleware through the timelock

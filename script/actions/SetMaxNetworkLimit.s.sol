@@ -22,7 +22,18 @@ contract SetMaxNetworkLimit is SetMaxNetworkLimitBase {
     // Salt for TimelockController operations
     bytes32 SALT = "SetMaxNetworkLimit";
 
-    constructor() SetMaxNetworkLimitBase(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, MAX_NETWORK_LIMIT, DELAY, SALT) {}
+    constructor()
+        SetMaxNetworkLimitBase(
+            SetMaxNetworkLimitBase.SetMaxNetworkLimitParams({
+                network: NETWORK,
+                vault: VAULT,
+                subnetworkId: SUBNETWORK_IDENTIFIER,
+                maxNetworkLimit: MAX_NETWORK_LIMIT,
+                delay: DELAY,
+                salt: SALT
+            })
+        )
+    {}
 
     /**
      * @notice Schedule a setMaxNetworkLimit through the timelock

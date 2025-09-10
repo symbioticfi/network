@@ -10,28 +10,31 @@ import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.s
 import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 
 contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
-    address public network;
-    uint256 public upgradeProxyDelay;
-    uint256 public delay;
-    bytes32 public salt;
+    struct UpgradeProxyUpdateDelayParams {
+        address network;
+        uint256 upgradeProxyDelay;
+        uint256 delay;
+        bytes32 salt;
+    }
 
-    constructor(address network_, uint256 upgradeProxyDelay_, uint256 delay_, bytes32 salt_) {
-        network = network_;
-        upgradeProxyDelay = upgradeProxyDelay_;
-        delay = delay_;
-        salt = salt_;
+    UpgradeProxyUpdateDelayParams public params;
+
+    constructor(
+        UpgradeProxyUpdateDelayParams memory params_
+    ) {
+        params = params_;
     }
 
     function runSchedule() public {
         (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: target,
                 data: payload,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -39,13 +42,13 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled upgradeProxyUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    upgradeProxyDelay:",
-                vm.toString(upgradeProxyDelay),
+                vm.toString(params.upgradeProxyDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -54,12 +57,12 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
         (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: target,
                 data: payload,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -67,19 +70,20 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed upgradeProxyUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    upgradeProxyDelay:",
-                vm.toString(upgradeProxyDelay),
+                vm.toString(params.upgradeProxyDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
 
         assert(
-            INetwork(network).getMinDelay(_getProxyAdmin(network), abi.encodePacked(ProxyAdmin.upgradeAndCall.selector))
-                == upgradeProxyDelay
+            INetwork(params.network).getMinDelay(
+                _getProxyAdmin(params.network), abi.encodePacked(ProxyAdmin.upgradeAndCall.selector)
+            ) == params.upgradeProxyDelay
         );
     }
 
@@ -89,9 +93,10 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
-        target = network;
+        target = params.network;
         payload = abi.encodeCall(
-            INetwork.updateDelay, (_getProxyAdmin(network), ProxyAdmin.upgradeAndCall.selector, true, upgradeProxyDelay)
+            INetwork.updateDelay,
+            (_getProxyAdmin(params.network), ProxyAdmin.upgradeAndCall.selector, true, params.upgradeProxyDelay)
         );
     }
 

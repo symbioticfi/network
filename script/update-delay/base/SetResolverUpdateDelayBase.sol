@@ -9,28 +9,31 @@ import {IVetoSlasher} from "@symbioticfi/core/src/interfaces/slasher/IVetoSlashe
 import {ITimelockAction} from "../../actions/interfaces/ITimelockAction.sol";
 
 contract SetResolverUpdateDelayBase is ActionBase, ITimelockAction {
-    address public network;
-    uint256 public setResolverDelay;
-    uint256 public delay;
-    bytes32 public salt;
+    struct SetResolverUpdateDelayParams {
+        address network;
+        uint256 setResolverDelay;
+        uint256 delay;
+        bytes32 salt;
+    }
 
-    constructor(address network_, uint256 setResolverDelay_, uint256 delay_, bytes32 salt_) {
-        network = network_;
-        setResolverDelay = setResolverDelay_;
-        delay = delay_;
-        salt = salt_;
+    SetResolverUpdateDelayParams public params;
+
+    constructor(
+        SetResolverUpdateDelayParams memory params_
+    ) {
+        params = params_;
     }
 
     function runSchedule() public {
         (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: target,
                 data: payload,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -38,13 +41,13 @@ contract SetResolverUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled setResolverUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    setResolverDelay:",
-                vm.toString(setResolverDelay),
+                vm.toString(params.setResolverDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -53,12 +56,12 @@ contract SetResolverUpdateDelayBase is ActionBase, ITimelockAction {
         (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: target,
                 data: payload,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -66,19 +69,19 @@ contract SetResolverUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed setResolverUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    setResolverDelay:",
-                vm.toString(setResolverDelay),
+                vm.toString(params.setResolverDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
 
         assert(
-            INetwork(network).getMinDelay(address(1), abi.encodePacked(IVetoSlasher.setResolver.selector))
-                == setResolverDelay
+            INetwork(params.network).getMinDelay(address(1), abi.encodePacked(IVetoSlasher.setResolver.selector))
+                == params.setResolverDelay
         );
     }
 
@@ -88,9 +91,9 @@ contract SetResolverUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
-        target = network;
+        target = params.network;
         payload = abi.encodeCall(
-            INetwork.updateDelay, (address(0), IVetoSlasher.setResolver.selector, true, setResolverDelay)
+            INetwork.updateDelay, (address(0), IVetoSlasher.setResolver.selector, true, params.setResolverDelay)
         );
     }
 }

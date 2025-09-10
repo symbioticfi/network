@@ -24,7 +24,19 @@ contract SetResolver is SetResolverBase {
     // Salt for TimelockController operations
     bytes32 SALT = "SetResolver";
 
-    constructor() SetResolverBase(NETWORK, VAULT, SUBNETWORK_IDENTIFIER, RESOLVER, HINTS, DELAY, SALT) {}
+    constructor()
+        SetResolverBase(
+            SetResolverBase.SetResolverParams({
+                network: NETWORK,
+                vault: VAULT,
+                identifier: SUBNETWORK_IDENTIFIER,
+                resolver: RESOLVER,
+                hints: HINTS,
+                delay: DELAY,
+                salt: SALT
+            })
+        )
+    {}
 
     /**
      * @notice Schedule a setResolver through the timelock

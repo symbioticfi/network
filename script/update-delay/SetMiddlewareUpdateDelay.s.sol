@@ -18,7 +18,16 @@ contract SetMiddlewareUpdateDelay is SetMiddlewareUpdateDelayBase {
     // Salt for TimelockController operations
     bytes32 SALT = "SetMiddlewareUpdateDelay";
 
-    constructor() SetMiddlewareUpdateDelayBase(NETWORK, SET_MIDDLEWARE_DELAY, DELAY, SALT) {}
+    constructor()
+        SetMiddlewareUpdateDelayBase(
+            SetMiddlewareUpdateDelayBase.SetMiddlewareUpdateDelayParams({
+                network: NETWORK,
+                setMiddlewareDelay: SET_MIDDLEWARE_DELAY,
+                delay: DELAY,
+                salt: SALT
+            })
+        )
+    {}
 
     /**
      * @notice Schedule an update of the setMiddleware delay through the timelock

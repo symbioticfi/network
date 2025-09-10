@@ -4,15 +4,31 @@ pragma solidity ^0.8.25;
 import "./ActionBase.sol";
 
 contract ArbitraryCallBase is ActionBase {
-    function runSchedule(address network, address target, bytes memory data, uint256 delay, bytes32 salt) public {
+    struct ArbitraryCallParams {
+        address network;
+        address target;
+        bytes data;
+        uint256 delay;
+        bytes32 salt;
+    }
+
+    ArbitraryCallParams public params;
+
+    constructor(
+        ArbitraryCallParams memory params_
+    ) {
+        params = params_;
+    }
+
+    function runSchedule() public {
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
-                target: target,
-                data: data,
-                delay: delay,
-                salt: salt
+                target: params.target,
+                data: params.data,
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -20,28 +36,28 @@ contract ArbitraryCallBase is ActionBase {
             string.concat(
                 "Scheduled arbitrary call for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    target:",
-                vm.toString(target),
+                vm.toString(params.target),
                 "\n    data:",
-                vm.toString(data),
+                vm.toString(params.data),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
 
-    function runExecute(address network, address target, bytes memory data, bytes32 salt) public {
+    function runExecute() public {
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
-                target: target,
-                data: data,
+                target: params.target,
+                data: params.data,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -49,19 +65,19 @@ contract ArbitraryCallBase is ActionBase {
             string.concat(
                 "Executed arbitrary call for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    target:",
-                vm.toString(target),
+                vm.toString(params.target),
                 "\n    data:",
-                vm.toString(data),
+                vm.toString(params.data),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
 
-    function runScheduleAndExecute(address network, address target, bytes memory data, bytes32 salt) public {
-        runSchedule(network, target, data, 0, salt);
-        runExecute(network, target, data, salt);
+    function runScheduleAndExecute() public {
+        runSchedule();
+        runExecute();
     }
 }

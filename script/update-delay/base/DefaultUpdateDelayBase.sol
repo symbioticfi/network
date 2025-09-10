@@ -9,28 +9,31 @@ import {TimelockControllerUpgradeable} from
 import {ITimelockAction} from "../../actions/interfaces/ITimelockAction.sol";
 
 contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
-    address public network;
-    uint256 public globalMinDelay;
-    uint256 public delay;
-    bytes32 public salt;
+    struct DefaultUpdateDelayParams {
+        address network;
+        uint256 globalMinDelay;
+        uint256 delay;
+        bytes32 salt;
+    }
 
-    constructor(address network_, uint256 globalMinDelay_, uint256 delay_, bytes32 salt_) {
-        network = network_;
-        globalMinDelay = globalMinDelay_;
-        delay = delay_;
-        salt = salt_;
+    DefaultUpdateDelayParams public params;
+
+    constructor(
+        DefaultUpdateDelayParams memory params_
+    ) {
+        params = params_;
     }
 
     function runSchedule() public {
         (address delegator, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: delegator,
                 data: payload,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -38,13 +41,13 @@ contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled globalMinDelayUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    globalMinDelay:",
-                vm.toString(globalMinDelay),
+                vm.toString(params.globalMinDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -53,12 +56,12 @@ contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
         (address target, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: target,
                 data: payload,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -66,17 +69,17 @@ contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed globalMinDelayUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    globalMinDelay:",
-                vm.toString(globalMinDelay),
+                vm.toString(params.globalMinDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
 
-        assert(TimelockControllerUpgradeable(payable(network)).getMinDelay() == globalMinDelay);
+        assert(TimelockControllerUpgradeable(payable(params.network)).getMinDelay() == params.globalMinDelay);
     }
 
     function runScheduleAndExecute() public {
@@ -85,7 +88,7 @@ contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
-        target = network;
-        payload = abi.encodeCall(TimelockControllerUpgradeable.updateDelay, (globalMinDelay));
+        target = params.network;
+        payload = abi.encodeCall(TimelockControllerUpgradeable.updateDelay, (params.globalMinDelay));
     }
 }

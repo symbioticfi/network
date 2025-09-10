@@ -22,7 +22,19 @@ contract ArbitraryCallUpdateDelay is ArbitraryCallUpdateDelayBase {
     // Salt for TimelockController operations
     bytes32 SALT = "ArbitraryCallUpdateDelay";
 
-    constructor() ArbitraryCallUpdateDelayBase(NETWORK, TARGET, SELECTOR, ARBITRARY_DELAY, DELAY, SALT) {}
+    constructor()
+        ArbitraryCallUpdateDelayBase(
+            ArbitraryCallUpdateDelayBase.ArbitraryCallUpdateDelayParams({
+                network: NETWORK,
+                enabled: true,
+                target: TARGET,
+                selector: SELECTOR,
+                arbitraryCallDelay: ARBITRARY_DELAY,
+                delay: DELAY,
+                salt: SALT
+            })
+        )
+    {}
 
     /**
      * @notice Schedule an update of the arbitrary call delay through the timelock

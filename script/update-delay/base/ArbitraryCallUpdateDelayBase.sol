@@ -8,41 +8,34 @@ import {INetwork} from "../../../src/interfaces/INetwork.sol";
 import {ITimelockAction} from "../../actions/interfaces/ITimelockAction.sol";
 
 contract ArbitraryCallUpdateDelayBase is ActionBase, ITimelockAction {
-    address public network;
-    bool public enabled;
-    address public target;
-    bytes4 public selector;
-    uint256 public arbitraryCallDelay;
-    uint256 public delay;
-    bytes32 public salt;
+    struct ArbitraryCallUpdateDelayParams {
+        address network;
+        bool enabled;
+        address target;
+        bytes4 selector;
+        uint256 arbitraryCallDelay;
+        uint256 delay;
+        bytes32 salt;
+    }
+
+    ArbitraryCallUpdateDelayParams public params;
 
     constructor(
-        address network_,
-        address target_,
-        bytes4 selector_,
-        uint256 arbitraryCallDelay_,
-        uint256 delay_,
-        bytes32 salt_
+        ArbitraryCallUpdateDelayParams memory params_
     ) {
-        network = network_;
-        enabled = true;
-        target = target_;
-        selector = selector_;
-        arbitraryCallDelay = arbitraryCallDelay_;
-        delay = delay_;
-        salt = salt_;
+        params = params_;
     }
 
     function runSchedule() public {
         (address target_, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: target_,
                 data: payload,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -50,17 +43,17 @@ contract ArbitraryCallUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled arbitraryCallUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    target:",
                 vm.toString(target_),
                 "\n    selector:",
-                vm.toString(selector),
+                vm.toString(params.selector),
                 "\n    arbitraryCallDelay:",
-                vm.toString(arbitraryCallDelay),
+                vm.toString(params.arbitraryCallDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -69,12 +62,12 @@ contract ArbitraryCallUpdateDelayBase is ActionBase, ITimelockAction {
         (address target_, bytes memory payload) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: target_,
                 data: payload,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -82,17 +75,17 @@ contract ArbitraryCallUpdateDelayBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed arbitraryCallUpdateDelay for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    target:",
                 vm.toString(target_),
                 "\n    selector:",
-                vm.toString(selector),
+                vm.toString(params.selector),
                 "\n    arbitraryCallDelay:",
-                vm.toString(arbitraryCallDelay),
+                vm.toString(params.arbitraryCallDelay),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -103,7 +96,9 @@ contract ArbitraryCallUpdateDelayBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target_, bytes memory payload) {
-        target_ = network;
-        payload = abi.encodeCall(INetwork.updateDelay, (target, selector, enabled, arbitraryCallDelay));
+        target_ = params.network;
+        payload = abi.encodeCall(
+            INetwork.updateDelay, (params.target, params.selector, params.enabled, params.arbitraryCallDelay)
+        );
     }
 }

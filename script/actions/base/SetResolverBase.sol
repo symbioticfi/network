@@ -11,42 +11,34 @@ import {ITimelockAction} from "../interfaces/ITimelockAction.sol";
 contract SetResolverBase is ActionBase, ITimelockAction {
     using Subnetwork for address;
 
-    address public network;
-    address public vault;
-    uint96 public identifier;
-    address public resolver;
-    uint256 public delay;
-    bytes32 public salt;
-    bytes public hints;
+    struct SetResolverParams {
+        address network;
+        address vault;
+        uint96 identifier;
+        address resolver;
+        bytes hints;
+        uint256 delay;
+        bytes32 salt;
+    }
+
+    SetResolverParams public params;
 
     constructor(
-        address network_,
-        address vault_,
-        uint96 identifier_,
-        address resolver_,
-        bytes memory hints_,
-        uint256 delay_,
-        bytes32 salt_
+        SetResolverParams memory params_
     ) {
-        network = network_;
-        vault = vault_;
-        identifier = identifier_;
-        resolver = resolver_;
-        hints = hints_;
-        delay = delay_;
-        salt = salt_;
+        params = params_;
     }
 
     function runSchedule() public {
         (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: false,
                 target: target,
                 data: data,
-                delay: delay,
-                salt: salt
+                delay: params.delay,
+                salt: params.salt
             })
         );
 
@@ -54,17 +46,17 @@ contract SetResolverBase is ActionBase, ITimelockAction {
             string.concat(
                 "Scheduled setResolver for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    vault:",
-                vm.toString(vault),
+                vm.toString(params.vault),
                 "\n    identifier:",
-                vm.toString(identifier),
+                vm.toString(params.identifier),
                 "\n    resolver:",
-                vm.toString(resolver),
+                vm.toString(params.resolver),
                 "\n    delay:",
-                vm.toString(delay),
+                vm.toString(params.delay),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
     }
@@ -73,12 +65,12 @@ contract SetResolverBase is ActionBase, ITimelockAction {
         (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: network,
+                network: params.network,
                 isExecutionMode: true,
                 target: target,
                 data: data,
                 delay: 0,
-                salt: salt
+                salt: params.salt
             })
         );
 
@@ -86,19 +78,23 @@ contract SetResolverBase is ActionBase, ITimelockAction {
             string.concat(
                 "Executed setResolver for",
                 "\n    network:",
-                vm.toString(network),
+                vm.toString(params.network),
                 "\n    vault:",
-                vm.toString(vault),
+                vm.toString(params.vault),
                 "\n    identifier:",
-                vm.toString(identifier),
+                vm.toString(params.identifier),
                 "\n    resolver:",
-                vm.toString(resolver),
+                vm.toString(params.resolver),
                 "\n    salt:",
-                vm.toString(salt)
+                vm.toString(params.salt)
             )
         );
 
-        assert(IVetoSlasher(IVault(vault).slasher()).resolver(network.subnetwork(identifier), bytes("")) == resolver);
+        assert(
+            IVetoSlasher(IVault(params.vault).slasher()).resolver(
+                params.network.subnetwork(params.identifier), bytes("")
+            ) == params.resolver
+        );
     }
 
     function runScheduleAndExecute() public {
@@ -107,7 +103,7 @@ contract SetResolverBase is ActionBase, ITimelockAction {
     }
 
     function getTargetAndPayload() public view returns (address target, bytes memory payload) {
-        target = IVault(vault).slasher();
-        payload = abi.encodeCall(IVetoSlasher.setResolver, (identifier, resolver, hints));
+        target = IVault(params.vault).slasher();
+        payload = abi.encodeCall(IVetoSlasher.setResolver, (params.identifier, params.resolver, params.hints));
     }
 }
