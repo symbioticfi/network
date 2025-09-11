@@ -7,20 +7,20 @@ contract ArbitraryCallUpdateDelay is ArbitraryCallUpdateDelayBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the Target to set a delay for (0x0000000000000000000000000000000000000000 means "for any target")
-    address TARGET = address(0);
+    address constant TARGET = 0x0000000000000000000000000000000000000000;
     // Selector of the Target to set a delay for (0xEEEEEEEE means "for native asset transfers")
-    bytes4 SELECTOR = bytes4(0);
+    bytes4 constant SELECTOR = 0x00000000;
     // New delay for arbitrary operations
-    uint256 ARBITRARY_DELAY = 0;
+    uint256 constant ARBITRARY_DELAY = 3 days;
     // Delay for the action to be executed
-    uint256 DELAY = 0;
+    uint256 constant DELAY = 3 days;
 
     // Optional
 
     // Salt for TimelockController operations
-    bytes32 SALT = "ArbitraryCallUpdateDelay";
+    bytes32 constant SALT = "ArbitraryCallUpdateDelay";
 
     constructor()
         ArbitraryCallUpdateDelayBase(

@@ -7,11 +7,11 @@ contract DefaultUpdateDelay is DefaultUpdateDelayBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // New default delay
-    uint256 GLOBAL_MIN_DELAY = 0;
+    uint256 constant GLOBAL_MIN_DELAY = 3 days;
     // Delay for the action to be executed
-    uint256 DELAY = 0;
+    uint256 constant DELAY = 3 days;
 
     // Optional
 

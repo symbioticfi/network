@@ -7,22 +7,22 @@ contract SetResolver is SetResolverBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = 0x0000000000000000000000000000000000000000;
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the Vault
-    address VAULT = 0x0000000000000000000000000000000000000000;
+    address constant VAULT = 0x0000000000000000000000000000000000000000;
     // Address of the Resolver
-    address RESOLVER = 0x0000000000000000000000000000000000000000;
+    address constant RESOLVER = 0x0000000000000000000000000000000000000000;
     // Delay for the action to be executed
-    uint256 DELAY = 0;
+    uint256 constant DELAY = 0;
 
     // Optional
 
     // Subnetwork Identifier (multiple subnetworks can be used, e.g., to have different resolvers for the same network)
-    uint96 SUBNETWORK_IDENTIFIER = 0;
+    uint96 constant SUBNETWORK_IDENTIFIER = 0;
     // Hints for the Resolver
-    bytes HINTS = new bytes(0);
+    bytes constant HINTS = hex"";
     // Salt for TimelockController operations
-    bytes32 SALT = "SetResolver";
+    bytes32 constant SALT = "SetResolver";
 
     constructor()
         SetResolverBase(

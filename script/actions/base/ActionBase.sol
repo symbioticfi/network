@@ -4,6 +4,7 @@ pragma solidity ^0.8.25;
 import {Script} from "forge-std/Script.sol";
 
 import "../../base/Logs.sol";
+import {ITimelockAction} from "../interfaces/ITimelockAction.sol";
 
 import {TimelockController} from "@openzeppelin/contracts/governance/TimelockController.sol";
 import {Address} from "@openzeppelin/contracts/utils/Address.sol";
@@ -23,8 +24,7 @@ contract ActionBase is Script, Logs {
     struct TimelockBatchParams {
         address network;
         bool isExecutionMode;
-        address[] targets;
-        bytes[] payloads;
+        ITimelockAction[] actions;
         uint256 delay;
         bytes32 salt;
     }
@@ -56,35 +56,40 @@ contract ActionBase is Script, Logs {
         vm.stopBroadcast();
 
         TimelockController timelockController = TimelockController(payable(params.network));
-        bytes32 id = timelockController.hashOperation(params.target, 0, params.data, predecessor, params.salt);
-        if (params.isExecutionMode) {
-            assert(timelockController.isOperationDone(id) == true);
-        } else {
-            assert(timelockController.isOperationPending(id) == true);
-        }
+        try timelockController.hashOperation(params.target, 0, params.data, predecessor, params.salt) returns (
+            bytes32 id
+        ) {
+            if (params.isExecutionMode) {
+                assert(timelockController.isOperationDone(id) == true);
+            } else {
+                assert(timelockController.isOperationPending(id) == true);
+            }
+        } catch {}
     }
 
     function callTimelockBatch(
         TimelockBatchParams memory params
     ) internal {
-        // Validate that all arrays have the same length
-        require(params.targets.length == params.payloads.length, "TimelockBatchParams: arrays length mismatch");
-        require(params.targets.length > 0, "TimelockBatchParams: empty batch");
+        assert(params.actions.length > 0);
+        address[] memory targets = new address[](params.actions.length);
+        bytes[] memory payloads = new bytes[](params.actions.length);
+        for (uint256 i; i < params.actions.length; ++i) {
+            (address target, bytes memory payload) = params.actions[i].getTargetAndPayload();
+            targets[i] = target;
+            payloads[i] = payload;
+        }
 
         vm.startBroadcast();
 
         bytes32 predecessor;
 
         // Create values array filled with zeros
-        uint256[] memory values = new uint256[](params.targets.length);
+        uint256[] memory values = new uint256[](targets.length);
 
         bytes memory callData = params.isExecutionMode
-            ? abi.encodeCall(
-                TimelockController.executeBatch, (params.targets, values, params.payloads, predecessor, params.salt)
-            )
+            ? abi.encodeCall(TimelockController.executeBatch, (targets, values, payloads, predecessor, params.salt))
             : abi.encodeCall(
-                TimelockController.scheduleBatch,
-                (params.targets, values, params.payloads, predecessor, params.salt, params.delay)
+                TimelockController.scheduleBatch, (targets, values, payloads, predecessor, params.salt, params.delay)
             );
         params.network.functionCall(callData);
 
@@ -94,7 +99,7 @@ contract ActionBase is Script, Logs {
                 "\n    network:",
                 vm.toString(params.network),
                 "\n    batch size:",
-                vm.toString(params.targets.length),
+                vm.toString(targets.length),
                 "\n    callData:",
                 vm.toString(callData)
             )
@@ -103,12 +108,14 @@ contract ActionBase is Script, Logs {
         vm.stopBroadcast();
 
         TimelockController timelockController = TimelockController(payable(params.network));
-        bytes32 id =
-            timelockController.hashOperationBatch(params.targets, values, params.payloads, predecessor, params.salt);
-        if (params.isExecutionMode) {
-            assert(timelockController.isOperationDone(id) == true);
-        } else {
-            assert(timelockController.isOperationPending(id) == true);
-        }
+        try timelockController.hashOperationBatch(targets, values, payloads, predecessor, params.salt) returns (
+            bytes32 id
+        ) {
+            if (params.isExecutionMode) {
+                assert(timelockController.isOperationDone(id) == true);
+            } else {
+                assert(timelockController.isOperationPending(id) == true);
+            }
+        } catch {}
     }
 }

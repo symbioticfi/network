@@ -7,20 +7,20 @@ contract SetMaxNetworkLimit is SetMaxNetworkLimitBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = 0xFCD714bC06f20B4877A83aC579F8800D5662aa19;
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the Vault
-    address VAULT = 0x49fC19bAE549e0b5F99B5b42d7222Caf09E8d2a1;
+    address constant VAULT = 0x0000000000000000000000000000000000000000;
     // Maximum amount of delegation that network is ready to receive
-    uint256 MAX_NETWORK_LIMIT = 0;
+    uint256 constant MAX_NETWORK_LIMIT = 0;
     // Delay for the action to be executed
-    uint256 DELAY = 0;
+    uint256 constant DELAY = 0;
 
     // Optional
 
     // Subnetwork Identifier (multiple subnetworks can be used, e.g., to have different max network limits for the same network)
-    uint96 SUBNETWORK_IDENTIFIER = 0;
+    uint96 constant SUBNETWORK_IDENTIFIER = 0;
     // Salt for TimelockController operations
-    bytes32 SALT = "SetMaxNetworkLimit";
+    bytes32 constant SALT = "SetMaxNetworkLimit";
 
     constructor()
         SetMaxNetworkLimitBase(

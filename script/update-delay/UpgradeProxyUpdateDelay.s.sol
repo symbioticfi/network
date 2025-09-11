@@ -7,16 +7,16 @@ contract UpgradeProxyUpdateDelay is UpgradeProxyUpdateDelayBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // New delay for upgradeProxy operations
-    uint256 UPGRADE_PROXY_DELAY = 0;
+    uint256 constant UPGRADE_PROXY_DELAY = 14 days;
     // Delay for the action to be executed
-    uint256 DELAY = 0;
+    uint256 constant DELAY = 14 days;
 
     // Optional
 
     // Salt for TimelockController operations
-    bytes32 SALT = "UpgradeProxyUpdateDelay";
+    bytes32 constant SALT = "UpgradeProxyUpdateDelay";
 
     constructor()
         UpgradeProxyUpdateDelayBase(

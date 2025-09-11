@@ -10,20 +10,18 @@ contract HotActionsUpdateDelay is ActionBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // New delay for hot actions
-    uint256 HOT_ACTIONS_DELAY = 0;
+    uint256 constant HOT_ACTIONS_DELAY = 0;
     // Delay for the action to be executed
-    uint256 DELAY = 0;
+    uint256 constant DELAY = 0;
 
     // Optional
 
     // Salt for TimelockController operations
-    bytes32 SALT = "HotActionsUpdateDelay";
+    bytes32 constant SALT = "HotActionsUpdateDelay";
 
     ITimelockAction[] public actions;
-    address[] public targets;
-    bytes[] public payloads;
 
     constructor() {
         actions.push(
@@ -46,12 +44,6 @@ contract HotActionsUpdateDelay is ActionBase {
                 })
             )
         );
-
-        for (uint256 i; i < actions.length; ++i) {
-            (address target, bytes memory payload) = actions[i].getTargetAndPayload();
-            targets.push(target);
-            payloads.push(payload);
-        }
     }
 
     /**
@@ -59,14 +51,7 @@ contract HotActionsUpdateDelay is ActionBase {
      */
     function runS() public {
         callTimelockBatch(
-            TimelockBatchParams({
-                network: NETWORK,
-                isExecutionMode: false,
-                targets: targets,
-                payloads: payloads,
-                delay: DELAY,
-                salt: SALT
-            })
+            TimelockBatchParams({network: NETWORK, isExecutionMode: false, actions: actions, delay: DELAY, salt: SALT})
         );
     }
 
@@ -75,14 +60,16 @@ contract HotActionsUpdateDelay is ActionBase {
      */
     function runE() public {
         callTimelockBatch(
-            TimelockBatchParams({
-                network: NETWORK,
-                isExecutionMode: true,
-                targets: targets,
-                payloads: payloads,
-                delay: 0,
-                salt: SALT
-            })
+            TimelockBatchParams({network: NETWORK, isExecutionMode: true, actions: actions, delay: 0, salt: SALT})
         );
+    }
+
+    /**
+     * @notice Schedule and execute an update of the hot actions delay through the timelock
+     * @dev It will succeed only if the delay is 0
+     */
+    function runSE() public {
+        runS();
+        runE();
     }
 }

@@ -7,16 +7,16 @@ contract SetMaxNetworkLimitUpdateDelay is SetMaxNetworkLimitUpdateDelayBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = address(0);
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // New delay for setMaxNetworkLimit operations
-    uint256 SET_MAX_NETWORK_LIMIT_DELAY = 0;
+    uint256 constant SET_MAX_NETWORK_LIMIT_DELAY = 0;
     // Delay for the action to be executed
-    uint256 DELAY = 0;
+    uint256 constant DELAY = 0;
 
     // Optional
 
     // Salt for TimelockController operations
-    bytes32 SALT = "SetMaxNetworkLimitUpdateDelay";
+    bytes32 constant SALT = "SetMaxNetworkLimitUpdateDelay";
 
     constructor()
         SetMaxNetworkLimitUpdateDelayBase(

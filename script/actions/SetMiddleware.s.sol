@@ -7,16 +7,16 @@ contract SetMiddleware is SetMiddlewareBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = 0x0000000000000000000000000000000000000000;
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the Middleware
-    address MIDDLEWARE = 0x0000000000000000000000000000000000000000;
+    address constant MIDDLEWARE = 0x0000000000000000000000000000000000000000;
     // Delay for the action to be executed
-    uint256 DELAY = 14 days;
+    uint256 constant DELAY = 14 days;
 
     // Optional
 
     // Salt for TimelockController operations
-    bytes32 SALT = "SetMiddleware";
+    bytes32 constant SALT = "SetMiddleware";
 
     constructor()
         SetMiddlewareBase(

@@ -7,18 +7,18 @@ contract ArbitraryCall is ArbitraryCallBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = 0x0000000000000000000000000000000000000000;
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the Target
-    address TARGET = 0x0000000000000000000000000000000000000000;
+    address constant TARGET = 0x0000000000000000000000000000000000000000;
     // Data to pass to the Target
-    bytes DATA = new bytes(0);
+    bytes constant DATA = hex"";
     // Delay for the action to be executed
-    uint256 DELAY = 3 days;
+    uint256 constant DELAY = 3 days;
 
     // Optional
 
     // Salt for TimelockController operations
-    bytes32 SALT = "ArbitraryCall";
+    bytes32 constant SALT = "ArbitraryCall";
 
     constructor()
         ArbitraryCallBase(

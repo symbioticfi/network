@@ -7,18 +7,18 @@ contract UpgradeProxy is UpgradeProxyBase {
     // Configuration constants - UPDATE THESE BEFORE EXECUTING
 
     // Address of the Network
-    address NETWORK = 0x0000000000000000000000000000000000000000;
+    address constant NETWORK = 0x0000000000000000000000000000000000000000;
     // Address of the new implementation
-    address NEW_IMPLEMENTATION = 0x0000000000000000000000000000000000000000;
+    address constant NEW_IMPLEMENTATION = 0x0000000000000000000000000000000000000000;
     // Data to pass to the new implementation after upgrade
-    bytes UPGRADE_DATA = new bytes(0);
+    bytes constant UPGRADE_DATA = hex"";
     // Delay for the action to be executed
-    uint256 DELAY = 14 days;
+    uint256 constant DELAY = 14 days;
 
     // Optional
 
     // Salt for TimelockController operations
-    bytes32 SALT = "UpgradeProxy";
+    bytes32 constant SALT = "UpgradeProxy";
 
     constructor()
         UpgradeProxyBase(
