@@ -16,7 +16,7 @@ import {TimelockControllerUpgradeable} from
  * @title Network
  * @notice Contract for network management.
  * @dev It allows any external watcher to verify if the set delay is sufficient for a given operation (call to some contract's function).
- *      It supports delays for native asset transfers.
+ *      It supports delays for native asset transfers (native transfer is determined as a call with 0xEEEEEEEE selector).
  *      It supports setting delay for (exact target | exact selector) pairs and for (any target | exact selector) pairs.
  */
 contract Network is TimelockControllerUpgradeable, INetwork {
@@ -78,7 +78,7 @@ contract Network is TimelockControllerUpgradeable, INetwork {
 
     function __Network_init(
         NetworkInitParams memory initParams
-    ) public virtual onlyInitializing {
+    ) internal virtual onlyInitializing {
         __TimelockController_init(
             initParams.globalMinDelay, initParams.proposers, initParams.executors, initParams.defaultAdminRoleHolder
         );
@@ -224,7 +224,7 @@ contract Network is TimelockControllerUpgradeable, INetwork {
      * @inheritdoc ISetMaxNetworkLimitHook
      */
     function setMaxNetworkLimit(address delegator, uint96 subnetworkId, uint256 maxNetworkLimit) public virtual {
-        if (msg.sender != INetworkMiddlewareService(NETWORK_MIDDLEWARE_SERVICE).middleware(address(this))) {
+        if (INetworkMiddlewareService(NETWORK_MIDDLEWARE_SERVICE).middleware(address(this)) != msg.sender) {
             revert NotMiddleware();
         }
         _setMaxNetworkLimit(delegator, subnetworkId, maxNetworkLimit);
