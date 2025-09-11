@@ -48,7 +48,7 @@ npm install
   // Hot actions delay (a delay that will be applied for minor actions like setMaxNetworkLimit and setResolver)
   uint256 HOT_ACTIONS_DELAY = 0;
   // Admin address (will become executor, proposer, and default admin by default)
-  address ADMIN = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+  address ADMIN = 0x0000000000000000000000000000000000000000;
 
   // Optional
 
