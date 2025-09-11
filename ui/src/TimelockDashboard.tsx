@@ -933,6 +933,11 @@ export default function TimelockDashboard() {
 
   return (
     <div className='min-h-screen bg-gray-50 text-gray-900'>
+      <div className='w-full bg-yellow-50 border-b border-yellow-200 text-yellow-900'>
+        <div className='max-w-6xl mx-auto px-4 py-2 text-sm font-medium text-center flex justify-center'>
+          WIP, USE WITH CAUTION!
+        </div>
+      </div>
       <div className='max-w-6xl mx-auto p-4 space-y-6'>
         <header className='flex items-center justify-between'>
           <div>
