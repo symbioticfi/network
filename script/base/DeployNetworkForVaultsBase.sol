@@ -27,8 +27,6 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
     function run(
         DeployNetworkForVaultsParams memory params
     ) public returns (address) {
-        vm.startBroadcast();
-
         assert(params.vaults.length > 0);
         assert(params.vaults.length == params.maxNetworkLimits.length);
         assert(params.vaults.length == params.resolvers.length);
@@ -36,22 +34,20 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         // update deploy network params to include deployer as proposer and executor
         DeployNetworkParams memory updatedDeployNetworkParams =
             updateDeployParamsForDeployer(params.deployNetworkParams);
-        vm.stopBroadcast();
 
         // deploy network
         address network = run(updatedDeployNetworkParams);
 
-        vm.startBroadcast();
         // update network for vaults
         updateNetworkForVaults(network, params, updatedDeployNetworkParams);
 
-        vm.stopBroadcast();
         return network;
     }
 
     function updateDeployParamsForDeployer(
         DeployNetworkParams memory deployNetworkParams
     ) public returns (DeployNetworkParams memory updatedDeployNetworkParams) {
+        vm.startBroadcast();
         // clone the struct
         updatedDeployNetworkParams = abi.decode(abi.encode(deployNetworkParams), (DeployNetworkParams));
         updatedDeployNetworkParams.globalMinDelay = 0;
@@ -87,6 +83,7 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
             tempExecutors[tempExecutors.length - 1] = deployer;
             updatedDeployNetworkParams.executors = tempExecutors;
         }
+        vm.stopBroadcast();
     }
 
     function updateNetworkForVaults(
@@ -94,6 +91,7 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         DeployNetworkForVaultsParams memory params,
         DeployNetworkParams memory updatedDeployNetworkParams
     ) public {
+        vm.startBroadcast();
         (,, address deployer) = vm.readCallers();
         bool isDeployerProposer =
             params.deployNetworkParams.proposers.length == updatedDeployNetworkParams.proposers.length;
@@ -226,5 +224,6 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
                 ) == params.maxNetworkLimits[i]
             );
         }
+        vm.stopBroadcast();
     }
 }
