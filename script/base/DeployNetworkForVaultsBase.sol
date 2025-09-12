@@ -194,20 +194,23 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         }
 
         for (uint256 i; i < params.deployNetworkParams.proposers.length; ++i) {
-            bool hasRole = AccessControl(network).hasRole(
+            bool hasProposerRole = AccessControl(network).hasRole(
                 Network(payable(network)).PROPOSER_ROLE(), params.deployNetworkParams.proposers[i]
             );
+            bool hasCancellerRole = AccessControl(network).hasRole(
+                Network(payable(network)).CANCELLER_ROLE(), params.deployNetworkParams.proposers[i]
+            );
             (params.deployNetworkParams.proposers[i] == deployer && !isDeployerProposer)
-                ? assert(!hasRole)
-                : assert(hasRole);
+                ? assert(!hasProposerRole && !hasCancellerRole)
+                : assert(hasProposerRole && hasCancellerRole);
         }
         for (uint256 i; i < params.deployNetworkParams.executors.length; ++i) {
-            bool hasRole = AccessControl(network).hasRole(
+            bool hasExecutorRole = AccessControl(network).hasRole(
                 Network(payable(network)).EXECUTOR_ROLE(), params.deployNetworkParams.executors[i]
             );
             (params.deployNetworkParams.executors[i] == deployer && !isDeployerExecutor)
-                ? assert(!hasRole)
-                : assert(hasRole);
+                ? assert(!hasExecutorRole)
+                : assert(hasExecutorRole);
         }
         for (uint256 i; i < params.resolvers.length; ++i) {
             if (params.resolvers[i] != address(0)) {

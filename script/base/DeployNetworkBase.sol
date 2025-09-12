@@ -92,11 +92,10 @@ contract DeployNetworkBase is Script, Logs {
                 metadataURIUpdateRoleHolder: params.metadataURIUpdateRoleHolder
             });
 
-            bytes memory initData = abi.encodeCall(INetwork.initialize, (initParams));
-
             // Create initialization code for TransparentUpgradeableProxy
             bytes memory proxyInitCode = abi.encodePacked(
-                type(TransparentUpgradeableProxy).creationCode, abi.encode(implementation, precomputedProxy, initData)
+                type(TransparentUpgradeableProxy).creationCode,
+                abi.encode(implementation, precomputedProxy, abi.encodeCall(INetwork.initialize, (initParams)))
             );
 
             // Deploy proxy using CREATE3
@@ -113,6 +112,36 @@ contract DeployNetworkBase is Script, Logs {
                 assert(
                     Network(payable(proxy)).getMinDelay(target, abi.encodePacked(delayParams[i].selector))
                         == delayParams[i].delay
+                );
+            }
+            for (uint256 i; i < params.proposers.length; ++i) {
+                address proposer = params.proposers[i];
+                assert(Network(payable(proxy)).hasRole(Network(payable(proxy)).PROPOSER_ROLE(), proposer));
+                assert(Network(payable(proxy)).hasRole(Network(payable(proxy)).CANCELLER_ROLE(), proposer));
+            }
+            for (uint256 i; i < params.executors.length; ++i) {
+                address executor = params.executors[i];
+                assert(Network(payable(proxy)).hasRole(Network(payable(proxy)).EXECUTOR_ROLE(), executor));
+            }
+            if (params.defaultAdminRoleHolder != address(0)) {
+                assert(
+                    Network(payable(proxy)).hasRole(
+                        Network(payable(proxy)).DEFAULT_ADMIN_ROLE(), params.defaultAdminRoleHolder
+                    )
+                );
+            }
+            if (params.nameUpdateRoleHolder != address(0)) {
+                assert(
+                    Network(payable(proxy)).hasRole(
+                        Network(payable(proxy)).NAME_UPDATE_ROLE(), params.nameUpdateRoleHolder
+                    )
+                );
+            }
+            if (params.metadataURIUpdateRoleHolder != address(0)) {
+                assert(
+                    Network(payable(proxy)).hasRole(
+                        Network(payable(proxy)).METADATA_URI_UPDATE_ROLE(), params.metadataURIUpdateRoleHolder
+                    )
                 );
             }
         }
