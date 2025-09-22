@@ -1,6 +1,6 @@
 {
   "name": "@symbioticfi/network",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-rc.0",
   "description": "Symbiotic Network contract provides a flexible and secure mechanism to manage network operations with customizable delays.",
   "homepage": "https://symbiotic.fi/network",
   "bugs": "https://github.com/symbioticfi/network/issues",
