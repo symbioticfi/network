@@ -27,6 +27,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p snapshots
+          forge build
           forge build --sizes | tee snapshots/sizes.txt
           forge test --gas-report | tee snapshots/gas.txt
 
