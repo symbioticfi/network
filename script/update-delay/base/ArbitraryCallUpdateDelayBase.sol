@@ -20,9 +20,7 @@ contract ArbitraryCallUpdateDelayBase is ActionBase, ITimelockAction {
 
     ArbitraryCallUpdateDelayParams public params;
 
-    constructor(
-        ArbitraryCallUpdateDelayParams memory params_
-    ) {
+    constructor(ArbitraryCallUpdateDelayParams memory params_) {
         params = params_;
     }
 

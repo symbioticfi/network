@@ -29,9 +29,7 @@ contract ActionBase is Script, Logs {
         bytes32 salt;
     }
 
-    function callTimelock(
-        TimelockParams memory params
-    ) internal {
+    function callTimelock(TimelockParams memory params) internal {
         vm.startBroadcast();
 
         bytes32 predecessor;
@@ -67,9 +65,7 @@ contract ActionBase is Script, Logs {
         } catch {}
     }
 
-    function callTimelockBatch(
-        TimelockBatchParams memory params
-    ) internal {
+    function callTimelockBatch(TimelockBatchParams memory params) internal {
         assert(params.actions.length > 0);
         address[] memory targets = new address[](params.actions.length);
         bytes[] memory payloads = new bytes[](params.actions.length);

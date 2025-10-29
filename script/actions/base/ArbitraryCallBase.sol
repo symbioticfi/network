@@ -14,9 +14,7 @@ contract ArbitraryCallBase is ActionBase {
 
     ArbitraryCallParams public params;
 
-    constructor(
-        ArbitraryCallParams memory params_
-    ) {
+    constructor(ArbitraryCallParams memory params_) {
         params = params_;
     }
 

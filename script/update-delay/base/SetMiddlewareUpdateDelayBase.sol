@@ -19,9 +19,7 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
 
     SetMiddlewareUpdateDelayParams public params;
 
-    constructor(
-        SetMiddlewareUpdateDelayParams memory params_
-    ) {
+    constructor(SetMiddlewareUpdateDelayParams memory params_) {
         params = params_;
     }
 
@@ -81,10 +79,11 @@ contract SetMiddlewareUpdateDelayBase is ActionBase, ITimelockAction {
         );
 
         assert(
-            INetwork(params.network).getMinDelay(
-                address(SymbioticCoreConstants.core().networkMiddlewareService),
-                abi.encodePacked(INetworkMiddlewareService.setMiddleware.selector)
-            ) == params.setMiddlewareDelay
+            INetwork(params.network)
+                .getMinDelay(
+                    address(SymbioticCoreConstants.core().networkMiddlewareService),
+                    abi.encodePacked(INetworkMiddlewareService.setMiddleware.selector)
+                ) == params.setMiddlewareDelay
         );
     }
 

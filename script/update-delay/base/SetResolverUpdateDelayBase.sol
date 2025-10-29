@@ -18,9 +18,7 @@ contract SetResolverUpdateDelayBase is ActionBase, ITimelockAction {
 
     SetResolverUpdateDelayParams public params;
 
-    constructor(
-        SetResolverUpdateDelayParams memory params_
-    ) {
+    constructor(SetResolverUpdateDelayParams memory params_) {
         params = params_;
     }
 

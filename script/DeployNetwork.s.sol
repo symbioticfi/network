@@ -35,7 +35,7 @@ contract DeployNetwork is DeployNetworkBase {
         proposers[0] = ADMIN;
         address[] memory executors = new address[](1);
         executors[0] = ADMIN;
-        run(
+        runBase(
             DeployNetworkParams({
                 name: NAME,
                 metadataURI: METADATA_URI,

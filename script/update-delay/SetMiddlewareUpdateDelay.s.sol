@@ -19,14 +19,9 @@ contract SetMiddlewareUpdateDelay is SetMiddlewareUpdateDelayBase {
     bytes32 constant SALT = "SetMiddlewareUpdateDelay";
 
     constructor()
-        SetMiddlewareUpdateDelayBase(
-            SetMiddlewareUpdateDelayBase.SetMiddlewareUpdateDelayParams({
-                network: NETWORK,
-                setMiddlewareDelay: SET_MIDDLEWARE_DELAY,
-                delay: DELAY,
-                salt: SALT
-            })
-        )
+        SetMiddlewareUpdateDelayBase(SetMiddlewareUpdateDelayBase.SetMiddlewareUpdateDelayParams({
+                network: NETWORK, setMiddlewareDelay: SET_MIDDLEWARE_DELAY, delay: DELAY, salt: SALT
+            }))
     {}
 
     /**

@@ -23,8 +23,7 @@ contract ArbitraryCallUpdateDelay is ArbitraryCallUpdateDelayBase {
     bytes32 constant SALT = "ArbitraryCallUpdateDelay";
 
     constructor()
-        ArbitraryCallUpdateDelayBase(
-            ArbitraryCallUpdateDelayBase.ArbitraryCallUpdateDelayParams({
+        ArbitraryCallUpdateDelayBase(ArbitraryCallUpdateDelayBase.ArbitraryCallUpdateDelayParams({
                 network: NETWORK,
                 enabled: true,
                 target: TARGET,
@@ -32,8 +31,7 @@ contract ArbitraryCallUpdateDelay is ArbitraryCallUpdateDelayBase {
                 arbitraryCallDelay: ARBITRARY_DELAY,
                 delay: DELAY,
                 salt: SALT
-            })
-        )
+            }))
     {}
 
     /**

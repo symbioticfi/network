@@ -19,14 +19,9 @@ contract UpgradeProxyUpdateDelay is UpgradeProxyUpdateDelayBase {
     bytes32 constant SALT = "UpgradeProxyUpdateDelay";
 
     constructor()
-        UpgradeProxyUpdateDelayBase(
-            UpgradeProxyUpdateDelayBase.UpgradeProxyUpdateDelayParams({
-                network: NETWORK,
-                upgradeProxyDelay: UPGRADE_PROXY_DELAY,
-                delay: DELAY,
-                salt: SALT
-            })
-        )
+        UpgradeProxyUpdateDelayBase(UpgradeProxyUpdateDelayBase.UpgradeProxyUpdateDelayParams({
+                network: NETWORK, upgradeProxyDelay: UPGRADE_PROXY_DELAY, delay: DELAY, salt: SALT
+            }))
     {}
 
     /**

@@ -4,8 +4,9 @@ pragma solidity ^0.8.25;
 import "../../actions/base/ActionBase.sol";
 import {Network} from "../../../src/Network.sol";
 
-import {TimelockControllerUpgradeable} from
-    "@openzeppelin/contracts-upgradeable/governance/TimelockControllerUpgradeable.sol";
+import {
+    TimelockControllerUpgradeable
+} from "@openzeppelin/contracts-upgradeable/governance/TimelockControllerUpgradeable.sol";
 import {ITimelockAction} from "../../actions/interfaces/ITimelockAction.sol";
 
 contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
@@ -18,9 +19,7 @@ contract DefaultUpdateDelayBase is ActionBase, ITimelockAction {
 
     DefaultUpdateDelayParams public params;
 
-    constructor(
-        DefaultUpdateDelayParams memory params_
-    ) {
+    constructor(DefaultUpdateDelayParams memory params_) {
         params = params_;
     }
 

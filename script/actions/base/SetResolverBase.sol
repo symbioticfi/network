@@ -23,9 +23,7 @@ contract SetResolverBase is ActionBase, ITimelockAction {
 
     SetResolverParams public params;
 
-    constructor(
-        SetResolverParams memory params_
-    ) {
+    constructor(SetResolverParams memory params_) {
         params = params_;
     }
 
@@ -65,12 +63,7 @@ contract SetResolverBase is ActionBase, ITimelockAction {
         (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: params.network,
-                isExecutionMode: true,
-                target: target,
-                data: data,
-                delay: 0,
-                salt: params.salt
+                network: params.network, isExecutionMode: true, target: target, data: data, delay: 0, salt: params.salt
             })
         );
 
@@ -91,9 +84,8 @@ contract SetResolverBase is ActionBase, ITimelockAction {
         );
 
         assert(
-            IVetoSlasher(IVault(params.vault).slasher()).resolver(
-                params.network.subnetwork(params.identifier), bytes("")
-            ) == params.resolver
+            IVetoSlasher(IVault(params.vault).slasher())
+                    .resolver(params.network.subnetwork(params.identifier), bytes("")) == params.resolver
         );
     }
 

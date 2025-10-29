@@ -18,9 +18,7 @@ contract SetMaxNetworkLimitUpdateDelayBase is ActionBase, ITimelockAction {
 
     SetMaxNetworkLimitUpdateDelayParams public params;
 
-    constructor(
-        SetMaxNetworkLimitUpdateDelayParams memory params_
-    ) {
+    constructor(SetMaxNetworkLimitUpdateDelayParams memory params_) {
         params = params_;
     }
 
@@ -80,9 +78,9 @@ contract SetMaxNetworkLimitUpdateDelayBase is ActionBase, ITimelockAction {
         );
 
         assert(
-            INetwork(params.network).getMinDelay(
-                address(1), abi.encodePacked(IBaseDelegator.setMaxNetworkLimit.selector)
-            ) == params.setMaxNetworkLimitDelay
+            INetwork(params.network)
+                    .getMinDelay(address(1), abi.encodePacked(IBaseDelegator.setMaxNetworkLimit.selector))
+                == params.setMaxNetworkLimitDelay
         );
     }
 

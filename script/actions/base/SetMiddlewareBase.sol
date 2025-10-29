@@ -18,9 +18,7 @@ contract SetMiddlewareBase is ActionBase, ITimelockAction {
 
     SetMiddlewareParams public params;
 
-    constructor(
-        SetMiddlewareParams memory params_
-    ) {
+    constructor(SetMiddlewareParams memory params_) {
         params = params_;
     }
 
@@ -56,12 +54,7 @@ contract SetMiddlewareBase is ActionBase, ITimelockAction {
         (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: params.network,
-                isExecutionMode: true,
-                target: target,
-                data: data,
-                delay: 0,
-                salt: params.salt
+                network: params.network, isExecutionMode: true, target: target, data: data, delay: 0, salt: params.salt
             })
         );
 

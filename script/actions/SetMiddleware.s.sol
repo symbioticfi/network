@@ -19,9 +19,9 @@ contract SetMiddleware is SetMiddlewareBase {
     bytes32 constant SALT = "SetMiddleware";
 
     constructor()
-        SetMiddlewareBase(
-            SetMiddlewareBase.SetMiddlewareParams({network: NETWORK, middleware: MIDDLEWARE, delay: DELAY, salt: SALT})
-        )
+        SetMiddlewareBase(SetMiddlewareBase.SetMiddlewareParams({
+                network: NETWORK, middleware: MIDDLEWARE, delay: DELAY, salt: SALT
+            }))
     {}
 
     /**

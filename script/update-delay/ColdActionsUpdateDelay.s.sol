@@ -27,20 +27,14 @@ contract ColdActionsUpdateDelay is ActionBase {
         actions.push(
             new SetMiddlewareUpdateDelayBase(
                 SetMiddlewareUpdateDelayBase.SetMiddlewareUpdateDelayParams({
-                    network: NETWORK,
-                    setMiddlewareDelay: COLD_ACTIONS_DELAY,
-                    delay: DELAY,
-                    salt: SALT
+                    network: NETWORK, setMiddlewareDelay: COLD_ACTIONS_DELAY, delay: DELAY, salt: SALT
                 })
             )
         );
         actions.push(
             new UpgradeProxyUpdateDelayBase(
                 UpgradeProxyUpdateDelayBase.UpgradeProxyUpdateDelayParams({
-                    network: NETWORK,
-                    upgradeProxyDelay: COLD_ACTIONS_DELAY,
-                    delay: DELAY,
-                    salt: SALT
+                    network: NETWORK, upgradeProxyDelay: COLD_ACTIONS_DELAY, delay: DELAY, salt: SALT
                 })
             )
         );

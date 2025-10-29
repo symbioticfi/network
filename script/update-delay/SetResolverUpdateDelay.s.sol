@@ -19,14 +19,9 @@ contract SetResolverUpdateDelay is SetResolverUpdateDelayBase {
     bytes32 constant SALT = "SetResolverUpdateDelay";
 
     constructor()
-        SetResolverUpdateDelayBase(
-            SetResolverUpdateDelayBase.SetResolverUpdateDelayParams({
-                network: NETWORK,
-                setResolverDelay: SET_RESOLVER_DELAY,
-                delay: DELAY,
-                salt: SALT
-            })
-        )
+        SetResolverUpdateDelayBase(SetResolverUpdateDelayBase.SetResolverUpdateDelayParams({
+                network: NETWORK, setResolverDelay: SET_RESOLVER_DELAY, delay: DELAY, salt: SALT
+            }))
     {}
 
     /**

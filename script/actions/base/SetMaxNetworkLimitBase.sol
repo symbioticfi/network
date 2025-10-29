@@ -23,9 +23,7 @@ contract SetMaxNetworkLimitBase is ActionBase, ITimelockAction {
 
     SetMaxNetworkLimitParams public params;
 
-    constructor(
-        SetMaxNetworkLimitParams memory params_
-    ) {
+    constructor(SetMaxNetworkLimitParams memory params_) {
         params = params_;
     }
 

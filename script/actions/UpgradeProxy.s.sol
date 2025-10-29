@@ -21,15 +21,13 @@ contract UpgradeProxy is UpgradeProxyBase {
     bytes32 constant SALT = "UpgradeProxy";
 
     constructor()
-        UpgradeProxyBase(
-            UpgradeProxyBase.UpgradeProxyParams({
+        UpgradeProxyBase(UpgradeProxyBase.UpgradeProxyParams({
                 network: NETWORK,
                 newImplementation: NEW_IMPLEMENTATION,
                 upgradeData: UPGRADE_DATA,
                 delay: DELAY,
                 salt: SALT
-            })
-        )
+            }))
     {}
 
     /**

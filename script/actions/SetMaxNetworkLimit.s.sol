@@ -23,16 +23,14 @@ contract SetMaxNetworkLimit is SetMaxNetworkLimitBase {
     bytes32 constant SALT = "SetMaxNetworkLimit";
 
     constructor()
-        SetMaxNetworkLimitBase(
-            SetMaxNetworkLimitBase.SetMaxNetworkLimitParams({
+        SetMaxNetworkLimitBase(SetMaxNetworkLimitBase.SetMaxNetworkLimitParams({
                 network: NETWORK,
                 vault: VAULT,
                 subnetworkId: SUBNETWORK_IDENTIFIER,
                 maxNetworkLimit: MAX_NETWORK_LIMIT,
                 delay: DELAY,
                 salt: SALT
-            })
-        )
+            }))
     {}
 
     /**
