@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+/**
+ * @title ISetMaxNetworkLimitHook
+ * @notice Interface for the setMaxNetworkLimit hook.
+ */
 interface ISetMaxNetworkLimitHook {
     /**
      * @notice Sets the maximum network limit for a delegator.

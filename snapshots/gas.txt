@@ -21,7 +21,7 @@ Ran 20 tests for test/Network.t.sol:NetworkTest
 [PASS] test_UpdateMetadataURI() (gas: 49653)
 [PASS] test_UpdateNameByRoleHolder() (gas: 49702)
 [PASS] test_UpdateNameWithoutRoleReverts() (gas: 32895)
-Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 3.27ms (2.57ms CPU time)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 9.13ms (17.58ms CPU time)
 
 ╭----------------------------------+-----------------+--------+--------+--------+---------╮
 | src/Network.sol:Network Contract |                 |        |        |        |         |
@@ -74,4 +74,4 @@ Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 3.27ms (2.57ms CPU
 ╰----------------------------------+-----------------+--------+--------+--------+---------╯
 
 
-Ran 1 test suite in 11.54ms (3.27ms CPU time): 20 tests passed, 0 failed, 0 skipped (20 total tests)
+Ran 1 test suite in 20.67ms (9.13ms CPU time): 20 tests passed, 0 failed, 0 skipped (20 total tests)

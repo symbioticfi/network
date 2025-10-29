@@ -3,6 +3,10 @@ pragma solidity ^0.8.0;
 
 import {ISetMaxNetworkLimitHook} from "./ISetMaxNetworkLimitHook.sol";
 
+/**
+ * @title INetwork
+ * @notice Interface for the Network contract.
+ */
 interface INetwork is ISetMaxNetworkLimitHook {
     /**
      * @notice Reverts when the calldata length is invalid.
