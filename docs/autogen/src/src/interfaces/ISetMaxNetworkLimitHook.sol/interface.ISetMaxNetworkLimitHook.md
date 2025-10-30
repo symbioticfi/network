@@ -1,5 +1,5 @@
 # ISetMaxNetworkLimitHook
-[Git Source](https://github.com/symbioticfi/network/blob/ed84efa0662a918b5701373ff8015efbdb7c5c29/src/interfaces/ISetMaxNetworkLimitHook.sol)
+[Git Source](https://github.com/symbioticfi/network/blob/40885f42f01a00727039ad723d5263fdb740bef0/src/interfaces/ISetMaxNetworkLimitHook.sol)
 
 Interface for the setMaxNetworkLimit hook.
 
