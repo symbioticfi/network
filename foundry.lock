@@ -1,8 +1,8 @@
 {
   "lib/core": {
-    "branch": {
-      "name": "integration-refactoring",
-      "rev": "515ea213e1264b8b48779f7452efca1a42cf0177"
+    "tag": {
+      "name": "v1.0.3",
+      "rev": "74c0c6fbd5531a6065cdafdab07840b04a0d2039"
     }
   },
   "lib/forge-std": {
