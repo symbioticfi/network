@@ -19,14 +19,9 @@ contract SetMaxNetworkLimitUpdateDelay is SetMaxNetworkLimitUpdateDelayBase {
     bytes32 constant SALT = "SetMaxNetworkLimitUpdateDelay";
 
     constructor()
-        SetMaxNetworkLimitUpdateDelayBase(
-            SetMaxNetworkLimitUpdateDelayBase.SetMaxNetworkLimitUpdateDelayParams({
-                network: NETWORK,
-                setMaxNetworkLimitDelay: SET_MAX_NETWORK_LIMIT_DELAY,
-                delay: DELAY,
-                salt: SALT
-            })
-        )
+        SetMaxNetworkLimitUpdateDelayBase(SetMaxNetworkLimitUpdateDelayBase.SetMaxNetworkLimitUpdateDelayParams({
+                network: NETWORK, setMaxNetworkLimitDelay: SET_MAX_NETWORK_LIMIT_DELAY, delay: DELAY, salt: SALT
+            }))
     {}
 
     /**

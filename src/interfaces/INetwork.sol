@@ -3,6 +3,10 @@ pragma solidity ^0.8.0;
 
 import {ISetMaxNetworkLimitHook} from "./ISetMaxNetworkLimitHook.sol";
 
+/**
+ * @title INetwork
+ * @notice Interface for the Network contract.
+ */
 interface INetwork is ISetMaxNetworkLimitHook {
     /**
      * @notice Reverts when the calldata length is invalid.
@@ -153,9 +157,7 @@ interface INetwork is ISetMaxNetworkLimitHook {
      * @notice Initializes the network.
      * @param networkInitParams The parameters for the initialization of the network.
      */
-    function initialize(
-        NetworkInitParams memory networkInitParams
-    ) external;
+    function initialize(NetworkInitParams memory networkInitParams) external;
 
     /**
      * @notice Updates the delay for a given target and selector.
@@ -172,16 +174,12 @@ interface INetwork is ISetMaxNetworkLimitHook {
      * @param name The new name.
      * @dev The caller must have the name update role.
      */
-    function updateName(
-        string memory name
-    ) external;
+    function updateName(string memory name) external;
 
     /**
      * @notice Updates the metadata URI of the network.
      * @param metadataURI The new metadata URI.
      * @dev The caller must have the metadata URI update role.
      */
-    function updateMetadataURI(
-        string memory metadataURI
-    ) external;
+    function updateMetadataURI(string memory metadataURI) external;
 }

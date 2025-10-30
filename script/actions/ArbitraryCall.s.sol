@@ -21,9 +21,9 @@ contract ArbitraryCall is ArbitraryCallBase {
     bytes32 constant SALT = "ArbitraryCall";
 
     constructor()
-        ArbitraryCallBase(
-            ArbitraryCallBase.ArbitraryCallParams({network: NETWORK, target: TARGET, data: DATA, delay: DELAY, salt: SALT})
-        )
+        ArbitraryCallBase(ArbitraryCallBase.ArbitraryCallParams({
+                network: NETWORK, target: TARGET, data: DATA, delay: DELAY, salt: SALT
+            }))
     {}
 
     /**

@@ -25,8 +25,7 @@ contract SetResolver is SetResolverBase {
     bytes32 constant SALT = "SetResolver";
 
     constructor()
-        SetResolverBase(
-            SetResolverBase.SetResolverParams({
+        SetResolverBase(SetResolverBase.SetResolverParams({
                 network: NETWORK,
                 vault: VAULT,
                 identifier: SUBNETWORK_IDENTIFIER,
@@ -34,8 +33,7 @@ contract SetResolver is SetResolverBase {
                 hints: HINTS,
                 delay: DELAY,
                 salt: SALT
-            })
-        )
+            }))
     {}
 
     /**

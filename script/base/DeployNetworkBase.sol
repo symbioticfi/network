@@ -11,17 +11,13 @@ import {SymbioticCoreConstants} from "@symbioticfi/core/test/integration/Symbiot
 import {INetworkMiddlewareService} from "@symbioticfi/core/src/interfaces/service/INetworkMiddlewareService.sol";
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {IVetoSlasher} from "@symbioticfi/core/src/interfaces/slasher/IVetoSlasher.sol";
+import {CreateXWrapper} from "@symbioticfi/core/script/utils/CreateXWrapper.sol";
 
 import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 import {TransparentUpgradeableProxy} from "@openzeppelin/contracts/proxy/transparent/TransparentUpgradeableProxy.sol";
 import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
-import {Hashes} from "@openzeppelin/contracts/utils/cryptography/Hashes.sol";
 
-import {ICreateX} from "@createx/ICreateX.sol";
-
-contract DeployNetworkBase is Script, Logs {
-    address public constant CREATEX_FACTORY = 0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed;
-
+contract DeployNetworkBase is Script, Logs, CreateXWrapper {
     struct DeployNetworkParams {
         string name;
         string metadataURI;
@@ -38,16 +34,14 @@ contract DeployNetworkBase is Script, Logs {
         bytes11 salt; // Salt for CREATE3 deterministic deployment
     }
 
-    function run(
-        DeployNetworkParams memory params
-    ) public returns (address) {
+    function runBase(DeployNetworkParams memory params) public returns (address) {
         vm.startBroadcast();
 
         // Needed for permissioned deploy protection
         (,, address deployer) = vm.readCallers();
         // CreateX-specific salt generation
-        bytes32 salt = bytes32(uint256(uint160(deployer)) << 96 | uint256(0x00) << 88 | uint256(uint88(params.salt)));
-        bytes32 guardedSalt = Hashes.efficientKeccak256({a: bytes32(uint256(uint160(deployer))), b: salt});
+        bytes32 salt = getSaltForCreate3(params.salt, deployer);
+        bytes32 guardedSalt = getGuardedSalt(deployer, salt);
 
         SymbioticCoreConstants.Core memory core = SymbioticCoreConstants.core();
         address implementation =
@@ -55,8 +49,8 @@ contract DeployNetworkBase is Script, Logs {
 
         address proxy;
         {
-            address precomputedProxy = ICreateX(CREATEX_FACTORY).computeCreate3Address(guardedSalt);
-            address precomputedProxyAdmin = ICreateX(CREATEX_FACTORY).computeCreateAddress(precomputedProxy, 1);
+            address precomputedProxy = computeCreate3Address(guardedSalt);
+            address precomputedProxyAdmin = vm.computeCreateAddress(precomputedProxy, 1);
 
             INetwork.DelayParams[] memory delayParams = new INetwork.DelayParams[](4);
             delayParams[0] = INetwork.DelayParams({
@@ -75,9 +69,7 @@ contract DeployNetworkBase is Script, Logs {
                 delay: params.setMaxNetworkLimitMinDelay
             });
             delayParams[3] = INetwork.DelayParams({
-                target: address(0),
-                selector: IVetoSlasher.setResolver.selector,
-                delay: params.setResolverMinDelay
+                target: address(0), selector: IVetoSlasher.setResolver.selector, delay: params.setResolverMinDelay
             });
 
             INetwork.NetworkInitParams memory initParams = INetwork.NetworkInitParams({
@@ -99,7 +91,7 @@ contract DeployNetworkBase is Script, Logs {
             );
 
             // Deploy proxy using CREATE3
-            proxy = ICreateX(CREATEX_FACTORY).deployCreate3(salt, proxyInitCode);
+            proxy = deployCreate3(salt, proxyInitCode);
 
             assert(proxy == precomputedProxy);
             assert(_getProxyAdmin(proxy) == precomputedProxyAdmin);
@@ -125,23 +117,20 @@ contract DeployNetworkBase is Script, Logs {
             }
             if (params.defaultAdminRoleHolder != address(0)) {
                 assert(
-                    Network(payable(proxy)).hasRole(
-                        Network(payable(proxy)).DEFAULT_ADMIN_ROLE(), params.defaultAdminRoleHolder
-                    )
+                    Network(payable(proxy))
+                        .hasRole(Network(payable(proxy)).DEFAULT_ADMIN_ROLE(), params.defaultAdminRoleHolder)
                 );
             }
             if (params.nameUpdateRoleHolder != address(0)) {
                 assert(
-                    Network(payable(proxy)).hasRole(
-                        Network(payable(proxy)).NAME_UPDATE_ROLE(), params.nameUpdateRoleHolder
-                    )
+                    Network(payable(proxy))
+                        .hasRole(Network(payable(proxy)).NAME_UPDATE_ROLE(), params.nameUpdateRoleHolder)
                 );
             }
             if (params.metadataURIUpdateRoleHolder != address(0)) {
                 assert(
-                    Network(payable(proxy)).hasRole(
-                        Network(payable(proxy)).METADATA_URI_UPDATE_ROLE(), params.metadataURIUpdateRoleHolder
-                    )
+                    Network(payable(proxy))
+                        .hasRole(Network(payable(proxy)).METADATA_URI_UPDATE_ROLE(), params.metadataURIUpdateRoleHolder)
                 );
             }
         }
@@ -165,9 +154,7 @@ contract DeployNetworkBase is Script, Logs {
         return proxy;
     }
 
-    function _getProxyAdmin(
-        address proxy
-    ) internal view returns (address admin) {
+    function _getProxyAdmin(address proxy) internal view returns (address admin) {
         return address(uint160(uint256(vm.load(proxy, ERC1967Utils.ADMIN_SLOT))));
     }
 }

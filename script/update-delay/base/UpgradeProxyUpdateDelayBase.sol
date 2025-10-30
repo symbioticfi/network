@@ -19,9 +19,7 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
 
     UpgradeProxyUpdateDelayParams public params;
 
-    constructor(
-        UpgradeProxyUpdateDelayParams memory params_
-    ) {
+    constructor(UpgradeProxyUpdateDelayParams memory params_) {
         params = params_;
     }
 
@@ -81,9 +79,9 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
         );
 
         assert(
-            INetwork(params.network).getMinDelay(
-                _getProxyAdmin(params.network), abi.encodePacked(ProxyAdmin.upgradeAndCall.selector)
-            ) == params.upgradeProxyDelay
+            INetwork(params.network)
+                .getMinDelay(_getProxyAdmin(params.network), abi.encodePacked(ProxyAdmin.upgradeAndCall.selector))
+            == params.upgradeProxyDelay
         );
     }
 
@@ -100,9 +98,7 @@ contract UpgradeProxyUpdateDelayBase is ActionBase, ITimelockAction {
         );
     }
 
-    function _getProxyAdmin(
-        address proxy
-    ) internal view returns (address admin) {
+    function _getProxyAdmin(address proxy) internal view returns (address admin) {
         return address(uint160(uint256(vm.load(proxy, ERC1967Utils.ADMIN_SLOT))));
     }
 }

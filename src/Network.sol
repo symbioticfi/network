@@ -4,13 +4,14 @@ pragma solidity ^0.8.25;
 import {INetwork} from "./interfaces/INetwork.sol";
 import {ISetMaxNetworkLimitHook} from "./interfaces/ISetMaxNetworkLimitHook.sol";
 
+import {Bytes} from "@openzeppelin/contracts/utils/Bytes.sol";
+import {
+    TimelockControllerUpgradeable
+} from "@openzeppelin/contracts-upgradeable/governance/TimelockControllerUpgradeable.sol";
+
 import {IBaseDelegator} from "@symbioticfi/core/src/interfaces/delegator/IBaseDelegator.sol";
 import {INetworkMiddlewareService} from "@symbioticfi/core/src/interfaces/service/INetworkMiddlewareService.sol";
 import {INetworkRegistry} from "@symbioticfi/core/src/interfaces/INetworkRegistry.sol";
-
-import {Bytes} from "@openzeppelin/contracts/utils/Bytes.sol";
-import {TimelockControllerUpgradeable} from
-    "@openzeppelin/contracts-upgradeable/governance/TimelockControllerUpgradeable.sol";
 
 /**
  * @title Network
@@ -43,7 +44,8 @@ contract Network is TimelockControllerUpgradeable, INetwork {
     address public immutable NETWORK_MIDDLEWARE_SERVICE;
 
     // keccak256(abi.encode(uint256(keccak256("symbiotic.storage.Network")) - 1)) & ~bytes32(uint256(0xff))
-    bytes32 private constant NetworkStorageLocation = 0x2affd7691de6b6d2a998e6b135d73a3c906ea64896dff9dcb273e98dd44a6100;
+    bytes32 private constant NetworkStorageLocation =
+        0x2affd7691de6b6d2a998e6b135d73a3c906ea64896dff9dcb273e98dd44a6100;
 
     // keccak256(abi.encode(uint256(keccak256("openzeppelin.storage.TimelockController")) - 1)) & ~bytes32(uint256(0xff))
     bytes32 private constant TimelockControllerStorageLocation =
@@ -70,15 +72,11 @@ contract Network is TimelockControllerUpgradeable, INetwork {
     /**
      * @inheritdoc INetwork
      */
-    function initialize(
-        NetworkInitParams memory initParams
-    ) public virtual initializer {
+    function initialize(NetworkInitParams memory initParams) public virtual initializer {
         __Network_init(initParams);
     }
 
-    function __Network_init(
-        NetworkInitParams memory initParams
-    ) internal virtual onlyInitializing {
+    function __Network_init(NetworkInitParams memory initParams) internal virtual onlyInitializing {
         __TimelockController_init(
             initParams.globalMinDelay, initParams.proposers, initParams.executors, initParams.defaultAdminRoleHolder
         );
@@ -119,10 +117,8 @@ contract Network is TimelockControllerUpgradeable, INetwork {
                     abi.decode(_getPayload(data), (address, bytes4, bool, uint256));
                 if (
                     underlyingTarget == address(this)
-                        && (
-                            underlyingSelector == INetwork.updateDelay.selector
-                                || underlyingSelector == TimelockControllerUpgradeable.updateDelay.selector
-                        )
+                        && (underlyingSelector == INetwork.updateDelay.selector
+                            || underlyingSelector == TimelockControllerUpgradeable.updateDelay.selector)
                 ) {
                     revert InvalidTargetAndSelector();
                 }
@@ -220,18 +216,14 @@ contract Network is TimelockControllerUpgradeable, INetwork {
     /**
      * @inheritdoc INetwork
      */
-    function updateName(
-        string memory name_
-    ) public virtual onlyRole(NAME_UPDATE_ROLE) {
+    function updateName(string memory name_) public virtual onlyRole(NAME_UPDATE_ROLE) {
         _updateName(name_);
     }
 
     /**
      * @inheritdoc INetwork
      */
-    function updateMetadataURI(
-        string memory metadataURI_
-    ) public virtual onlyRole(METADATA_URI_UPDATE_ROLE) {
+    function updateMetadataURI(string memory metadataURI_) public virtual onlyRole(METADATA_URI_UPDATE_ROLE) {
         _updateMetadataURI(metadataURI_);
     }
 
@@ -264,16 +256,12 @@ contract Network is TimelockControllerUpgradeable, INetwork {
         $._timestamps[id] = block.timestamp + delay;
     }
 
-    function _updateName(
-        string memory name_
-    ) internal virtual {
+    function _updateName(string memory name_) internal virtual {
         _getNetworkStorage()._name = name_;
         emit NameSet(name_);
     }
 
-    function _updateMetadataURI(
-        string memory metadataURI_
-    ) internal virtual {
+    function _updateMetadataURI(string memory metadataURI_) internal virtual {
         _getNetworkStorage()._metadataURI = metadataURI_;
         emit MetadataURISet(metadataURI_);
     }
@@ -298,16 +286,12 @@ contract Network is TimelockControllerUpgradeable, INetwork {
         return getMinDelay();
     }
 
-    function _getMinDelay(
-        bytes32 id
-    ) internal view virtual returns (bool, uint256) {
+    function _getMinDelay(bytes32 id) internal view virtual returns (bool, uint256) {
         NetworkStorage storage $ = _getNetworkStorage();
         return ($._isMinDelayEnabled[id], $._minDelays[id]);
     }
 
-    function _getSelector(
-        bytes memory data
-    ) internal pure returns (bytes4 selector) {
+    function _getSelector(bytes memory data) internal pure returns (bytes4 selector) {
         if (data.length == 0) {
             return 0xEEEEEEEE;
         }
@@ -319,9 +303,7 @@ contract Network is TimelockControllerUpgradeable, INetwork {
         }
     }
 
-    function _getPayload(
-        bytes memory data
-    ) internal pure returns (bytes memory payload) {
+    function _getPayload(bytes memory data) internal pure returns (bytes memory payload) {
         if (data.length < 4) {
             revert InvalidDataLength();
         }
@@ -336,7 +318,11 @@ contract Network is TimelockControllerUpgradeable, INetwork {
         address[] memory, /* proposers */
         address[] memory, /* executors */
         address /* admin */
-    ) public virtual override {
+    )
+        public
+        virtual
+        override
+    {
         revert();
     }
 }

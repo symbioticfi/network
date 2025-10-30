@@ -7,9 +7,7 @@ import {Vm, VmSafe} from "forge-std/Vm.sol";
 contract Logs is Script {
     string internal constant LOG_FILE = "script/logs.txt";
 
-    function log(
-        string memory data
-    ) internal {
+    function log(string memory data) internal {
         console2.log(data);
         vm.writeFile(LOG_FILE, string.concat(vm.readFile(LOG_FILE), data, "\n"));
     }

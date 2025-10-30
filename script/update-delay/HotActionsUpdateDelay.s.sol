@@ -27,20 +27,14 @@ contract HotActionsUpdateDelay is ActionBase {
         actions.push(
             new SetMaxNetworkLimitUpdateDelayBase(
                 SetMaxNetworkLimitUpdateDelayBase.SetMaxNetworkLimitUpdateDelayParams({
-                    network: NETWORK,
-                    setMaxNetworkLimitDelay: HOT_ACTIONS_DELAY,
-                    delay: DELAY,
-                    salt: SALT
+                    network: NETWORK, setMaxNetworkLimitDelay: HOT_ACTIONS_DELAY, delay: DELAY, salt: SALT
                 })
             )
         );
         actions.push(
             new SetResolverUpdateDelayBase(
                 SetResolverUpdateDelayBase.SetResolverUpdateDelayParams({
-                    network: NETWORK,
-                    setResolverDelay: HOT_ACTIONS_DELAY,
-                    delay: DELAY,
-                    salt: SALT
+                    network: NETWORK, setResolverDelay: HOT_ACTIONS_DELAY, delay: DELAY, salt: SALT
                 })
             )
         );

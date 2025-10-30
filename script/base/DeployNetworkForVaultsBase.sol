@@ -24,9 +24,7 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         uint96 subnetworkId;
     }
 
-    function run(
-        DeployNetworkForVaultsParams memory params
-    ) public returns (address) {
+    function runBase(DeployNetworkForVaultsParams memory params) public returns (address) {
         assert(params.vaults.length > 0);
         assert(params.vaults.length == params.maxNetworkLimits.length);
         assert(params.vaults.length == params.resolvers.length);
@@ -36,7 +34,7 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
             updateDeployParamsForDeployer(params.deployNetworkParams);
 
         // deploy network
-        address network = run(updatedDeployNetworkParams);
+        address network = runBase(updatedDeployNetworkParams);
 
         // update network for vaults
         updateNetworkForVaults(network, params, updatedDeployNetworkParams);
@@ -44,9 +42,10 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         return network;
     }
 
-    function updateDeployParamsForDeployer(
-        DeployNetworkParams memory deployNetworkParams
-    ) public returns (DeployNetworkParams memory updatedDeployNetworkParams) {
+    function updateDeployParamsForDeployer(DeployNetworkParams memory deployNetworkParams)
+        public
+        returns (DeployNetworkParams memory updatedDeployNetworkParams)
+    {
         vm.startBroadcast();
         // clone the struct
         updatedDeployNetworkParams = abi.decode(abi.encode(deployNetworkParams), (DeployNetworkParams));
@@ -115,8 +114,9 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
             uint256 index;
             for (uint256 i; i < params.vaults.length; ++i) {
                 targets[index] = IVault(params.vaults[i]).delegator();
-                payloads[index++] =
-                    abi.encodeCall(IBaseDelegator.setMaxNetworkLimit, (params.subnetworkId, params.maxNetworkLimits[i]));
+                payloads[index++] = abi.encodeCall(
+                    IBaseDelegator.setMaxNetworkLimit, (params.subnetworkId, params.maxNetworkLimits[i])
+                );
 
                 if (params.resolvers[i] != address(0)) {
                     targets[index] = IVault(params.vaults[i]).slasher();
@@ -194,20 +194,17 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         }
 
         for (uint256 i; i < params.deployNetworkParams.proposers.length; ++i) {
-            bool hasProposerRole = AccessControl(network).hasRole(
-                Network(payable(network)).PROPOSER_ROLE(), params.deployNetworkParams.proposers[i]
-            );
-            bool hasCancellerRole = AccessControl(network).hasRole(
-                Network(payable(network)).CANCELLER_ROLE(), params.deployNetworkParams.proposers[i]
-            );
+            bool hasProposerRole = AccessControl(network)
+                .hasRole(Network(payable(network)).PROPOSER_ROLE(), params.deployNetworkParams.proposers[i]);
+            bool hasCancellerRole = AccessControl(network)
+                .hasRole(Network(payable(network)).CANCELLER_ROLE(), params.deployNetworkParams.proposers[i]);
             (params.deployNetworkParams.proposers[i] == deployer && !isDeployerProposer)
                 ? assert(!hasProposerRole && !hasCancellerRole)
                 : assert(hasProposerRole && hasCancellerRole);
         }
         for (uint256 i; i < params.deployNetworkParams.executors.length; ++i) {
-            bool hasExecutorRole = AccessControl(network).hasRole(
-                Network(payable(network)).EXECUTOR_ROLE(), params.deployNetworkParams.executors[i]
-            );
+            bool hasExecutorRole = AccessControl(network)
+                .hasRole(Network(payable(network)).EXECUTOR_ROLE(), params.deployNetworkParams.executors[i]);
             (params.deployNetworkParams.executors[i] == deployer && !isDeployerExecutor)
                 ? assert(!hasExecutorRole)
                 : assert(hasExecutorRole);
@@ -215,16 +212,14 @@ contract DeployNetworkForVaultsBase is DeployNetworkBase {
         for (uint256 i; i < params.resolvers.length; ++i) {
             if (params.resolvers[i] != address(0)) {
                 assert(
-                    IVetoSlasher(IVault(params.vaults[i]).slasher()).resolver(
-                        network.subnetwork(params.subnetworkId), bytes("")
-                    ) == params.resolvers[i]
+                    IVetoSlasher(IVault(params.vaults[i]).slasher())
+                        .resolver(network.subnetwork(params.subnetworkId), bytes("")) == params.resolvers[i]
                 );
             }
 
             assert(
-                IBaseDelegator(IVault(params.vaults[i]).delegator()).maxNetworkLimit(
-                    network.subnetwork(params.subnetworkId)
-                ) == params.maxNetworkLimits[i]
+                IBaseDelegator(IVault(params.vaults[i]).delegator())
+                    .maxNetworkLimit(network.subnetwork(params.subnetworkId)) == params.maxNetworkLimits[i]
             );
         }
         vm.stopBroadcast();

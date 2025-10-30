@@ -20,9 +20,7 @@ contract UpgradeProxyBase is ActionBase, ITimelockAction {
 
     UpgradeProxyParams public params;
 
-    constructor(
-        UpgradeProxyParams memory params_
-    ) {
+    constructor(UpgradeProxyParams memory params_) {
         params = params_;
     }
 
@@ -60,12 +58,7 @@ contract UpgradeProxyBase is ActionBase, ITimelockAction {
         (address target, bytes memory data) = getTargetAndPayload();
         callTimelock(
             ActionBase.TimelockParams({
-                network: params.network,
-                isExecutionMode: true,
-                target: target,
-                data: data,
-                delay: 0,
-                salt: params.salt
+                network: params.network, isExecutionMode: true, target: target, data: data, delay: 0, salt: params.salt
             })
         );
 
@@ -94,9 +87,7 @@ contract UpgradeProxyBase is ActionBase, ITimelockAction {
         runExecute();
     }
 
-    function _getProxyAdmin(
-        address proxy
-    ) internal view returns (address admin) {
+    function _getProxyAdmin(address proxy) internal view returns (address admin) {
         return address(uint160(uint256(vm.load(proxy, ERC1967Utils.ADMIN_SLOT))));
     }
 

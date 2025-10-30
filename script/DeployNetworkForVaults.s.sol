@@ -44,7 +44,7 @@ contract DeployNetworkForVaults is DeployNetworkForVaultsBase {
         proposers[0] = ADMIN;
         address[] memory executors = new address[](1);
         executors[0] = ADMIN;
-        run(
+        runBase(
             DeployNetworkForVaultsParams({
                 deployNetworkParams: DeployNetworkParams({
                     name: NAME,

@@ -1,56 +1,58 @@
 {
-  "name": "@symbioticfi/network",
-  "version": "1.0.0-rc.0",
-  "description": "Symbiotic Network contract provides a flexible and secure mechanism to manage network operations with customizable delays.",
-  "homepage": "https://symbiotic.fi/network",
-  "bugs": "https://github.com/symbioticfi/network/issues",
-  "license": "MIT",
-  "author": "Symbiotic Team",
-  "files": [
-    "examples/**/*",
-    "src/**/*",
-    "script/**/*",
-    "test/mocks/**/*",
-    "out/**/*"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/symbioticfi/network.git"
-  },
-  "keywords": [
-    "solidity",
-    "ethereum",
-    "smart",
-    "contracts",
-    "security"
-  ],
-  "scripts": {
-    "dev": "vite ui",
-    "build": "vite build ui",
-    "preview": "vite preview ui",
-    "typecheck": "tsc --noEmit"
-  },
-  "dependencies": {
-    "@reown/appkit": "^1.8.4",
-    "@reown/appkit-adapter-wagmi": "^1.8.4",
-    "@tanstack/react-query": "^5.87.1",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "viem": "^2.37.5",
-    "wagmi": "^2.16.9"
-  },
-  "devDependencies": {
-    "@types/node": "^20.16.11",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8.4.41",
-    "tailwindcss": "^3.4.10",
-    "typescript": "^5.5.4",
-    "vite": "^5.4.2"
-  },
-  "engines": {
-    "node": ">=18"
-  }
+    "name": "@symbioticfi/network",
+    "version": "1.0.0-rc.1",
+    "description": "Symbiotic Network contract provides a flexible and secure mechanism to manage network operations with customizable delays.",
+    "homepage": "https://symbiotic.fi/network",
+    "bugs": "https://github.com/symbioticfi/network/issues",
+    "license": "MIT",
+    "author": "Symbiotic Team",
+    "files": [
+        "examples/**/*",
+        "src/**/*",
+        "script/**/*",
+        "test/mocks/**/*"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/symbioticfi/network.git"
+    },
+    "keywords": [
+        "solidity",
+        "ethereum",
+        "smart",
+        "contracts",
+        "security"
+    ],
+    "scripts": {
+        "dev": "vite ui",
+        "build": "vite build ui",
+        "preview": "vite preview ui",
+        "typecheck": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@symbioticfi/core": "1.0.3",
+        "@openzeppelin/contracts": "5.4.0",
+        "@openzeppelin/contracts-upgradeable": "5.4.0",
+        "@reown/appkit": "^1.8.4",
+        "@reown/appkit-adapter-wagmi": "^1.8.4",
+        "@tanstack/react-query": "^5.87.1",
+        "react": "^18.3.1",
+        "react-dom": "^18.3.1",
+        "viem": "^2.37.5",
+        "wagmi": "^2.16.9"
+    },
+    "devDependencies": {
+        "@types/node": "^20.16.11",
+        "@types/react": "^18.3.3",
+        "@types/react-dom": "^18.3.0",
+        "@vitejs/plugin-react": "^4.3.1",
+        "autoprefixer": "^10.4.20",
+        "postcss": "^8.4.41",
+        "tailwindcss": "^3.4.10",
+        "typescript": "^5.5.4",
+        "vite": "^5.4.2"
+    },
+    "engines": {
+        "node": ">=18"
+    }
 }

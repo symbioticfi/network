@@ -1,14 +1,8 @@
 {
   "lib/core": {
     "tag": {
-      "name": "v1.0.2",
-      "rev": "a7b6bbdcd917ad4fe4e4607b26b8cf7a5ff3fa81"
-    }
-  },
-  "lib/createx": {
-    "tag": {
-      "name": "v1.0.0",
-      "rev": "cbac803268835138f86a69bfe01fcf05a50e0447"
+      "name": "v1.0.3",
+      "rev": "74c0c6fbd5531a6065cdafdab07840b04a0d2039"
     }
   },
   "lib/forge-std": {

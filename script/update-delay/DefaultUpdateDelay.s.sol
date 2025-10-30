@@ -19,14 +19,9 @@ contract DefaultUpdateDelay is DefaultUpdateDelayBase {
     bytes32 SALT = "DefaultUpdateDelay";
 
     constructor()
-        DefaultUpdateDelayBase(
-            DefaultUpdateDelayBase.DefaultUpdateDelayParams({
-                network: NETWORK,
-                globalMinDelay: GLOBAL_MIN_DELAY,
-                delay: DELAY,
-                salt: SALT
-            })
-        )
+        DefaultUpdateDelayBase(DefaultUpdateDelayBase.DefaultUpdateDelayParams({
+                network: NETWORK, globalMinDelay: GLOBAL_MIN_DELAY, delay: DELAY, salt: SALT
+            }))
     {}
 
     /**

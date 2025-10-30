@@ -9,8 +9,9 @@ import {INetwork} from "../src/interfaces/INetwork.sol";
 
 import "@symbioticfi/core/test/integration/SymbioticCoreInit.sol";
 import {Subnetwork} from "@symbioticfi/core/src/contracts/libraries/Subnetwork.sol";
-import {TimelockControllerUpgradeable} from
-    "@openzeppelin/contracts-upgradeable/governance/TimelockControllerUpgradeable.sol";
+import {
+    TimelockControllerUpgradeable
+} from "@openzeppelin/contracts-upgradeable/governance/TimelockControllerUpgradeable.sol";
 
 contract NetworkTest is SymbioticCoreInit {
     using Subnetwork for address;
@@ -26,7 +27,6 @@ contract NetworkTest is SymbioticCoreInit {
     bytes4 constant FOO_SEL = bytes4(keccak256("foo()"));
 
     function setUp() public override {
-        SYMBIOTIC_CORE_PROJECT_ROOT = "lib/core/";
         SymbioticCoreInit.setUp();
 
         myNetwork = new Network(address(symbioticCore.networkRegistry), address(symbioticCore.networkMiddlewareService));
@@ -290,9 +290,8 @@ contract NetworkTest is SymbioticCoreInit {
         myNetwork.setMaxNetworkLimit(ISymbioticVault(vault).delegator(), 1, type(uint96).max);
 
         assertEq(
-            ISymbioticBaseDelegator(ISymbioticVault(vault).delegator()).maxNetworkLimit(
-                address(myNetwork).subnetwork(uint96(1))
-            ),
+            ISymbioticBaseDelegator(ISymbioticVault(vault).delegator())
+                .maxNetworkLimit(address(myNetwork).subnetwork(uint96(1))),
             type(uint96).max
         );
     }
