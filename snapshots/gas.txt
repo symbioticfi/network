@@ -5,23 +5,23 @@ Ran 20 tests for test/Network.t.sol:NetworkTest
 [PASS] test_DirectUpdateDelayReverts() (gas: 31548)
 [PASS] test_EthTransfer() (gas: 205524)
 [PASS] test_GetMinDelayInvalidSelectorReverts() (gas: 9433)
-[PASS] test_Init() (gas: 99556)
+[PASS] test_Init() (gas: 134556)
 [PASS] test_PerSelectorDelayOverridesGlobal() (gas: 16091)
 [PASS] test_ScheduleBatchAndExecute() (gas: 220484)
 [PASS] test_ScheduleBatchLengthMismatchReverts() (gas: 39546)
 [PASS] test_ScheduleBatchRevertsIfDelayTooShort() (gas: 59378)
 [PASS] test_ScheduleRevertsIfDelayTooShort() (gas: 46561)
-[PASS] test_SetMaxNetworkLimitOnlyMiddleware() (gas: 1324679)
+[PASS] test_SetMaxNetworkLimitOnlyMiddleware() (gas: 1327179)
 [PASS] test_SetMaxNetworkLimitWrongCallerReverts() (gas: 38043)
-[PASS] test_TryBreakInvariant() (gas: 182261)
-[PASS] test_UpdateDelayThroughTimelock() (gas: 237398)
+[PASS] test_TryBreakInvariant() (gas: 189761)
+[PASS] test_UpdateDelayThroughTimelock() (gas: 242398)
 [PASS] test_UpdateDelayThroughTimelock_RevertInvalidNewDelay() (gas: 115278)
-[PASS] test_UpdateDelayThroughTimelock_ZeroAddress() (gas: 199124)
-[PASS] test_UpdateDelayThroughTimelock_ZeroSelector() (gas: 241360)
+[PASS] test_UpdateDelayThroughTimelock_ZeroAddress() (gas: 204124)
+[PASS] test_UpdateDelayThroughTimelock_ZeroSelector() (gas: 246360)
 [PASS] test_UpdateMetadataURI() (gas: 49653)
 [PASS] test_UpdateNameByRoleHolder() (gas: 49702)
 [PASS] test_UpdateNameWithoutRoleReverts() (gas: 32895)
-Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 9.89ms (15.03ms CPU time)
+Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 8.96ms (16.76ms CPU time)
 
 ╭----------------------------------+-----------------+--------+--------+--------+---------╮
 | src/Network.sol:Network Contract |                 |        |        |        |         |
@@ -74,4 +74,4 @@ Suite result: ok. 20 passed; 0 failed; 0 skipped; finished in 9.89ms (15.03ms CP
 ╰----------------------------------+-----------------+--------+--------+--------+---------╯
 
 
-Ran 1 test suite in 23.58ms (9.89ms CPU time): 20 tests passed, 0 failed, 0 skipped (20 total tests)
+Ran 1 test suite in 20.89ms (8.96ms CPU time): 20 tests passed, 0 failed, 0 skipped (20 total tests)

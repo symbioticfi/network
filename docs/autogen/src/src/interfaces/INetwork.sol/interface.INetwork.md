@@ -1,8 +1,11 @@
 # INetwork
-[Git Source](https://github.com/symbioticfi/network/blob/13e391e8622daa693350c256ee1d14b7e04abaf2/src/interfaces/INetwork.sol)
+[Git Source](https://github.com/symbioticfi/network/blob/14b8650824e7d445b4229f8c24a9f9dee50cdeca/src/interfaces/INetwork.sol)
 
 **Inherits:**
-[ISetMaxNetworkLimitHook](/Users/andreikorokhov/symbiotic/network/docs/autogen/src/src/interfaces/ISetMaxNetworkLimitHook.sol/interface.ISetMaxNetworkLimitHook.md)
+[ISetMaxNetworkLimitHook](/src/interfaces/ISetMaxNetworkLimitHook.sol/interface.ISetMaxNetworkLimitHook.md)
+
+**Title:**
+INetwork
 
 Interface for the Network contract.
 
