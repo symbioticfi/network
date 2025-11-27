@@ -1,5 +1,5 @@
 # INetwork
-[Git Source](https://github.com/symbioticfi/network/blob/6baebf59702197b6a66a690e6780ea5a5f42de5e/src/interfaces/INetwork.sol)
+[Git Source](https://github.com/symbioticfi/network/blob/f51ba2834df60d2b67fb0fb910fc642e84339cee/src/interfaces/INetwork.sol)
 
 **Inherits:**
 [ISetMaxNetworkLimitHook](/src/interfaces/ISetMaxNetworkLimitHook.sol/interface.ISetMaxNetworkLimitHook.md)

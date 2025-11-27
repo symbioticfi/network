@@ -1,347 +1,347 @@
 [
-  {
-    "type": "function",
-    "name": "METADATA_URI_UPDATE_ROLE",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "NAME_UPDATE_ROLE",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes32",
-        "internalType": "bytes32"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "NETWORK_MIDDLEWARE_SERVICE",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "NETWORK_REGISTRY",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getMinDelay",
-    "inputs": [
-      {
-        "name": "target",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "initialize",
-    "inputs": [
-      {
-        "name": "networkInitParams",
-        "type": "tuple",
-        "internalType": "struct INetwork.NetworkInitParams",
-        "components": [
-          {
-            "name": "globalMinDelay",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "delayParams",
-            "type": "tuple[]",
-            "internalType": "struct INetwork.DelayParams[]",
-            "components": [
-              {
+    {
+        "type": "function",
+        "name": "METADATA_URI_UPDATE_ROLE",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "NAME_UPDATE_ROLE",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "bytes32",
+                "internalType": "bytes32"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "NETWORK_MIDDLEWARE_SERVICE",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "NETWORK_REGISTRY",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "address",
+                "internalType": "address"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "getMinDelay",
+        "inputs": [
+            {
                 "name": "target",
                 "type": "address",
                 "internalType": "address"
-              },
-              {
+            },
+            {
+                "name": "data",
+                "type": "bytes",
+                "internalType": "bytes"
+            }
+        ],
+        "outputs": [
+            {
+                "name": "",
+                "type": "uint256",
+                "internalType": "uint256"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "initialize",
+        "inputs": [
+            {
+                "name": "networkInitParams",
+                "type": "tuple",
+                "internalType": "struct INetwork.NetworkInitParams",
+                "components": [
+                    {
+                        "name": "globalMinDelay",
+                        "type": "uint256",
+                        "internalType": "uint256"
+                    },
+                    {
+                        "name": "delayParams",
+                        "type": "tuple[]",
+                        "internalType": "struct INetwork.DelayParams[]",
+                        "components": [
+                            {
+                                "name": "target",
+                                "type": "address",
+                                "internalType": "address"
+                            },
+                            {
+                                "name": "selector",
+                                "type": "bytes4",
+                                "internalType": "bytes4"
+                            },
+                            {
+                                "name": "delay",
+                                "type": "uint256",
+                                "internalType": "uint256"
+                            }
+                        ]
+                    },
+                    {
+                        "name": "proposers",
+                        "type": "address[]",
+                        "internalType": "address[]"
+                    },
+                    {
+                        "name": "executors",
+                        "type": "address[]",
+                        "internalType": "address[]"
+                    },
+                    {
+                        "name": "name",
+                        "type": "string",
+                        "internalType": "string"
+                    },
+                    {
+                        "name": "metadataURI",
+                        "type": "string",
+                        "internalType": "string"
+                    },
+                    {
+                        "name": "defaultAdminRoleHolder",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "nameUpdateRoleHolder",
+                        "type": "address",
+                        "internalType": "address"
+                    },
+                    {
+                        "name": "metadataURIUpdateRoleHolder",
+                        "type": "address",
+                        "internalType": "address"
+                    }
+                ]
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "metadataURI",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "string",
+                "internalType": "string"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "name",
+        "inputs": [],
+        "outputs": [
+            {
+                "name": "",
+                "type": "string",
+                "internalType": "string"
+            }
+        ],
+        "stateMutability": "view"
+    },
+    {
+        "type": "function",
+        "name": "setMaxNetworkLimit",
+        "inputs": [
+            {
+                "name": "delegator",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
+                "name": "subnetworkId",
+                "type": "uint96",
+                "internalType": "uint96"
+            },
+            {
+                "name": "maxNetworkLimit",
+                "type": "uint256",
+                "internalType": "uint256"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "updateDelay",
+        "inputs": [
+            {
+                "name": "target",
+                "type": "address",
+                "internalType": "address"
+            },
+            {
                 "name": "selector",
                 "type": "bytes4",
                 "internalType": "bytes4"
-              },
-              {
-                "name": "delay",
+            },
+            {
+                "name": "enabled",
+                "type": "bool",
+                "internalType": "bool"
+            },
+            {
+                "name": "newDelay",
                 "type": "uint256",
                 "internalType": "uint256"
-              }
-            ]
-          },
-          {
-            "name": "proposers",
-            "type": "address[]",
-            "internalType": "address[]"
-          },
-          {
-            "name": "executors",
-            "type": "address[]",
-            "internalType": "address[]"
-          },
-          {
-            "name": "name",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "metadataURI",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "defaultAdminRoleHolder",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "nameUpdateRoleHolder",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "metadataURIUpdateRoleHolder",
-            "type": "address",
-            "internalType": "address"
-          }
-        ]
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "metadataURI",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "name",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "setMaxNetworkLimit",
-    "inputs": [
-      {
-        "name": "delegator",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "subnetworkId",
-        "type": "uint96",
-        "internalType": "uint96"
-      },
-      {
-        "name": "maxNetworkLimit",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "updateDelay",
-    "inputs": [
-      {
-        "name": "target",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "selector",
-        "type": "bytes4",
-        "internalType": "bytes4"
-      },
-      {
-        "name": "enabled",
-        "type": "bool",
-        "internalType": "bool"
-      },
-      {
-        "name": "newDelay",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "updateMetadataURI",
-    "inputs": [
-      {
-        "name": "metadataURI",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "updateName",
-    "inputs": [
-      {
-        "name": "name",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "event",
-    "name": "MetadataURISet",
-    "inputs": [
-      {
-        "name": "metadataURI",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "MinDelayChange",
-    "inputs": [
-      {
-        "name": "target",
-        "type": "address",
-        "indexed": true,
-        "internalType": "address"
-      },
-      {
-        "name": "selector",
-        "type": "bytes4",
-        "indexed": true,
-        "internalType": "bytes4"
-      },
-      {
-        "name": "oldEnabledStatus",
-        "type": "bool",
-        "indexed": false,
-        "internalType": "bool"
-      },
-      {
-        "name": "oldDelay",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "newEnabledStatus",
-        "type": "bool",
-        "indexed": false,
-        "internalType": "bool"
-      },
-      {
-        "name": "newDelay",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "NameSet",
-    "inputs": [
-      {
-        "name": "name",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "InvalidDataLength",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidNewDelay",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "InvalidTargetAndSelector",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "NotMiddleware",
-    "inputs": []
-  }
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "updateMetadataURI",
+        "inputs": [
+            {
+                "name": "metadataURI",
+                "type": "string",
+                "internalType": "string"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "function",
+        "name": "updateName",
+        "inputs": [
+            {
+                "name": "name",
+                "type": "string",
+                "internalType": "string"
+            }
+        ],
+        "outputs": [],
+        "stateMutability": "nonpayable"
+    },
+    {
+        "type": "event",
+        "name": "MetadataURISet",
+        "inputs": [
+            {
+                "name": "metadataURI",
+                "type": "string",
+                "indexed": false,
+                "internalType": "string"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "MinDelayChange",
+        "inputs": [
+            {
+                "name": "target",
+                "type": "address",
+                "indexed": true,
+                "internalType": "address"
+            },
+            {
+                "name": "selector",
+                "type": "bytes4",
+                "indexed": true,
+                "internalType": "bytes4"
+            },
+            {
+                "name": "oldEnabledStatus",
+                "type": "bool",
+                "indexed": false,
+                "internalType": "bool"
+            },
+            {
+                "name": "oldDelay",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            },
+            {
+                "name": "newEnabledStatus",
+                "type": "bool",
+                "indexed": false,
+                "internalType": "bool"
+            },
+            {
+                "name": "newDelay",
+                "type": "uint256",
+                "indexed": false,
+                "internalType": "uint256"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "event",
+        "name": "NameSet",
+        "inputs": [
+            {
+                "name": "name",
+                "type": "string",
+                "indexed": false,
+                "internalType": "string"
+            }
+        ],
+        "anonymous": false
+    },
+    {
+        "type": "error",
+        "name": "InvalidDataLength",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidNewDelay",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "InvalidTargetAndSelector",
+        "inputs": []
+    },
+    {
+        "type": "error",
+        "name": "NotMiddleware",
+        "inputs": []
+    }
 ]
