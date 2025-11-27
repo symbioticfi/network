@@ -1,0 +1,10 @@
+[package]
+name = "symbiotic-network-contracts"
+version = "1.0.0-rc.2"
+edition = "2021"
+description = "Alloy bindings for Symbiotic Network contracts"
+license = "MIT"
+
+[dependencies]
+alloy = { version = "1.0", features = ["sol-types", "contract"] }
+serde = { version = "1.0", features = ["derive"] }
