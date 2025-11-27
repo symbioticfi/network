@@ -1,0 +1,25 @@
+[
+  {
+    "type": "function",
+    "name": "setMaxNetworkLimit",
+    "inputs": [
+      {
+        "name": "delegator",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "subnetworkId",
+        "type": "uint96",
+        "internalType": "uint96"
+      },
+      {
+        "name": "maxNetworkLimit",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  }
+]

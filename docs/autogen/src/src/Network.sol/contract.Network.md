@@ -1,5 +1,5 @@
 # Network
-[Git Source](https://github.com/symbioticfi/network/blob/14b8650824e7d445b4229f8c24a9f9dee50cdeca/src/Network.sol)
+[Git Source](https://github.com/symbioticfi/network/blob/6baebf59702197b6a66a690e6780ea5a5f42de5e/src/Network.sol)
 
 **Inherits:**
 TimelockControllerUpgradeable, [INetwork](/src/interfaces/INetwork.sol/interface.INetwork.md)

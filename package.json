@@ -10,7 +10,9 @@
         "examples/**/*",
         "src/**/*",
         "script/**/*",
-        "test/mocks/**/*"
+        "test/mocks/**/*",
+        "abis/**/*",
+        "bindings/ts-viem/**/*"
     ],
     "repository": {
         "type": "git",
@@ -53,6 +55,6 @@
         "vite": "^5.4.2"
     },
     "engines": {
-        "node": ">=18"
+        "node": ">=20"
     }
 }
