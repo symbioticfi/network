@@ -193,8 +193,8 @@ We provide "update delay" scripts for actions mentioned above, and also some add
 - [SetResolverUpdateDelay](./script/update-delay/SetResolverUpdateDelay.s.sol)
 - [SetMiddlewareUpdateDelay](./script/update-delay/SetMiddlewareUpdateDelay.s.sol)
 - [UpgradeProxyUpdateDelay](./script/update-delay/UpgradeProxyUpdateDelay.s.sol)
-- [HotActionsUpdateDelay](./script/update-delay/HotActionsUpdateDelay.s.sol) - update a delay for [SetMiddlewareUpdateDelay](./script/update-delay/SetMiddlewareUpdateDelay.s.sol) and [SetResolverUpdateDelay](./script/update-delay/SetResolverUpdateDelay.s.sol)
-- [ColdActionsUpdateDelay](./script/update-delay/ColdActionsUpdateDelay.s.sol) - update a delay for [SetMaxNetworkLimitUpdateDelay](./script/update-delay/SetMaxNetworkLimitUpdateDelay.s.sol) and [UpgradeProxyUpdateDelay](./script/update-delay/UpgradeProxyUpdateDelay.s.sol)
+- [HotActionsUpdateDelay](./script/update-delay/HotActionsUpdateDelay.s.sol) - update a delay for [SetMaxNetworkLimitUpdateDelay](./script/update-delay/SetMaxNetworkLimitUpdateDelay.s.sol) and [SetResolverUpdateDelay](./script/update-delay/SetResolverUpdateDelay.s.sol)
+- [ColdActionsUpdateDelay](./script/update-delay/ColdActionsUpdateDelay.s.sol) - update a delay for [SetMiddlewareUpdateDelay](./script/update-delay/SetMiddlewareUpdateDelay.s.sol) and [UpgradeProxyUpdateDelay](./script/update-delay/UpgradeProxyUpdateDelay.s.sol) 
 - [DefaultUpdateDelay](./script/update-delay/DefaultUpdateDelay.s.sol) - update a delay for unconstrained actions
 - [ArbitraryUpdateDelay](./script/update-delay/ArbitraryCallUpdateDelay.s.sol) - update a delay for an arbitrary call:
   - set a delay for the exact target address and the exact selector
